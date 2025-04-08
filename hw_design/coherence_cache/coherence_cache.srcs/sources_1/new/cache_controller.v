@@ -188,7 +188,7 @@ module cache_controller
     localparam  S_R_DATA  = 15;
     
     // variable to store state
-    (* fsm_encoding = "none" *) reg [3:0] state, next_state;
+    (* fsm_encoding = "none" *) reg [3:0] state;
     reg [3:0] next_state;
     
     // internal registers
