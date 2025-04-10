@@ -21,16 +21,14 @@ def testcase_1():
                 used_tags.add(tag)
                 tags_list.append(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
-        addr_hex = to_hex32(addr)
-        instructions.append(f"read\t{addr_hex}")
+        instructions.append(f"read\t{to_hex32(addr)}")
         addresses.append(addr)
     tag = random.choice(tags_list)
-    offset = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
     addr = (tag << 10) | (fixed_set << 6) | offset
-    addr_hex = to_hex32(addr)
-    instructions.append(f"read\t{addr_hex}")
+    instructions.append(f"read\t{to_hex32(addr)}")
     addresses.append(addr)
     with open(path_0, "w") as f:
         for line in instructions: f.write(line + "\n")
@@ -59,10 +57,9 @@ def testcase_2():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
-        addr_hex = to_hex32(addr)
-        instructions.append(f"read\t{addr_hex}")
+        instructions.append(f"read\t{to_hex32(addr)}")
         addresses.append(addr)
     with open(path_0, "w") as f:
         for line in instructions: f.write(line + "\n")
@@ -91,10 +88,9 @@ def testcase_3():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
-        addr_hex = to_hex32(addr)
-        instructions.append(f"read\t{addr_hex}")
+        instructions.append(f"read\t{to_hex32(addr)}")
         addresses.append(addr)
     with open(path_0, "w") as f:
         for line in instructions: f.write(line + "\n")
@@ -123,7 +119,7 @@ def testcase_4():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         data = to_hex32(random.getrandbits(32))
@@ -134,7 +130,7 @@ def testcase_4():
         if tag not in used_tags:
             used_tags.add(tag)
             break
-    offset = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
     addr = (tag << 10) | (fixed_set << 6) | offset
     addr_hex = to_hex32(addr)
     instructions.append(f"read\t{addr_hex}")
@@ -166,13 +162,13 @@ def testcase_5():
                 used_tags.add(tag)
                 tags_list.append(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
         addresses.append(addr)
     tag = random.choice(tags_list)
-    offset = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
     addr = (tag << 10) | (fixed_set << 6) | offset
     addr_hex = to_hex32(addr)
     data = to_hex32(random.getrandbits(32))
@@ -205,7 +201,7 @@ def testcase_6():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
@@ -215,7 +211,7 @@ def testcase_6():
         if tag not in used_tags:
             used_tags.add(tag)
             break
-    offset = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
     addr = (tag << 10) | (fixed_set << 6) | offset
     addr_hex = to_hex32(addr)
     data = to_hex32(random.getrandbits(32))
@@ -248,7 +244,7 @@ def testcase_7():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
@@ -258,7 +254,7 @@ def testcase_7():
         if tag not in used_tags:
             used_tags.add(tag)
             break
-    offset = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
     addr = (tag << 10) | (fixed_set << 6) | offset
     addr_hex = to_hex32(addr)
     data = to_hex32(random.getrandbits(32))
@@ -291,7 +287,7 @@ def testcase_8():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         data = to_hex32(random.getrandbits(32))
@@ -327,18 +323,18 @@ def testcase_9():
                 used_tags.add(tag)
                 tags_list.append(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
         addresses.append(addr)
     tag = random.choice(tags_list)
-    offset1 = random.randint(0, 0x3F)
+    offset1 = random.choice(range(0, 64, 4))
     addr1 = (tag << 10) | (fixed_set << 6) | offset1
     addr_hex1 = to_hex32(addr1)
     instructions.append(f"read\t{addr_hex1}")
     addresses.append(addr1)
-    offset2 = random.randint(0, 0x3F)
+    offset2 = random.choice(range(0, 64, 4))
     addr2 = (tag << 10) | (fixed_set << 6) | offset2
     addr_hex2 = to_hex32(addr2)
     data = to_hex32(random.getrandbits(32))
@@ -373,12 +369,12 @@ def testcase_10():
                 used_tags.add(tag)
                 break
         last_tag = tag
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
         addresses.append(addr)
-    offset = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
     addr = (last_tag << 10) | (fixed_set << 6) | offset
     addr_hex = to_hex32(addr)
     data = to_hex32(random.getrandbits(32))
@@ -413,12 +409,12 @@ def testcase_11():
                 used_tags.add(tag)
                 break
         last_tag = tag
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
         addresses.append(addr)
-    offset = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
     addr = (last_tag << 10) | (fixed_set << 6) | offset
     addr_hex = to_hex32(addr)
     data = to_hex32(random.getrandbits(32))
@@ -451,7 +447,7 @@ def testcase_12():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         data = to_hex32(random.getrandbits(32))
@@ -462,12 +458,12 @@ def testcase_12():
         if tag not in used_tags:
             used_tags.add(tag)
             break
-    offset1 = random.randint(0, 0x3F)
+    offset1 = random.choice(range(0, 64, 4))
     addr1 = (tag << 10) | (fixed_set << 6) | offset1
     addr_hex1 = to_hex32(addr1)
     instructions.append(f"read\t{addr_hex1}")
     addresses.append(addr1)
-    offset2 = random.randint(0, 0x3F)
+    offset2 = random.choice(range(0, 64, 4))
     addr2 = (tag << 10) | (fixed_set << 6) | offset2
     addr_hex2 = to_hex32(addr2)
     data2 = to_hex32(random.getrandbits(32))
@@ -503,19 +499,19 @@ def testcase_13():
                 used_tags.add(tag)
                 tags_list.append(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
         addresses.append(addr)
     tag = random.choice(tags_list)
-    offset_w = random.randint(0, 0x3F)
+    offset_w = random.choice(range(0, 64, 4))
     addr_w = (tag << 10) | (fixed_set << 6) | offset_w
     addr_hex_w = to_hex32(addr_w)
     data_w = to_hex32(random.getrandbits(32))
     instructions.append(f"write\t{addr_hex_w}\t{data_w}")
     addresses.append(addr_w)
-    offset_r = random.randint(0, 0x3F)
+    offset_r = random.choice(range(0, 64, 4))
     addr_r = (tag << 10) | (fixed_set << 6) | offset_r
     addr_hex_r = to_hex32(addr_r)
     instructions.append(f"read\t{addr_hex_r}")
@@ -547,7 +543,7 @@ def testcase_14():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
@@ -557,13 +553,13 @@ def testcase_14():
         if tag not in used_tags:
             used_tags.add(tag)
             break
-    offset_w = random.randint(0, 0x3F)
+    offset_w = random.choice(range(0, 64, 4))
     addr_w = (tag << 10) | (fixed_set << 6) | offset_w
     addr_hex_w = to_hex32(addr_w)
     data_w = to_hex32(random.getrandbits(32))
     instructions.append(f"write\t{addr_hex_w}\t{data_w}")
     addresses.append(addr_w)
-    offset_r = random.randint(0, 0x3F)
+    offset_r = random.choice(range(0, 64, 4))
     addr_r = (tag << 10) | (fixed_set << 6) | offset_r
     addr_hex_r = to_hex32(addr_r)
     instructions.append(f"read\t{addr_hex_r}")
@@ -595,7 +591,7 @@ def testcase_15():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         instructions.append(f"read\t{addr_hex}")
@@ -605,13 +601,13 @@ def testcase_15():
         if tag not in used_tags:
             used_tags.add(tag)
             break
-    offset_w = random.randint(0, 0x3F)
+    offset_w = random.choice(range(0, 64, 4))
     addr_w = (tag << 10) | (fixed_set << 6) | offset_w
     addr_hex_w = to_hex32(addr_w)
     data_w = to_hex32(random.getrandbits(32))
     instructions.append(f"write\t{addr_hex_w}\t{data_w}")
     addresses.append(addr_w)
-    offset_r = random.randint(0, 0x3F)
+    offset_r = random.choice(range(0, 64, 4))
     addr_r = (tag << 10) | (fixed_set << 6) | offset_r
     addr_hex_r = to_hex32(addr_r)
     instructions.append(f"read\t{addr_hex_r}")
@@ -643,14 +639,14 @@ def testcase_16():
             if tag not in used_tags:
                 used_tags.add(tag)
                 break
-        offset = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
         addr = (tag << 10) | (fixed_set << 6) | offset
         addr_hex = to_hex32(addr)
         data = to_hex32(random.getrandbits(32))
         instructions.append(f"write\t{addr_hex}\t{data}")
         addresses.append(addr)
     last_tag = tag  # tag của lệnh write cuối cùng
-    offset_r = random.randint(0, 0x3F)
+    offset_r = random.choice(range(0, 64, 4))
     addr_r = (last_tag << 10) | (fixed_set << 6) | offset_r
     addr_hex_r = to_hex32(addr_r)
     instructions.append(f"read\t{addr_hex_r}")
