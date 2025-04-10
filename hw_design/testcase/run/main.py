@@ -202,8 +202,10 @@ def copy_axi_coherence_testcases(testcase_id):
 
 def run_testcase(run_testbench_file, testcase_id):
     print(f"Start running testcase_{testcase_id}!")
-    # Create the command to run the Tcl script in Vivado
-    tcl_script_path = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}/{run_testbench_file}.tcl")
+
+    project_dir = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}")
+    tcl_script_path = os.path.join(project_dir, f"{run_testbench_file}.tcl")
+    log_file_path = os.path.join(project_dir, "run.log")
 
     # Ensure the Tcl script file exists
     if not os.path.isfile(tcl_script_path):
@@ -211,20 +213,29 @@ def run_testcase(run_testbench_file, testcase_id):
         exit(1)
 
     vivado_command = [vivado_path, "-mode", "batch", "-source", tcl_script_path, "-nojournal", "-nolog"]
-    # Run the command and capture the output
-    result = subprocess.run(vivado_command, capture_output=True, text=True)
 
-    # Print the output and error (if any)
-    print(result.stdout)
-    if result.stderr:
-        print("Error:", result.stderr)
-    else:
+    # Run the command and write both stdout and stderr to run.log
+    with open(log_file_path, "w") as log_file:
+        result = subprocess.run(vivado_command, stdout=log_file, stderr=subprocess.STDOUT, cwd=project_dir)
+
+    if result.returncode == 0:
         print(f"Finish running testcase_{testcase_id}!")
+    else:
+        print(f"[Error] Testcase_{testcase_id} failed. Check log at: {log_file_path}")
 
 
-def copy_actual_result(testcase_id):
+def copy_actual_result(testcase_id, behavioral0_post_synthesis_timming1):
     src_result_path = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}/coherence_cache.srcs/sim_1/new/")
     dst_result_path = os.path.join(current_dir, f"subsystem_actual_result/testcase_{testcase_id}")
+    src_log_path = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}")
+
+    if behavioral0_post_synthesis_timming1 == 0:
+        dst_log_path = os.path.join(current_dir, f"subsystem_logs")
+    elif behavioral0_post_synthesis_timming1 == 1:
+        dst_log_path = os.path.join(current_dir, f"subsystem_timing_logs")
+    else:
+        print("Unsupported option!")
+        exit(1)
 
     os.makedirs(dst_result_path, exist_ok=True)
 
@@ -243,6 +254,8 @@ def copy_actual_result(testcase_id):
 
     src_main_memory_result = os.path.join(src_result_path, "main_memory_result.mem")
 
+    src_log_file = os.path.join(src_log_path, "run.log")
+
     # destination
     dst_state_tag_A_result = os.path.join(dst_result_path, "state_tag_A.mem")
     dst_state_tag_B_result = os.path.join(dst_result_path, "state_tag_B.mem")
@@ -258,6 +271,8 @@ def copy_actual_result(testcase_id):
 
     dst_main_memory_result = os.path.join(dst_result_path, "main_memory_result.mem")
 
+    dst_log_file = os.path.join(dst_log_path, f"run_{testcase_id}.log")
+
     # copy result to actual_result folder
     shutil.copyfile(src_state_tag_A_result, dst_state_tag_A_result)
     shutil.copyfile(src_state_tag_B_result, dst_state_tag_B_result)
@@ -272,11 +287,15 @@ def copy_actual_result(testcase_id):
     shutil.copyfile(src_read_data_B_result, dst_read_data_B_result)
 
     shutil.copyfile(src_main_memory_result, dst_main_memory_result)
+
+    shutil.copyfile(src_log_file, dst_log_file)
     print(f"Result of testcase_{testcase_id} has been saved!")
 
 def copy_cache_actual_result(testcase_id):
     src_result_path = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}/coherence_cache.srcs/sim_1/new/")
     dst_result_path = os.path.join(current_dir, f"cache_actual_result/testcase_{testcase_id}")
+    src_log_path = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}")
+    dst_log_path = os.path.join(current_dir, f"cache_logs")
 
     os.makedirs(dst_result_path, exist_ok=True)
 
@@ -286,6 +305,7 @@ def copy_cache_actual_result(testcase_id):
     src_data_ram_A_result = os.path.join(src_result_path, "data_ram_A.mem")
     src_read_data_A_result = os.path.join(src_result_path, "read_data_A.mem")
     src_main_memory_result = os.path.join(src_result_path, "main_memory_result.mem")
+    src_log_file = os.path.join(src_log_path, "run.log")
 
     # destination
     dst_state_tag_A_result = os.path.join(dst_result_path, "state_tag_A.mem")
@@ -293,6 +313,7 @@ def copy_cache_actual_result(testcase_id):
     dst_data_ram_A_result = os.path.join(dst_result_path, "data_ram_A.mem")
     dst_read_data_A_result = os.path.join(dst_result_path, "read_data_A.mem")
     dst_main_memory_result = os.path.join(dst_result_path, "main_memory_result.mem")
+    dst_log_file = os.path.join(dst_log_path, f"run_{testcase_id}.log")
 
     # copy result to actual_result folder
     shutil.copyfile(src_state_tag_A_result, dst_state_tag_A_result)
@@ -300,37 +321,49 @@ def copy_cache_actual_result(testcase_id):
     shutil.copyfile(src_data_ram_A_result, dst_data_ram_A_result)
     shutil.copyfile(src_read_data_A_result, dst_read_data_A_result)
     shutil.copyfile(src_main_memory_result, dst_main_memory_result)
+    shutil.copyfile(src_log_file, dst_log_file)
     print(f"Result of testcase_{testcase_id} has been saved!")
 
 
 def copy_axi_coherence_actual_result(testcase_id):
     src_result_path = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}/coherence_cache.srcs/sim_1/new/")
     dst_result_path = os.path.join(current_dir, f"axi_coherence_actual_result/testcase_{testcase_id}")
+    src_log_path = os.path.join(current_dir, f"copied_vivado_project/copied_vivado_project_{testcase_id}")
+    dst_log_path = os.path.join(current_dir, f"axi_coherence_logs")
 
     os.makedirs(dst_result_path, exist_ok=True)
 
     # source
     src_read_data_A_result = os.path.join(src_result_path, "read_data_A.mem")
     src_read_data_B_result = os.path.join(src_result_path, "read_data_B.mem")
-
     src_main_memory_result = os.path.join(src_result_path, "main_memory_result.mem")
+    src_log_file = os.path.join(src_log_path, "run.log")
 
     # destination
     dst_read_data_A_result = os.path.join(dst_result_path, "read_data_A.mem")
     dst_read_data_B_result = os.path.join(dst_result_path, "read_data_B.mem")
-
     dst_main_memory_result = os.path.join(dst_result_path, "main_memory_result.mem")
+    dst_log_file = os.path.join(dst_log_path, f"run_{testcase_id}.log")
 
     # copy result to actual_result folder
     shutil.copyfile(src_read_data_A_result, dst_read_data_A_result)
     shutil.copyfile(src_read_data_B_result, dst_read_data_B_result)
 
     shutil.copyfile(src_main_memory_result, dst_main_memory_result)
+    shutil.copyfile(src_log_file, dst_log_file)
     print(f"Result of testcase_{testcase_id} has been saved!")
 
 
-def run_subsystem():
+def run_subsystem(behavioral0_post_synthesis_timming1):
     testcase = int(input(f"Which testcase do you want to run? \n 0    : runall\n 1-{number_of_testcase}: testcase 1 - testcase {number_of_testcase} \n Your choice: "))
+    if behavioral0_post_synthesis_timming1 == 0:
+        tcl_file_name = "subsystem_run_testbench"
+    elif behavioral0_post_synthesis_timming1 == 1:
+        tcl_file_name = "subsystem_run_testbench_timing"
+    else:
+        print("Unsupported option!")
+        exit(1)
+
 
     if testcase == 0:
         for i in range(1, number_of_testcase + 1):
@@ -340,22 +373,22 @@ def run_subsystem():
         for i in range(1, number_of_testcase + 1):
             copy_vivado_projects(i)
         for i in range(1, number_of_testcase + 1):
-            update_tcl_scripts("subsystem_run_testbench", i)
+            update_tcl_scripts(tcl_file_name, i)
             # copy_vivado_bat(i)
         for i in range(1, number_of_testcase + 1):
             copy_testcases(i)
 
         # create input for running in parallel
-        tcl_list = ["subsystem_run_testbench"] * number_of_testcase
+        tcl_list = [tcl_file_name] * number_of_testcase
         # Generate test case IDs from 1 to 119 (as integers)
         testcase_ids = list(range(1, number_of_testcase + 1))  # Creates [1, 2, ..., 115]
 
         # Run test cases in parallel using 4 worker processes
-        with concurrent.futures.ProcessPoolExecutor(max_workers=6) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
             executor.map(run_testcase, tcl_list, testcase_ids)
 
         for i in range(1, number_of_testcase + 1):
-            copy_actual_result(i)
+            copy_actual_result(i, behavioral0_post_synthesis_timming1)
 
         for i in range(1, number_of_testcase + 1):
             delete_copied_vivado_projects(i)
@@ -364,11 +397,11 @@ def run_subsystem():
         delete_copied_vivado_projects(testcase)
         delete_previous_actual_result("subsystem_actual_result", testcase)
         copy_vivado_projects(testcase)
-        update_tcl_scripts("subsystem_run_testbench", testcase)
+        update_tcl_scripts(tcl_file_name, testcase)
         # copy_vivado_bat(testcase)
         copy_testcases(testcase)
-        run_testcase("subsystem_run_testbench", testcase)
-        copy_actual_result(testcase)
+        run_testcase(tcl_file_name, testcase)
+        copy_actual_result(testcase, behavioral0_post_synthesis_timming1)
         delete_copied_vivado_projects(testcase)
 
 def run_cache():
@@ -393,7 +426,7 @@ def run_cache():
         testcase_ids = list(range(1, cache_number_of_testcase + 1))  # Creates [1, 2, ..., 115]
 
         # Run test cases in parallel using 4 worker processes
-        with concurrent.futures.ProcessPoolExecutor(max_workers=6) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
             executor.map(run_testcase, tcl_list, testcase_ids)
 
         for i in range(1, cache_number_of_testcase + 1):
@@ -436,7 +469,7 @@ def run_axi_coherence():
         testcase_ids = list(range(1, axi_coherence_number_of_testcase + 1))  # Creates [1, 2, ..., 115]
 
         # Run test cases in parallel using 4 worker processes
-        with concurrent.futures.ProcessPoolExecutor(max_workers=6) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
             executor.map(run_testcase, tcl_list, testcase_ids)
 
         for i in range(1, axi_coherence_number_of_testcase + 1):
@@ -458,11 +491,13 @@ def run_axi_coherence():
 
 
 if __name__ == "__main__":
-    while (testbench_id := int(input("Which component do you want to run simulation?\n1. Cache\n2. AXI + Coherence\n3. Subsystem\nEnter your choice: "))) not in [1, 2, 3]:
+    while (testbench_id := int(input("Which component do you want to run simulation?\n1. Run Behavioral Cache\n2. Run Behavioral AXI + Coherence\n3. Run Behavioral Subsystem\n4. Run Post-Synthesis Timming Subsystem\nEnter your choice: "))) not in [1, 2, 3, 4]:
         print("Your choice is unsupported!")
     if testbench_id == 1:
         run_cache()
     elif testbench_id == 2:
         run_axi_coherence()
     elif testbench_id == 3:
-        run_subsystem()
+        run_subsystem(0)
+    elif testbench_id == 4:
+        run_subsystem(1)
