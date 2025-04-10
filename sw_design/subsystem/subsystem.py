@@ -243,7 +243,7 @@ def run_subsystem():
         testcase_ids = list(range(1, number_of_testcase + 1))  # Creates [1, 2, ..., 115]
 
         # Run test cases in parallel using 4 worker processes
-        with concurrent.futures.ProcessPoolExecutor(max_workers=6) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
             executor.map(run_subsystem_testcase, testcase_ids)
 
     elif testcase >= 1 and testcase <= number_of_testcase:
