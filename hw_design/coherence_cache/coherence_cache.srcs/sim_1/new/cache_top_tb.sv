@@ -104,65 +104,66 @@ module cache_top_tb
     )
     cpuA
     (
-        // system signals
-        .ACLK       (m_if.ACLK   ),
-        .ARESETn    (m_if.ARESETn),
+//        // system signals
+//        .ACLK       (m_if.ACLK   ),
+//        .ARESETn    (m_if.ARESETn),
         
-        // AW Channel
-        .AWID       (m_if.m0_AWID    ),
-        .AWADDR     (m_if.m0_AWADDR  ),
-        .AWLEN      (m_if.m0_AWLEN   ),
-        .AWSIZE     (m_if.m0_AWSIZE  ),
-        .AWBURST    (m_if.m0_AWBURST ),
-        .AWLOCK     (m_if.m0_AWLOCK  ),
-        .AWCACHE    (m_if.m0_AWCACHE ),
-        .AWPROT     (m_if.m0_AWPROT  ),
-        .AWQOS      (m_if.m0_AWQOS   ),
-        .AWREGION   (m_if.m0_AWREGION),
-        .AWUSER     (m_if.m0_AWUSER  ),
-        .AWDOMAIN   (m_if.m0_AWDOMAIN),
-        .AWVALID    (m_if.m0_AWVALID ),
-        .AWREADY    (m_if.m0_AWREADY ),
+//        // AW Channel
+//        .AWID       (m_if.m0_AWID    ),
+//        .AWADDR     (m_if.m0_AWADDR  ),
+//        .AWLEN      (m_if.m0_AWLEN   ),
+//        .AWSIZE     (m_if.m0_AWSIZE  ),
+//        .AWBURST    (m_if.m0_AWBURST ),
+//        .AWLOCK     (m_if.m0_AWLOCK  ),
+//        .AWCACHE    (m_if.m0_AWCACHE ),
+//        .AWPROT     (m_if.m0_AWPROT  ),
+//        .AWQOS      (m_if.m0_AWQOS   ),
+//        .AWREGION   (m_if.m0_AWREGION),
+//        .AWUSER     (m_if.m0_AWUSER  ),
+//        .AWDOMAIN   (m_if.m0_AWDOMAIN),
+//        .AWVALID    (m_if.m0_AWVALID ),
+//        .AWREADY    (m_if.m0_AWREADY ),
         
-        // W Channel
-        .WDATA      (m_if.m0_WDATA ),
-        .WSTRB      (m_if.m0_WSTRB ), // use default value: 0xF
-        .WLAST      (m_if.m0_WLAST ),
-        .WUSER      (m_if.m0_WUSER ),
-        .WVALID     (m_if.m0_WVALID),
-        .WREADY     (m_if.m0_WREADY),
+//        // W Channel
+//        .WDATA      (m_if.m0_WDATA ),
+//        .WSTRB      (m_if.m0_WSTRB ), // use default value: 0xF
+//        .WLAST      (m_if.m0_WLAST ),
+//        .WUSER      (m_if.m0_WUSER ),
+//        .WVALID     (m_if.m0_WVALID),
+//        .WREADY     (m_if.m0_WREADY),
         
-        // B Channel
-        .BID        (m_if.m0_BID   ),
-        .BRESP      (m_if.m0_BRESP ),
-        .BUSER      (m_if.m0_BUSER ),
-        .BVALID     (m_if.m0_BVALID),
-        .BREADY     (m_if.m0_BREADY),
+//        // B Channel
+//        .BID        (m_if.m0_BID   ),
+//        .BRESP      (m_if.m0_BRESP ),
+//        .BUSER      (m_if.m0_BUSER ),
+//        .BVALID     (m_if.m0_BVALID),
+//        .BREADY     (m_if.m0_BREADY),
         
-        // AR Channel
-        .ARID       (m_if.m0_ARID    ),
-        .ARADDR     (m_if.m0_ARADDR  ),
-        .ARLEN      (m_if.m0_ARLEN   ),
-        .ARSIZE     (m_if.m0_ARSIZE  ),
-        .ARBURST    (m_if.m0_ARBURST ),
-        .ARLOCK     (m_if.m0_ARLOCK  ),
-        .ARCACHE    (m_if.m0_ARCACHE ),
-        .ARPROT     (m_if.m0_ARPROT  ),
-        .ARQOS      (m_if.m0_ARQOS   ),
-        .ARREGION   (m_if.m0_ARREGION),
-        .ARUSER     (m_if.m0_ARUSER  ),
-        .ARDOMAIN   (m_if.m0_ARDOMAIN),
-        .ARVALID    (m_if.m0_ARVALID ),
-        .ARREADY    (m_if.m0_ARREADY ),
+//        // AR Channel
+//        .ARID       (m_if.m0_ARID    ),
+//        .ARADDR     (m_if.m0_ARADDR  ),
+//        .ARLEN      (m_if.m0_ARLEN   ),
+//        .ARSIZE     (m_if.m0_ARSIZE  ),
+//        .ARBURST    (m_if.m0_ARBURST ),
+//        .ARLOCK     (m_if.m0_ARLOCK  ),
+//        .ARCACHE    (m_if.m0_ARCACHE ),
+//        .ARPROT     (m_if.m0_ARPROT  ),
+//        .ARQOS      (m_if.m0_ARQOS   ),
+//        .ARREGION   (m_if.m0_ARREGION),
+//        .ARUSER     (m_if.m0_ARUSER  ),
+//        .ARDOMAIN   (m_if.m0_ARDOMAIN),
+//        .ARVALID    (m_if.m0_ARVALID ),
+//        .ARREADY    (m_if.m0_ARREADY ),
         
-        // R Channel
-        .RID        (m_if.m0_RID   ),
-        .RDATA      (m_if.m0_RDATA ),
-        .RRESP      (m_if.m0_RRESP ),
-        .RLAST      (m_if.m0_RLAST ),
-        .RUSER      (m_if.m0_RUSER ),
-        .RVALID     (m_if.m0_RVALID),
-        .RREADY     (m_if.m0_RREADY)
+//        // R Channel
+//        .RID        (m_if.m0_RID   ),
+//        .RDATA      (m_if.m0_RDATA ),
+//        .RRESP      (m_if.m0_RRESP ),
+//        .RLAST      (m_if.m0_RLAST ),
+//        .RUSER      (m_if.m0_RUSER ),
+//        .RVALID     (m_if.m0_RVALID),
+//        .RREADY     (m_if.m0_RREADY)
+        .m_if(m_if)
     );
     
     // instance single cache here
@@ -347,60 +348,61 @@ module cache_top_tb
     )
     main_memory
     (
-        // system signals
-        .ACLK       (m_if.ACLK   ),
-        .ARESETn    (m_if.ARESETn),
+//        // system signals
+//        .ACLK       (m_if.ACLK   ),
+//        .ARESETn    (m_if.ARESETn),
         
-        // AW Channel
-        .AWID       (m_if.s_AWID    ),
-        .AWADDR     (m_if.s_AWADDR  ),
-        .AWLEN      (m_if.s_AWLEN   ),
-        .AWSIZE     (m_if.s_AWSIZE  ),
-        .AWBURST    (m_if.s_AWBURST ),
-        .AWLOCK     (m_if.s_AWLOCK  ),
-        .AWCACHE    (m_if.s_AWCACHE ),
-        .AWPROT     (m_if.s_AWPROT  ),
-        .AWQOS      (m_if.s_AWQOS   ),
-        .AWREGION   (m_if.s_AWREGION),
-        .AWUSER     (m_if.s_AWUSER  ),
-        .AWVALID    (m_if.s_AWVALID ),
-        .AWREADY    (m_if.s_AWREADY ),
-        // W Channel
-        // input     [ID_WIDTH-1:0]   s_WID(),
-        .WDATA      (m_if.s_WDATA ),
-        .WSTRB      (m_if.s_WSTRB ),
-        .WLAST      (m_if.s_WLAST ),
-        .WUSER      (m_if.s_WUSER ),
-        .WVALID     (m_if.s_WVALID),
-        .WREADY     (m_if.s_WREADY),
-        // B Channel
-        .BID        (m_if.s_BID   ),
-        .BRESP      (m_if.s_BRESP ),
-        .BUSER      (m_if.s_BUSER ),
-        .BVALID     (m_if.s_BVALID),
-        .BREADY     (m_if.s_BREADY),
-        // AR Channel
-        .ARID       (m_if.s_ARID    ),    
-        .ARADDR     (m_if.s_ARADDR  ),
-        .ARLEN      (m_if.s_ARLEN   ),
-        .ARSIZE     (m_if.s_ARSIZE  ),
-        .ARBURST    (m_if.s_ARBURST ),
-        .ARLOCK     (m_if.s_ARLOCK  ),
-        .ARCACHE    (m_if.s_ARCACHE ),
-        .ARPROT     (m_if.s_ARPROT  ),
-        .ARQOS      (m_if.s_ARQOS   ),
-        .ARREGION   (m_if.s_ARREGION),
-        .ARUSER     (m_if.s_ARUSER  ),
-        .ARVALID    (m_if.s_ARVALID ),
-        .ARREADY    (m_if.s_ARREADY ),
-        // R Channel
-        .RID        (m_if.s_RID   ),
-        .RDATA      (m_if.s_RDATA ),
-        .RRESP      (m_if.s_RRESP ),
-        .RLAST      (m_if.s_RLAST ),
-        .RUSER      (m_if.s_RUSER ),
-        .RVALID     (m_if.s_RVALID), 
-        .RREADY     (m_if.s_RREADY)
+//        // AW Channel
+//        .AWID       (m_if.s_AWID    ),
+//        .AWADDR     (m_if.s_AWADDR  ),
+//        .AWLEN      (m_if.s_AWLEN   ),
+//        .AWSIZE     (m_if.s_AWSIZE  ),
+//        .AWBURST    (m_if.s_AWBURST ),
+//        .AWLOCK     (m_if.s_AWLOCK  ),
+//        .AWCACHE    (m_if.s_AWCACHE ),
+//        .AWPROT     (m_if.s_AWPROT  ),
+//        .AWQOS      (m_if.s_AWQOS   ),
+//        .AWREGION   (m_if.s_AWREGION),
+//        .AWUSER     (m_if.s_AWUSER  ),
+//        .AWVALID    (m_if.s_AWVALID ),
+//        .AWREADY    (m_if.s_AWREADY ),
+//        // W Channel
+//        // input     [ID_WIDTH-1:0]   s_WID(),
+//        .WDATA      (m_if.s_WDATA ),
+//        .WSTRB      (m_if.s_WSTRB ),
+//        .WLAST      (m_if.s_WLAST ),
+//        .WUSER      (m_if.s_WUSER ),
+//        .WVALID     (m_if.s_WVALID),
+//        .WREADY     (m_if.s_WREADY),
+//        // B Channel
+//        .BID        (m_if.s_BID   ),
+//        .BRESP      (m_if.s_BRESP ),
+//        .BUSER      (m_if.s_BUSER ),
+//        .BVALID     (m_if.s_BVALID),
+//        .BREADY     (m_if.s_BREADY),
+//        // AR Channel
+//        .ARID       (m_if.s_ARID    ),    
+//        .ARADDR     (m_if.s_ARADDR  ),
+//        .ARLEN      (m_if.s_ARLEN   ),
+//        .ARSIZE     (m_if.s_ARSIZE  ),
+//        .ARBURST    (m_if.s_ARBURST ),
+//        .ARLOCK     (m_if.s_ARLOCK  ),
+//        .ARCACHE    (m_if.s_ARCACHE ),
+//        .ARPROT     (m_if.s_ARPROT  ),
+//        .ARQOS      (m_if.s_ARQOS   ),
+//        .ARREGION   (m_if.s_ARREGION),
+//        .ARUSER     (m_if.s_ARUSER  ),
+//        .ARVALID    (m_if.s_ARVALID ),
+//        .ARREADY    (m_if.s_ARREADY ),
+//        // R Channel
+//        .RID        (m_if.s_RID   ),
+//        .RDATA      (m_if.s_RDATA ),
+//        .RRESP      (m_if.s_RRESP ),
+//        .RLAST      (m_if.s_RLAST ),
+//        .RUSER      (m_if.s_RUSER ),
+//        .RVALID     (m_if.s_RVALID), 
+//        .RREADY     (m_if.s_RREADY)
+        .m_if(m_if)
     );
 
 endmodule

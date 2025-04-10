@@ -19,60 +19,61 @@ module main_memory
     parameter DMEM_RESULT = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/main_memory_result.mem"
 )
 (
-    // system signals
-    input                       ACLK,
-    output                      ARESETn,
+//    // system signals
+//    input                       ACLK,
+//    output                      ARESETn,
     
-    // AW Channel
-    input     [ID_WIDTH-1:0]    AWID,
-    input     [ADDR_WIDTH-1:0]	AWADDR,
-    input     [7:0]             AWLEN,
-    input     [2:0]             AWSIZE,
-    input     [1:0]             AWBURST,
-    input                       AWLOCK,
-    input     [3:0]             AWCACHE,
-    input     [2:0]             AWPROT,
-    input     [3:0]             AWQOS,
-    input     [3:0]             AWREGION,
-    input     [USER_WIDTH-1:0]  AWUSER,
-    input                       AWVALID,
-    output reg 	                AWREADY,
-    // W Channel
-    // input     [ID_WIDTH-1:0]   s_WID,
-    input     [DATA_WIDTH-1:0]  WDATA,
-    input     [STRB_WIDTH-1:0]  WSTRB,
-    input                       WLAST,
-    input     [USER_WIDTH-1:0]  WUSER,
-    input                       WVALID,
-    output reg		            WREADY,
-    // B Channel
-	output reg [ID_WIDTH-1:0]	BID,
-	output reg [1:0]	        BRESP,
-	output reg [USER_WIDTH-1:0] BUSER,
-	output reg   		        BVALID,
-    input                       BREADY,
-    // AR Channel
-    input     [ID_WIDTH-1:0]    ARID,    
-    input     [ADDR_WIDTH-1:0]  ARADDR,
-    input     [7:0]             ARLEN,
-    input     [2:0]             ARSIZE,
-    input     [1:0]             ARBURST,
-    input                       ARLOCK,
-    input     [3:0]             ARCACHE,
-    input     [2:0]             ARPROT,
-    input     [3:0]             ARQOS,
-    input     [3:0]             ARREGION,
-    input     [USER_WIDTH-1:0]  ARUSER,
-    input                       ARVALID,
-	output reg		            ARREADY,
-    // R Channel
-	output reg [ID_WIDTH-1:0]   RID,
-	output reg [DATA_WIDTH-1:0] RDATA,
-	output reg [1:0]	        RRESP,
-	output reg  	            RLAST,
-	output reg [USER_WIDTH-1:0]	RUSER,
-	output reg  	            RVALID, 
-    input                       RREADY
+//    // AW Channel
+//    input     [ID_WIDTH-1:0]    AWID,
+//    input     [ADDR_WIDTH-1:0]	AWADDR,
+//    input     [7:0]             AWLEN,
+//    input     [2:0]             AWSIZE,
+//    input     [1:0]             AWBURST,
+//    input                       AWLOCK,
+//    input     [3:0]             AWCACHE,
+//    input     [2:0]             AWPROT,
+//    input     [3:0]             AWQOS,
+//    input     [3:0]             AWREGION,
+//    input     [USER_WIDTH-1:0]  AWUSER,
+//    input                       AWVALID,
+//    output reg 	                AWREADY,
+//    // W Channel
+//    // input     [ID_WIDTH-1:0]   s_WID,
+//    input     [DATA_WIDTH-1:0]  WDATA,
+//    input     [STRB_WIDTH-1:0]  WSTRB,
+//    input                       WLAST,
+//    input     [USER_WIDTH-1:0]  WUSER,
+//    input                       WVALID,
+//    output reg		            WREADY,
+//    // B Channel
+//	output reg [ID_WIDTH-1:0]	BID,
+//	output reg [1:0]	        BRESP,
+//	output reg [USER_WIDTH-1:0] BUSER,
+//	output reg   		        BVALID,
+//    input                       BREADY,
+//    // AR Channel
+//    input     [ID_WIDTH-1:0]    ARID,    
+//    input     [ADDR_WIDTH-1:0]  ARADDR,
+//    input     [7:0]             ARLEN,
+//    input     [2:0]             ARSIZE,
+//    input     [1:0]             ARBURST,
+//    input                       ARLOCK,
+//    input     [3:0]             ARCACHE,
+//    input     [2:0]             ARPROT,
+//    input     [3:0]             ARQOS,
+//    input     [3:0]             ARREGION,
+//    input     [USER_WIDTH-1:0]  ARUSER,
+//    input                       ARVALID,
+//	output reg		            ARREADY,
+//    // R Channel
+//	output reg [ID_WIDTH-1:0]   RID,
+//	output reg [DATA_WIDTH-1:0] RDATA,
+//	output reg [1:0]	        RRESP,
+//	output reg  	            RLAST,
+//	output reg [USER_WIDTH-1:0]	RUSER,
+//	output reg  	            RVALID, 
+//    input                       RREADY
+    dual_core_cache_if m_if
 );
 
     cache_block_s main_memory [$];
@@ -130,15 +131,15 @@ module main_memory
         bit [31:0] read_addr;
         bit [ID_WIDTH-1:0] ARID_reg;
         while(1) begin
-            @(posedge ACLK);
-            ARREADY <= 1;
+            @(m_if.drv_cb);
+            m_if.drv_cb.s_ARREADY <= 1;
             do begin
-                @(posedge ACLK);
-            end while (!ARVALID);
-            ARREADY <= 0;
-            $display("[%0t(ns)] Core_%0d start reading from Mem", $time, ARID);
-            read_addr = ARADDR;
-            ARID_reg  = ARID;
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.s_ARVALID);
+            m_if.drv_cb.s_ARREADY <= 0;
+            read_addr = m_if.drv_cb.s_ARADDR;
+            ARID_reg  = m_if.drv_cb.s_ARID;
+            $display("[%0t(ns)] Core_%0d start reading from Mem", $time, ARID_reg);
             // hit_block = cache_L2_read.find_first with (item.addr == read_addr);
             hit_index = -1;
             foreach(main_memory[i]) 
@@ -157,21 +158,21 @@ module main_memory
             end
             cnt = 0;
             do begin
-                if (RREADY) begin
+                if (m_if.drv_cb.s_RREADY) begin
                     // R Channel
-                    RID    <= ARID_reg;
-                    RDATA  <= hit_block.data[cnt];
-                    RRESP  <= 2'b00;
-                    RLAST  <= cnt == 15;
-                    RUSER  <= 0;
-                    RVALID <= 1;
+                    m_if.drv_cb.s_RID    <= ARID_reg;
+                    m_if.drv_cb.s_RDATA  <= hit_block.data[cnt];
+                    m_if.drv_cb.s_RRESP  <= 2'b00;
+                    m_if.drv_cb.s_RLAST  <= cnt == 15;
+                    m_if.drv_cb.s_RUSER  <= 0;
+                    m_if.drv_cb.s_RVALID <= 1;
                     cnt++;
                 end
-                @(posedge ACLK);
+                @(m_if.drv_cb);
             end while (cnt < 16);
-            RLAST  <= 0;
-            RVALID <= 0;
-            @(posedge ACLK);
+            m_if.drv_cb.s_RLAST  <= 0;
+            m_if.drv_cb.s_RVALID <= 0;
+            @(m_if.drv_cb);
             $display("[%0t(ns)] Core_%0d finish reading from Mem", $time, ARID_reg);
         end
     endtask
@@ -184,15 +185,15 @@ module main_memory
         bit [ID_WIDTH-1:0] AWID_reg;
         
         while(1) begin
-            @(posedge ACLK);
-            AWREADY <= 1;
+            @(m_if.drv_cb);
+            m_if.drv_cb.s_AWREADY <= 1;
             do begin
-                @(posedge ACLK);
-            end while (!AWVALID);
-            AWREADY <= 0;
-            $display("[%0t(ns)] Core_%0d start write to Mem", $time, AWID);
-            write_addr = AWADDR;
-            AWID_reg   = AWID;
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.s_AWVALID);
+            m_if.drv_cb.s_AWREADY <= 0;
+            write_addr = m_if.drv_cb.s_AWADDR;
+            AWID_reg   = m_if.drv_cb.s_AWID;
+            $display("[%0t(ns)] Core_%0d start writing to Mem", $time, AWID_reg);
             // hit_index = main_memory.find_first_index(x) with (x.addr == write_addr);
             hit_index = -1;
             foreach(main_memory[i]) 
@@ -200,35 +201,36 @@ module main_memory
                     hit_index = i;
                     break;
                 end
-            WREADY <= 1;
+            m_if.drv_cb.s_WREADY <= 1;
             cnt = 0;
             do begin
-                if (WVALID) begin
+                if (m_if.drv_cb.s_WVALID) begin
                     if (hit_index != -1) begin
-                        main_memory[hit_index].data[cnt] = WDATA;
+                        main_memory[hit_index].data[cnt] = m_if.drv_cb.s_WDATA;
                     end
                     else begin
                         hit_block.addr      = write_addr;
-                        hit_block.data[cnt] = WDATA;
+                        hit_block.data[cnt] = m_if.drv_cb.s_WDATA;
                     end
                     cnt++;
                 end
-                @(posedge ACLK);
+                @(m_if.drv_cb);
             end while (cnt < 16);
-            WREADY <= 0;
+            m_if.drv_cb.s_WREADY <= 0;
             if (hit_index == -1) begin
                 main_memory.push_back(hit_block);
             end
             // B Channel
-            BID    <= AWID_reg;
-            BRESP  <= 2'b00;
-            BUSER  <= 0;
-            BVALID <= 1;
+            m_if.drv_cb.s_BID    <= AWID_reg;
+            m_if.drv_cb.s_BRESP  <= 2'b00;
+            m_if.drv_cb.s_BUSER  <= 0;
+            m_if.drv_cb.s_BVALID <= 1;
             do begin
-                @(posedge ACLK);
-            end while (!BREADY);
-            BVALID <= 0;
-            @(posedge ACLK);
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.s_BREADY);
+            m_if.drv_cb.s_BVALID <= 0;
+            @(m_if.drv_cb);
+            $display("[%0t(ns)] Core_%0d finish writing to Mem", $time, AWID_reg);
         end
     endtask
     

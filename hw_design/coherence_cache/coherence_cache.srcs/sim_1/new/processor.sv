@@ -23,65 +23,66 @@ module processor
     parameter READ_DATA = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/read_data_A.mem"
 )
 (
-    // system signals
-    input                        ACLK,
-    input                        ARESETn,
+//    // system signals
+//    input                        ACLK,
+//    input                        ARESETn,
     
-    // AW Channel
-    output reg [ID_WIDTH-1:0]    AWID,
-    output reg [ADDR_WIDTH-1:0]  AWADDR,
-    output reg [7:0]             AWLEN,
-    output reg [2:0]             AWSIZE,
-    output reg [1:0]             AWBURST,
-    output reg                   AWLOCK,
-    output reg [3:0]             AWCACHE,
-    output reg [2:0]             AWPROT,
-    output reg [3:0]             AWQOS,
-    output reg [3:0]             AWREGION,
-    output reg [USER_WIDTH-1:0]  AWUSER,
-    output reg [1:0]             AWDOMAIN,
-    output reg                   AWVALID,
-    input                        AWREADY,
+//    // AW Channel
+//    output reg [ID_WIDTH-1:0]    AWID,
+//    output reg [ADDR_WIDTH-1:0]  AWADDR,
+//    output reg [7:0]             AWLEN,
+//    output reg [2:0]             AWSIZE,
+//    output reg [1:0]             AWBURST,
+//    output reg                   AWLOCK,
+//    output reg [3:0]             AWCACHE,
+//    output reg [2:0]             AWPROT,
+//    output reg [3:0]             AWQOS,
+//    output reg [3:0]             AWREGION,
+//    output reg [USER_WIDTH-1:0]  AWUSER,
+//    output reg [1:0]             AWDOMAIN,
+//    output reg                   AWVALID,
+//    input                        AWREADY,
     
-    // W Channel
-    output reg [DATA_WIDTH-1:0]  WDATA,
-    output reg [STRB_WIDTH-1:0]  WSTRB, // use default value: 0xF
-    output reg                   WLAST,
-    output reg [USER_WIDTH-1:0]  WUSER,
-    output reg                   WVALID,
-    input                        WREADY,
+//    // W Channel
+//    output reg [DATA_WIDTH-1:0]  WDATA,
+//    output reg [STRB_WIDTH-1:0]  WSTRB, // use default value: 0xF
+//    output reg                   WLAST,
+//    output reg [USER_WIDTH-1:0]  WUSER,
+//    output reg                   WVALID,
+//    input                        WREADY,
     
-    // B Channel
-    input    [ID_WIDTH-1:0]      BID,
-    input    [1:0]               BRESP,
-    input    [USER_WIDTH-1:0]    BUSER,
-    input                        BVALID,
-    output reg                   BREADY,
+//    // B Channel
+//    input    [ID_WIDTH-1:0]      BID,
+//    input    [1:0]               BRESP,
+//    input    [USER_WIDTH-1:0]    BUSER,
+//    input                        BVALID,
+//    output reg                   BREADY,
     
-    // AR Channel
-    output reg [ID_WIDTH-1:0]    ARID,
-    output reg [ADDR_WIDTH-1:0]  ARADDR,
-    output reg [7:0]             ARLEN,
-    output reg [2:0]             ARSIZE,
-    output reg [1:0]             ARBURST,
-    output reg                   ARLOCK,
-    output reg [3:0]             ARCACHE,
-    output reg [2:0]             ARPROT,
-    output reg [3:0]             ARQOS,
-    output reg [3:0]             ARREGION,
-    output reg [USER_WIDTH-1:0]  ARUSER,
-    output reg [1:0]             ARDOMAIN,
-    output reg                   ARVALID,
-    input                        ARREADY,
+//    // AR Channel
+//    output reg [ID_WIDTH-1:0]    ARID,
+//    output reg [ADDR_WIDTH-1:0]  ARADDR,
+//    output reg [7:0]             ARLEN,
+//    output reg [2:0]             ARSIZE,
+//    output reg [1:0]             ARBURST,
+//    output reg                   ARLOCK,
+//    output reg [3:0]             ARCACHE,
+//    output reg [2:0]             ARPROT,
+//    output reg [3:0]             ARQOS,
+//    output reg [3:0]             ARREGION,
+//    output reg [USER_WIDTH-1:0]  ARUSER,
+//    output reg [1:0]             ARDOMAIN,
+//    output reg                   ARVALID,
+//    input                        ARREADY,
     
-    // R Channel
-    input    [ID_WIDTH-1:0]      RID,
-    input    [DATA_WIDTH-1:0]    RDATA,
-    input    [1:0]               RRESP,
-    input                        RLAST,
-    input    [USER_WIDTH-1:0]    RUSER,
-    input                        RVALID,
-    output reg                   RREADY
+//    // R Channel
+//    input    [ID_WIDTH-1:0]      RID,
+//    input    [DATA_WIDTH-1:0]    RDATA,
+//    input    [1:0]               RRESP,
+//    input                        RLAST,
+//    input    [USER_WIDTH-1:0]    RUSER,
+//    input                        RVALID,
+//    output reg                   RREADY
+    dual_core_cache_if m_if
 );
 
     instruction_s cpu_instr_mem[$];
@@ -152,73 +153,139 @@ module processor
     
     task cpu_read(input bit [31:0] read_addr, output bit [31:0] read_data);
         $display("[%0t(ns)] Core_%0d start reading from Address = 0x%h", $time, ID, read_addr);
-        @(posedge ACLK);
-        // AR Channel
-        ARID      <= ID;
-        ARADDR    <= read_addr;
-        ARLEN     <= 0;
-        ARSIZE    <= 3'h2;
-        ARBURST   <= 2'h1;
-        ARLOCK    <= 0;
-        ARCACHE   <= 4'hF;
-        ARPROT    <= 0;
-        ARQOS     <= 0;
-        ARREGION  <= 0;
-        ARUSER    <= 0;
-        ARDOMAIN  <= (read_addr >= SHAREABLE_REGION_START && read_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
-        ARVALID   <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!ARREADY);
-        ARVALID <= 0;
-        RREADY  <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!RVALID);
-        read_data = RDATA;
-        RREADY <= 0;
-        @(posedge ACLK);
+        @(m_if.drv_cb);
+        if (ID == 0) begin
+            // AR Channel
+            m_if.drv_cb.m0_ARID      <= ID;
+            m_if.drv_cb.m0_ARADDR    <= read_addr;
+            m_if.drv_cb.m0_ARLEN     <= 0;
+            m_if.drv_cb.m0_ARSIZE    <= 3'h2;
+            m_if.drv_cb.m0_ARBURST   <= 2'h1;
+            m_if.drv_cb.m0_ARLOCK    <= 0;
+            m_if.drv_cb.m0_ARCACHE   <= 4'hF;
+            m_if.drv_cb.m0_ARPROT    <= 0;
+            m_if.drv_cb.m0_ARQOS     <= 0;
+            m_if.drv_cb.m0_ARREGION  <= 0;
+            m_if.drv_cb.m0_ARUSER    <= 0;
+            m_if.drv_cb.m0_ARDOMAIN  <= (read_addr >= SHAREABLE_REGION_START && read_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m0_ARVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_ARREADY);
+            m_if.drv_cb.m0_ARVALID <= 0;
+            m_if.drv_cb.m0_RREADY  <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_RVALID);
+            read_data = m_if.drv_cb.m0_RDATA;
+            m_if.drv_cb.m0_RREADY <= 0;
+        end
+        if (ID == 1) begin
+            // AR Channel
+            m_if.drv_cb.m1_ARID      <= ID;
+            m_if.drv_cb.m1_ARADDR    <= read_addr;
+            m_if.drv_cb.m1_ARLEN     <= 0;
+            m_if.drv_cb.m1_ARSIZE    <= 3'h2;
+            m_if.drv_cb.m1_ARBURST   <= 2'h1;
+            m_if.drv_cb.m1_ARLOCK    <= 0;
+            m_if.drv_cb.m1_ARCACHE   <= 4'hF;
+            m_if.drv_cb.m1_ARPROT    <= 0;
+            m_if.drv_cb.m1_ARQOS     <= 0;
+            m_if.drv_cb.m1_ARREGION  <= 0;
+            m_if.drv_cb.m1_ARUSER    <= 0;
+            m_if.drv_cb.m1_ARDOMAIN  <= (read_addr >= SHAREABLE_REGION_START && read_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m1_ARVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_ARREADY);
+            m_if.drv_cb.m1_ARVALID <= 0;
+            m_if.drv_cb.m1_RREADY  <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_RVALID);
+            read_data = m_if.drv_cb.m1_RDATA;
+            m_if.drv_cb.m1_RREADY <= 0;
+        end
+        @(m_if.drv_cb);
         $display("[%0t(ns)] Core_%0d finish reading from Address = 0x%h, Data = 0x%h", $time, ID, read_addr, read_data);
     endtask
     
     task cpu_write(input bit [31:0] write_addr, input bit [31:0] write_data);
         $display("[%0t(ns)] Core_%0d start writing from Address = 0x%h, Data = 0x%h", $time, ID, write_addr, write_data);
-        @(posedge ACLK);
-        // AW Channel
-        AWID      <= ID;
-        AWADDR    <= write_addr;
-        AWLEN     <= 0;
-        AWSIZE    <= 3'h2;
-        AWBURST   <= 2'h1;
-        AWLOCK    <= 0;
-        AWCACHE   <= 4'hF;
-        AWPROT    <= 0;
-        AWQOS     <= 0;
-        AWREGION  <= 0;
-        AWUSER    <= 0;
-        AWDOMAIN  <= (write_addr >= SHAREABLE_REGION_START && write_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
-        AWVALID   <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!AWREADY);
-        AWVALID   <= 0;
-        // W Channel
-        WDATA     <= write_data;
-        WSTRB     <= 4'hF;
-        WLAST     <= 1;
-        WUSER     <= 0;
-        WVALID    <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!WREADY);
-        WVALID    <= 0;
-        WLAST     <= 0;
-        BREADY    <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!BVALID);
-        BREADY    <= 0;
-        @(posedge ACLK);
+        @(m_if.drv_cb);
+        if (ID == 0) begin
+            // AW Channel
+            m_if.drv_cb.m0_AWID      <= ID;
+            m_if.drv_cb.m0_AWADDR    <= write_addr;
+            m_if.drv_cb.m0_AWLEN     <= 0;
+            m_if.drv_cb.m0_AWSIZE    <= 3'h2;
+            m_if.drv_cb.m0_AWBURST   <= 2'h1;
+            m_if.drv_cb.m0_AWLOCK    <= 0;
+            m_if.drv_cb.m0_AWCACHE   <= 4'hF;
+            m_if.drv_cb.m0_AWPROT    <= 0;
+            m_if.drv_cb.m0_AWQOS     <= 0;
+            m_if.drv_cb.m0_AWREGION  <= 0;
+            m_if.drv_cb.m0_AWUSER    <= 0;
+            m_if.drv_cb.m0_AWDOMAIN  <= (write_addr >= SHAREABLE_REGION_START && write_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m0_AWVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_AWREADY);
+            m_if.drv_cb.m0_AWVALID   <= 0;
+            // W Channel
+            m_if.drv_cb.m0_WDATA     <= write_data;
+            m_if.drv_cb.m0_WSTRB     <= 4'hF;
+            m_if.drv_cb.m0_WLAST     <= 1;
+            m_if.drv_cb.m0_WUSER     <= 0;
+            m_if.drv_cb.m0_WVALID    <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_WREADY);
+            m_if.drv_cb.m0_WVALID    <= 0;
+            m_if.drv_cb.m0_WLAST     <= 0;
+            m_if.drv_cb.m0_BREADY    <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_BVALID);
+            m_if.drv_cb.m0_BREADY    <= 0;
+        end
+        if (ID == 1) begin
+            // AW Channel
+            m_if.drv_cb.m1_AWID      <= ID;
+            m_if.drv_cb.m1_AWADDR    <= write_addr;
+            m_if.drv_cb.m1_AWLEN     <= 0;
+            m_if.drv_cb.m1_AWSIZE    <= 3'h2;
+            m_if.drv_cb.m1_AWBURST   <= 2'h1;
+            m_if.drv_cb.m1_AWLOCK    <= 0;
+            m_if.drv_cb.m1_AWCACHE   <= 4'hF;
+            m_if.drv_cb.m1_AWPROT    <= 0;
+            m_if.drv_cb.m1_AWQOS     <= 0;
+            m_if.drv_cb.m1_AWREGION  <= 0;
+            m_if.drv_cb.m1_AWUSER    <= 0;
+            m_if.drv_cb.m1_AWDOMAIN  <= (write_addr >= SHAREABLE_REGION_START && write_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m1_AWVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_AWREADY);
+            m_if.drv_cb.m1_AWVALID   <= 0;
+            // W Channel
+            m_if.drv_cb.m1_WDATA     <= write_data;
+            m_if.drv_cb.m1_WSTRB     <= 4'hF;
+            m_if.drv_cb.m1_WLAST     <= 1;
+            m_if.drv_cb.m1_WUSER     <= 0;
+            m_if.drv_cb.m1_WVALID    <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_WREADY);
+            m_if.drv_cb.m1_WVALID    <= 0;
+            m_if.drv_cb.m1_WLAST     <= 0;
+            m_if.drv_cb.m1_BREADY    <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_BVALID);
+            m_if.drv_cb.m1_BREADY    <= 0;
+        end
+        @(m_if.drv_cb);
         $display("[%0t(ns)] Core_%0d finish writing from Address = 0x%h, Data = 0x%h", $time, ID, write_addr, write_data);
     endtask
     
@@ -249,7 +316,7 @@ module processor
         bit [15:0][31:0] data;
         
         // Clear the queue before loading new data
-        cpu_instr_mem.delete(); // Reset the queue
+        cpu_instr_16_mem.delete(); // Reset the queue
         file = $fopen(IMEM, "r");
         if (file == 0) begin
             $display("Error: Unable to open file %s", IMEM);
@@ -331,91 +398,157 @@ module processor
     
     task cpu_read_16(input bit [31:0] read_addr, output bit [15:0][31:0] read_data);
         int cnt;
-    
         $display("[%0t(ns)] Core_%0d start reading from Address = 0x%h", $time, ID, read_addr);
-        @(posedge ACLK);
-        // AR Channel
-        ARID      <= ID;
-        ARADDR    <= read_addr;
-        ARLEN     <= 0;
-        ARSIZE    <= 3'h2;
-        ARBURST   <= 2'h1;
-        ARLOCK    <= 0;
-        ARCACHE   <= 4'hF;
-        ARPROT    <= 0;
-        ARQOS     <= 0;
-        ARREGION  <= 0;
-        ARUSER    <= 0;
-        ARDOMAIN  <= (read_addr >= SHAREABLE_REGION_START && read_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
-        ARVALID   <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!ARREADY);
-        ARVALID <= 0;
-        RREADY  <= 1;
-        cnt = 0;
-        do begin
-            if (RVALID) begin
-                read_data[cnt] = RDATA;
-                cnt++;
-            end
-            @(posedge ACLK);
-        end while (cnt < 16);
-        // read_data = RDATA;
-        RREADY <= 0;
-        @(posedge ACLK);
+        @(m_if.drv_cb);
+        if (ID == 0) begin
+            // AR Channel
+            m_if.drv_cb.m0_ARID      <= ID;
+            m_if.drv_cb.m0_ARADDR    <= read_addr;
+            m_if.drv_cb.m0_ARLEN     <= 0;
+            m_if.drv_cb.m0_ARSIZE    <= 3'h2;
+            m_if.drv_cb.m0_ARBURST   <= 2'h1;
+            m_if.drv_cb.m0_ARLOCK    <= 0;
+            m_if.drv_cb.m0_ARCACHE   <= 4'hF;
+            m_if.drv_cb.m0_ARPROT    <= 0;
+            m_if.drv_cb.m0_ARQOS     <= 0;
+            m_if.drv_cb.m0_ARREGION  <= 0;
+            m_if.drv_cb.m0_ARUSER    <= 0;
+            m_if.drv_cb.m0_ARDOMAIN  <= (read_addr >= SHAREABLE_REGION_START && read_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m0_ARVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_ARREADY);
+            m_if.drv_cb.m0_ARVALID <= 0;
+            m_if.drv_cb.m0_RREADY  <= 1;
+            cnt = 0;
+            do begin
+                if (m_if.drv_cb.m0_RVALID) begin
+                    read_data[cnt] = m_if.drv_cb.m0_RDATA;
+                    cnt++;
+                end
+                @(m_if.drv_cb);
+            end while (cnt < 16);
+            // read_data = RDATA;
+            m_if.drv_cb.m0_RREADY <= 0;
+        end
+        if (ID == 1) begin
+            // AR Channel
+            m_if.drv_cb.m1_ARID      <= ID;
+            m_if.drv_cb.m1_ARADDR    <= read_addr;
+            m_if.drv_cb.m1_ARLEN     <= 0;
+            m_if.drv_cb.m1_ARSIZE    <= 3'h2;
+            m_if.drv_cb.m1_ARBURST   <= 2'h1;
+            m_if.drv_cb.m1_ARLOCK    <= 0;
+            m_if.drv_cb.m1_ARCACHE   <= 4'hF;
+            m_if.drv_cb.m1_ARPROT    <= 0;
+            m_if.drv_cb.m1_ARQOS     <= 0;
+            m_if.drv_cb.m1_ARREGION  <= 0;
+            m_if.drv_cb.m1_ARUSER    <= 0;
+            m_if.drv_cb.m1_ARDOMAIN  <= (read_addr >= SHAREABLE_REGION_START && read_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m1_ARVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_ARREADY);
+            m_if.drv_cb.m1_ARVALID <= 0;
+            m_if.drv_cb.m1_RREADY  <= 1;
+            cnt = 0;
+            do begin
+                if (m_if.drv_cb.m1_RVALID) begin
+                    read_data[cnt] = m_if.drv_cb.m1_RDATA;
+                    cnt++;
+                end
+                @(m_if.drv_cb);
+            end while (cnt < 16);
+            // read_data = RDATA;
+            m_if.drv_cb.m1_RREADY <= 0;
+        end
+        @(m_if.drv_cb);
         $display("[%0t(ns)] Core_%0d finish reading from Address = 0x%h, Data = 0x%h", $time, ID, read_addr, read_data);
     endtask
     
     task cpu_write_16(input bit [31:0] write_addr, input bit [15:0][31:0] write_data);
         int cnt;
-        
         $display("[%0t(ns)] Core_%0d start writing from Address = 0x%h, Data = 0x%h", $time, ID, write_addr, write_data);
-        @(posedge ACLK);
-        // AW Channel
-        AWID      <= ID;
-        AWADDR    <= write_addr;
-        AWLEN     <= 0;
-        AWSIZE    <= 3'h2;
-        AWBURST   <= 2'h1;
-        AWLOCK    <= 0;
-        AWCACHE   <= 4'hF;
-        AWPROT    <= 0;
-        AWQOS     <= 0;
-        AWREGION  <= 0;
-        AWUSER    <= 0;
-        AWDOMAIN  <= (write_addr >= SHAREABLE_REGION_START && write_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
-        AWVALID   <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!AWREADY);
-        AWVALID   <= 0;
-        // W Channel
-        // WDATA     <= write_data;
-        // WSTRB     <= 4'hF;
-        // WLAST     <= 1;
-        // WUSER     <= 0;
-        // WVALID    <= 1;
-        cnt = 0;
-        do begin
-            if (WREADY) begin
-                WDATA   <= write_data[cnt];
-                WSTRB   <= 4'hF;
-                WLAST   <= cnt == 15;
-                WUSER   <= 0;
-                WVALID  <= 1;
-                cnt++;
-            end
-            @(posedge ACLK);
-        end while (cnt < 16);
-        WVALID    <= 0;
-        WLAST     <= 0;
-        BREADY    <= 1;
-        do begin
-            @(posedge ACLK);
-        end while (!BVALID);
-        BREADY    <= 0;
-        @(posedge ACLK);
+        @(m_if.drv_cb);
+        if (ID == 0) begin
+            // AW Channel
+            m_if.drv_cb.m0_AWID      <= ID;
+            m_if.drv_cb.m0_AWADDR    <= write_addr;
+            m_if.drv_cb.m0_AWLEN     <= 0;
+            m_if.drv_cb.m0_AWSIZE    <= 3'h2;
+            m_if.drv_cb.m0_AWBURST   <= 2'h1;
+            m_if.drv_cb.m0_AWLOCK    <= 0;
+            m_if.drv_cb.m0_AWCACHE   <= 4'hF;
+            m_if.drv_cb.m0_AWPROT    <= 0;
+            m_if.drv_cb.m0_AWQOS     <= 0;
+            m_if.drv_cb.m0_AWREGION  <= 0;
+            m_if.drv_cb.m0_AWUSER    <= 0;
+            m_if.drv_cb.m0_AWDOMAIN  <= (write_addr >= SHAREABLE_REGION_START && write_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m0_AWVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_AWREADY);
+            m_if.drv_cb.m0_AWVALID   <= 0;
+            cnt = 0;
+            do begin
+                if (m_if.drv_cb.m0_WREADY) begin
+                    m_if.drv_cb.m0_WDATA   <= write_data[cnt];
+                    m_if.drv_cb.m0_WSTRB   <= 4'hF;
+                    m_if.drv_cb.m0_WLAST   <= cnt == 15;
+                    m_if.drv_cb.m0_WUSER   <= 0;
+                    m_if.drv_cb.m0_WVALID  <= 1;
+                    cnt++;
+                end
+                @(m_if.drv_cb);
+            end while (cnt < 16);
+            m_if.drv_cb.m0_WVALID    <= 0;
+            m_if.drv_cb.m0_WLAST     <= 0;
+            m_if.drv_cb.m0_BREADY    <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m0_BVALID);
+            m_if.drv_cb.m0_BREADY    <= 0;
+        end
+        if (ID == 1) begin
+            // AW Channel
+            m_if.drv_cb.m1_AWID      <= ID;
+            m_if.drv_cb.m1_AWADDR    <= write_addr;
+            m_if.drv_cb.m1_AWLEN     <= 0;
+            m_if.drv_cb.m1_AWSIZE    <= 3'h2;
+            m_if.drv_cb.m1_AWBURST   <= 2'h1;
+            m_if.drv_cb.m1_AWLOCK    <= 0;
+            m_if.drv_cb.m1_AWCACHE   <= 4'hF;
+            m_if.drv_cb.m1_AWPROT    <= 0;
+            m_if.drv_cb.m1_AWQOS     <= 0;
+            m_if.drv_cb.m1_AWREGION  <= 0;
+            m_if.drv_cb.m1_AWUSER    <= 0;
+            m_if.drv_cb.m1_AWDOMAIN  <= (write_addr >= SHAREABLE_REGION_START && write_addr <= SHAREABLE_REGION_END) ? 2'b10 : 2'b00;
+            m_if.drv_cb.m1_AWVALID   <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_AWREADY);
+            m_if.drv_cb.m1_AWVALID   <= 0;
+            cnt = 0;
+            do begin
+                if (m_if.drv_cb.m1_WREADY) begin
+                    m_if.drv_cb.m1_WDATA   <= write_data[cnt];
+                    m_if.drv_cb.m1_WSTRB   <= 4'hF;
+                    m_if.drv_cb.m1_WLAST   <= cnt == 15;
+                    m_if.drv_cb.m1_WUSER   <= 0;
+                    m_if.drv_cb.m1_WVALID  <= 1;
+                    cnt++;
+                end
+                @(m_if.drv_cb);
+            end while (cnt < 16);
+            m_if.drv_cb.m1_WVALID    <= 0;
+            m_if.drv_cb.m1_WLAST     <= 0;
+            m_if.drv_cb.m1_BREADY    <= 1;
+            do begin
+                @(m_if.drv_cb);
+            end while (!m_if.drv_cb.m1_BVALID);
+            m_if.drv_cb.m1_BREADY    <= 0;
+        end
+        @(m_if.drv_cb);
         $display("[%0t(ns)] Core_%0d finish writing from Address = 0x%h, Data = 0x%h", $time, ID, write_addr, write_data);
     endtask
     
