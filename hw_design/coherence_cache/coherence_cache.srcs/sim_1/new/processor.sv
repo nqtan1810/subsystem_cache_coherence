@@ -404,7 +404,7 @@ module processor
             // AR Channel
             m_if.drv_cb.m0_ARID      <= ID;
             m_if.drv_cb.m0_ARADDR    <= read_addr;
-            m_if.drv_cb.m0_ARLEN     <= 0;
+            m_if.drv_cb.m0_ARLEN     <= 15;
             m_if.drv_cb.m0_ARSIZE    <= 3'h2;
             m_if.drv_cb.m0_ARBURST   <= 2'h1;
             m_if.drv_cb.m0_ARLOCK    <= 0;
@@ -435,7 +435,7 @@ module processor
             // AR Channel
             m_if.drv_cb.m1_ARID      <= ID;
             m_if.drv_cb.m1_ARADDR    <= read_addr;
-            m_if.drv_cb.m1_ARLEN     <= 0;
+            m_if.drv_cb.m1_ARLEN     <= 15;
             m_if.drv_cb.m1_ARSIZE    <= 3'h2;
             m_if.drv_cb.m1_ARBURST   <= 2'h1;
             m_if.drv_cb.m1_ARLOCK    <= 0;
@@ -474,7 +474,7 @@ module processor
             // AW Channel
             m_if.drv_cb.m0_AWID      <= ID;
             m_if.drv_cb.m0_AWADDR    <= write_addr;
-            m_if.drv_cb.m0_AWLEN     <= 0;
+            m_if.drv_cb.m0_AWLEN     <= 15;
             m_if.drv_cb.m0_AWSIZE    <= 3'h2;
             m_if.drv_cb.m0_AWBURST   <= 2'h1;
             m_if.drv_cb.m0_AWLOCK    <= 0;
@@ -513,7 +513,7 @@ module processor
             // AW Channel
             m_if.drv_cb.m1_AWID      <= ID;
             m_if.drv_cb.m1_AWADDR    <= write_addr;
-            m_if.drv_cb.m1_AWLEN     <= 0;
+            m_if.drv_cb.m1_AWLEN     <= 15;
             m_if.drv_cb.m1_AWSIZE    <= 3'h2;
             m_if.drv_cb.m1_AWBURST   <= 2'h1;
             m_if.drv_cb.m1_AWLOCK    <= 0;
