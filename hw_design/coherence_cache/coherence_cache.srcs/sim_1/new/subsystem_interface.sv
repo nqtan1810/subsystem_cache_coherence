@@ -208,7 +208,7 @@ interface dual_core_cache_if
 
     // Clocking Block
     clocking drv_cb @(posedge ACLK);
-        default input #1 output #1;
+        default input #1 output #2;
         // system signals
         output  ARESETn;
         
@@ -396,7 +396,7 @@ interface dual_core_cache_if
     endclocking
     
     clocking mon_cb @(posedge ACLK);
-        default input #1 output #1;
+        default input #1 output #2;
         // system signals
         input   ARESETn;
         
