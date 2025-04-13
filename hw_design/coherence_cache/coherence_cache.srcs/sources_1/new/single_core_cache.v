@@ -75,7 +75,7 @@ module single_core_cache
     // R Channel
     
     output  [ID_WIDTH-1:0]      m_RID,
-    output  [DATA_WIDTH-1:0]    m_RDATA,
+    output  reg[DATA_WIDTH-1:0] m_RDATA,
     output  [1:0]               m_RRESP,
     output                      m_RLAST,
     output  [USER_WIDTH-1:0]	m_RUSER,
@@ -174,12 +174,15 @@ module single_core_cache
     reg [3:0] m_AWCACHE_reg;
     reg [1:0] m_AWDOMAIN_reg;
     reg [ADDR_WIDTH-1:0] m_AWADDR_reg;
+    reg [2:0]            m_AWSIZE_reg;
     reg [DATA_WIDTH-1:0] m_WDATA_reg;
+    reg [STRB_WIDTH-1:0] m_WSTRB_reg;
     
     reg m_ARID_reg;
     reg [3:0] m_ARCACHE_reg;
     reg [1:0] m_ARDOMAIN_reg;
     reg [ADDR_WIDTH-1:0] m_ARADDR_reg;
+    reg [2:0]            m_ARSIZE_reg;
     reg instr_type;
     
     // signals Cache L1 --> Cache L2
@@ -252,6 +255,7 @@ module single_core_cache
     // data_mem
     wire [DATA_WIDTH-1:0] w_data;
     wire [9:0] w_addr;
+    wire [STRB_WIDTH-1:0] m_strobe;
     wire [3:0] word_offset, w_word_offset, control_offset, control_offset_s;
     wire [9:0] r_addr;
     wire [9:0] r_addr_s;
@@ -265,6 +269,7 @@ module single_core_cache
     
     assign word_offset = instr_type ? m_AWADDR_reg[5:2] : m_ARADDR_reg[5:2];
     assign w_word_offset = mem_bus_fetch ? control_offset : word_offset;
+    assign m_strobe = mem_bus_fetch ? 4'hF : m_WSTRB_reg;
     
     assign w_data = w_data_sel ? s_RDATA : m_WDATA_reg;
     assign w_addr = {set, access_way, w_word_offset};
@@ -273,7 +278,39 @@ module single_core_cache
     
     // assign m_RDATA = m_RVALID ? r_data : 0;
     // assign s_WDATA = s_WVALID ? r_data : 0;
-    assign m_RDATA = r_data;
+    wire [1:0] byte_offset;
+    assign byte_offset = m_ARADDR_reg[1:0];
+    always @(*) begin
+        case (m_ARSIZE_reg)
+            3'b000: begin // 1 byte access
+                case (byte_offset)
+                    2'b00: m_RDATA = {24'b0, r_data[7:0]};
+                    2'b01: m_RDATA = {24'b0, r_data[15:8]};
+                    2'b10: m_RDATA = {24'b0, r_data[23:16]};
+                    2'b11: m_RDATA = {24'b0, r_data[31:24]};
+                    default: m_RDATA = 32'b0;
+                endcase
+            end
+    
+            3'b001: begin // 2 byte access (half-word), aligned to 2 bytes
+                case (byte_offset)
+                    2'b00: m_RDATA = {16'b0, r_data[15:0]};
+                    2'b10: m_RDATA = {16'b0, r_data[31:16]};
+                    default: m_RDATA = 32'b0; // misaligned half-word (optional: handle separately)
+                endcase
+            end
+    
+            3'b010: begin // 4 byte access (word), must be 4-byte aligned
+                if (byte_offset == 2'b00)
+                    m_RDATA = r_data;
+                else
+                    m_RDATA = 32'b0; // misaligned word (optional: handle separately)
+            end
+    
+            default: m_RDATA = 32'b0; // unsupported ARSIZE
+        endcase
+    end
+    // assign m_RDATA = r_data;
     assign s_WDATA = r_data;
     assign CDDATA = r_data_s;
     
@@ -291,12 +328,15 @@ module single_core_cache
             m_AWCACHE_reg <= 0;
             m_AWDOMAIN_reg <= 0;
             m_AWADDR_reg <= 0;
+            m_AWSIZE_reg <= 0;
             m_WDATA_reg <= 0;
+            m_WSTRB_reg <= 0;
             
             m_ARID_reg <= 0;
             m_ARCACHE_reg <= 0;
             m_ARDOMAIN_reg <= 0;
             m_ARADDR_reg <= 0;
+            m_ARSIZE_reg <= 0;
             instr_type <= 0;
             // registers Cache L1 --> Cache L2
             s_AWADDR_reg <= 0;
@@ -312,16 +352,19 @@ module single_core_cache
                 m_AWCACHE_reg <= m_AWCACHE;
                 m_AWDOMAIN_reg <= m_AWDOMAIN;
                 m_AWADDR_reg <= m_AWADDR;
+                m_AWSIZE_reg <= m_AWSIZE;
                 instr_type <= 1;
             end
             if (cpu_m_w_in_reg_en) begin
                 m_WDATA_reg <= m_WDATA;
+                m_WSTRB_reg <= m_WSTRB;
             end
             if (cpu_m_ar_in_reg_en) begin
                 m_ARID_reg <= m_ARID;
                 m_ARCACHE_reg <= m_ARCACHE;
                 m_ARDOMAIN_reg <= m_ARDOMAIN;
                 m_ARADDR_reg <= m_ARADDR; 
+                m_ARSIZE_reg <= m_ARSIZE;
                 instr_type <= 0;
             end  
             
@@ -455,10 +498,23 @@ module single_core_cache
     );
     
     // to store data in cache
-    data_ram    cache_data_ram
+//    data_ram    cache_data_ram
+//    (
+//        .clk(ACLK), .rst_n(ARESETn),       // input
+//        .w_en(data_w_en),                // input
+//        .w_data(w_data),              // input
+//        .w_addr(w_addr),              // input    // address = {set, way, word offset}
+//        .r_addr1(r_addr),             // input
+//        .r_addr2(r_addr_s),             // input
+//        .r_data1(r_data),             // output
+//        .r_data2(r_data_s)              // output
+//    );
+    bytewrite_2r1w_ram    cache_data_ram
     (
         .clk(ACLK), .rst_n(ARESETn),       // input
         .w_en(data_w_en),                // input
+        // .w_be(4'hF),
+        .w_be(m_strobe),             // implement strobes to support writing 1-byte, 2-byte, 4-byte for sb, shw, sw instr
         .w_data(w_data),              // input
         .w_addr(w_addr),              // input    // address = {set, way, word offset}
         .r_addr1(r_addr),             // input
