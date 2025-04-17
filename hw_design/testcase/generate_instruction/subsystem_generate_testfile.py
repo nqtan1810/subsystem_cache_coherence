@@ -1,3571 +1,6417 @@
 import os
 import random
-
+from inspect_testcase import *
 # Hàm xử lý từng testcase trong nhóm 1.1
-def testcase_1(n_set=16):
-    base_path="subsystem_testcase/testcase_1/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=selected_tags+[chosen_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in set(all_tags):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 1 created")
-def testcase_2(n_set=16):
-    base_path="subsystem_testcase/testcase_2/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 2 created")
-def testcase_3(n_set=16):
-    base_path="subsystem_testcase/testcase_3/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 3 created")
-def testcase_4(n_set=16):
-    base_path="subsystem_testcase/testcase_4/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 4 created")
-def testcase_5(n_set=16):
-    base_path="subsystem_testcase/testcase_5/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=selected_tags+[chosen_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in set(all_tags):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 5 created")
-def testcase_6(n_set=16):
-    base_path="subsystem_testcase/testcase_6/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 6 created")
-def testcase_7(n_set=16):
-    base_path="subsystem_testcase/testcase_7/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 7 created")
-def testcase_8(n_set=16):
-    base_path="subsystem_testcase/testcase_8/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00000000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00000000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00000000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 8 created")
-def testcase_9(n_set=16):
-    base_path="subsystem_testcase/testcase_9/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=selected_tags+[chosen_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in set(all_tags):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 9 created")
-def testcase_10(n_set=16):
-    base_path="subsystem_testcase/testcase_10/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 10 created")
-def testcase_11(n_set=16):
-    base_path="subsystem_testcase/testcase_11/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 11 created")
-def testcase_12(n_set=16):
-    base_path="subsystem_testcase/testcase_12/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 12 created")
-def testcase_13(n_set=16):
-    base_path="subsystem_testcase/testcase_13/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=selected_tags+[chosen_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in set(all_tags):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 13 created")
-def testcase_14(n_set=16):
-    base_path="subsystem_testcase/testcase_14/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 14 created")
-def testcase_15(n_set=16):
-    base_path="subsystem_testcase/testcase_15/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 15 created")
-def testcase_16(n_set=16):
-    base_path="subsystem_testcase/testcase_16/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00010000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00010000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00010000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 16 created")
-def testcase_17(n_set=16):
-    base_path="subsystem_testcase/testcase_17/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=selected_tags+[chosen_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in set(all_tags):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 17 created")
-def testcase_18(n_set=16):
-    base_path="subsystem_testcase/testcase_18/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 18 created")
-def testcase_19(n_set=16):
-    base_path="subsystem_testcase/testcase_19/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 19 created")
-def testcase_20(n_set=16):
-    base_path="subsystem_testcase/testcase_20/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 20 created")
-def testcase_21(n_set=16):
-    base_path="subsystem_testcase/testcase_21/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 21 created")
-def testcase_22(n_set=16):
-    base_path="subsystem_testcase/testcase_22/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        last_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        last_addr=(last_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{last_addr:08x}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 22 created")
-def testcase_23(n_set=16):
-    base_path="subsystem_testcase/testcase_23/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        last_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        last_addr=(last_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{last_addr:08x}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 23 created")
-def testcase_24(n_set=16):
-    base_path="subsystem_testcase/testcase_24/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=selected_tags+[chosen_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in set(all_tags):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 24 created")
-def testcase_25(n_set=16):
-    base_path="subsystem_testcase/testcase_25/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 25 created")
-def testcase_26(n_set=16):
-    base_path="subsystem_testcase/testcase_26/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 26 created")
-def testcase_27(n_set=16):
-    base_path="subsystem_testcase/testcase_27/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 27 created")
-def testcase_28(n_set=16):
-    base_path="subsystem_testcase/testcase_28/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 28 created")
-def testcase_29(n_set=16):
-    base_path="subsystem_testcase/testcase_29/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        last_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        last_addr=(last_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{last_addr:08x}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 29 created")
-def testcase_30(n_set=16):
-    base_path="subsystem_testcase/testcase_30/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); extra_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[extra_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        last_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        last_addr=(last_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{last_addr:08x}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(extra_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 30 created")
-def testcase_31(n_set=16):
-    base_path="subsystem_testcase/testcase_31/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=set(selected_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}"); all_tags.add(chosen_tag)
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 31 created")
-def testcase_32(n_set=16):
-    base_path="subsystem_testcase/testcase_32/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 32 created")
-def testcase_33(n_set=16):
-    base_path="subsystem_testcase/testcase_33/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 33 created")
-def testcase_34(n_set=16):
-    base_path="subsystem_testcase/testcase_34/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 34 created")
-def testcase_35(n_set=16):
-    base_path="subsystem_testcase/testcase_35/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 35 created")
-def testcase_36(n_set=16):
-    base_path="subsystem_testcase/testcase_36/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 36 created")
-def testcase_37(n_set=16):
-    base_path="subsystem_testcase/testcase_37/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        read_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 37 created")
-def testcase_38(n_set=16):
-    base_path="subsystem_testcase/testcase_38/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    chosen_tag=random.choice(selected_tags); all_tags=set(selected_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(chosen_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}"); all_tags.add(chosen_tag)
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 38 created")
-def testcase_39(n_set=16):
-    base_path="subsystem_testcase/testcase_39/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 39 created")
-def testcase_40(n_set=16):
-    base_path="subsystem_testcase/testcase_40/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 40 created")
-def testcase_41(n_set=16):
-    base_path="subsystem_testcase/testcase_41/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 41 created")
-def testcase_42(n_set=16):
-    base_path="subsystem_testcase/testcase_42/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,3))
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 42 created")
-def testcase_43(n_set=16):
-    base_path="subsystem_testcase/testcase_43/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        mirror_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        mirror_addr=(mirror_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{mirror_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 43 created")
-def testcase_44(n_set=16):
-    base_path="subsystem_testcase/testcase_44/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        read_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 44 created")
-def testcase_45(n_set=16):
-    base_path="subsystem_testcase/testcase_45/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    mirror_tag=random.choice(selected_tags); all_tags=selected_tags.copy()
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        read_word_offset=random.randint(0,15)
-        read_addr=(mirror_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(read_word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        write_word_offset=random.randint(0,15)
-        write_addr=(mirror_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(write_word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in list(set(all_tags+[mirror_tag])):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 45 created")
-def testcase_46(n_set=16):
-    base_path="subsystem_testcase/testcase_46/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_reads=random.randint(1,3)
-    selected_tags=random.sample(available_tags,num_reads)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(random.randint(0,15)<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000; data=f"0x{random.randint(0,2**32-1):08x}"
-        f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 46 created")
-def testcase_47(n_set=16):
-    base_path="subsystem_testcase/testcase_47/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(random.randint(0,15)<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000; data=f"0x{random.randint(0,2**32-1):08x}"
-        f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        all_tags=selected_tags+[new_tag]
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 47 created")
-def testcase_48(n_set=16):
-    base_path="subsystem_testcase/testcase_48/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:  # 4 lệnh write với tag khác nhau
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)  # lệnh read với tag mới
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)  # lệnh write trùng tag với read vừa tạo
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 48 created")
-def testcase_49(n_set=16):
-    base_path="subsystem_testcase/testcase_49/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    num_read=random.randint(1,3); available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,num_read)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 49 created")
-def testcase_50(n_set=16):
-    base_path="subsystem_testcase/testcase_50/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:  # 4 read khác tag
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000
-            f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)  # read với tag mới
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)  # write trùng tag với read trên
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f:  # inst_1 read trùng tag cuối
-        word_offset=random.randint(0,15)
-        inst1_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        inst1_addr=(inst1_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{inst1_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 50 created")
-def testcase_51(n_set=16):
-    base_path="subsystem_testcase/testcase_51/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); mid_tag=random.choice(remaining_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:  # 4 write khác tag
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)  # read với tag mới
-        read_addr=(mid_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)  # write lại đúng tag của read trên
-        write_addr=(mid_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_1,'w') as f:  # inst_1 đọc lại đúng tag của write cuối
-        word_offset=random.randint(0,15)
-        inst1_addr=(mid_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        inst1_addr=(inst1_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{inst1_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[mid_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 51 created")
-def testcase_52(n_set=16):
-    base_path="subsystem_testcase/testcase_52/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_reads=random.randint(1,4)
-    selected_tags=random.sample(available_tags,num_reads)
-    shared_tag=random.choice(selected_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(shared_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        read_addr2=(shared_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr2=(read_addr2&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr2:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        all_tags=set(selected_tags+[shared_tag])
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 52 created")
-def testcase_53(n_set=16):
-    base_path="subsystem_testcase/testcase_53/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_reads=random.randint(1,3)
-    selected_tags=random.sample(available_tags,num_reads)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        read_addr2=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr2=(read_addr2&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr2:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        all_tags=set(selected_tags+[write_tag])
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 53 created")
-def testcase_54(n_set=16):
-    base_path = "subsystem_testcase/testcase_54/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem"); path_1 = os.path.join(base_path, "instr_mem_B.mem"); path_mem = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2); set_index = random.randint(0, n_set - 1)
-    available_tags = list(range(1 << tag_bits)); selected_tags = random.sample(available_tags, 4)
-    remaining_tags = list(set(available_tags) - set(selected_tags)); write_tag = random.choice(remaining_tags)
-    all_tags = selected_tags + [write_tag]
-    with open(path_0, 'w') as f:
-        for tag in selected_tags:  # 4 read cùng set khác tag
-            word_offset = random.randint(0, 15)
-            addr = (tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6) | (word_offset << 2)
-            addr = (addr & 0x0001FFFF) | 0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset = random.randint(0, 15)  # write cùng set, tag khác
-        write_addr = (write_tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6) | (word_offset << 2)
-        write_addr = (write_addr & 0x0001FFFF) | 0x00020000
-        data = f"0x{random.randint(0, 2 ** 32 - 1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        read_offset = random.randint(0, 15)  # read lại đúng tag của lệnh write
-        read_addr = (write_tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6) | (read_offset << 2)
-        read_addr = (read_addr & 0x0001FFFF) | 0x00020000; f.write(f"read\t0x{read_addr:08x}")
-    with open(path_1, 'w') as f: pass
-    with open(path_mem, 'w') as f:
-        for tag in all_tags:
-            block_addr = (tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6)
-            block_addr = (block_addr & 0x0001FFC0) | 0x00020000
-            data = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 54 created")
-def testcase_55(n_set=16):
-    base_path="subsystem_testcase/testcase_55/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags); all_tags=selected_tags+[write_tag]
-    def shared(addr): return (addr&0x0003FFFF)|0x00020000
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15); addr=(tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); addr=shared(addr)
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15); write_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); write_addr=shared(write_addr)
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        read_offset=random.randint(0,15); read_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(read_offset<<2); read_addr=shared(read_addr)
-        f.write(f"read\t0x{read_addr:08x}")
-    with open(path_1,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(n_set.bit_length()+4+2))|(set_index<<6); block_addr=shared(block_addr&0xFFFFFFC0)
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 55 created")
-def testcase_56(n_set=16):
-    base_path="subsystem_testcase/testcase_56/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_read=random.randint(1,3); selected_tags=random.sample(available_tags,num_read)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    def shared(addr): return (addr&0x0003FFFF)|0x00020000
-    addr_list=[]  # thu thập địa chỉ cần tạo mem
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15); addr=(tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); addr=shared(addr)
-            f.write(f"read\t0x{addr:08x}\n"); addr_list.append(addr)
-        word_offset=random.randint(0,15); write_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); write_addr=shared(write_addr)
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n"); addr_list.append(write_addr)
-        read_offset=random.randint(0,15); read_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(read_offset<<2); read_addr=shared(read_addr)
-        f.write(f"read\t0x{read_addr:08x}"); addr_list.append(read_addr)
-    with open(path_1,'w') as f:
-        ref_offset=random.randint(0,15); ref_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(ref_offset<<2); ref_addr=shared(ref_addr)
-        f.write(f"read\t0x{ref_addr:08x}"); addr_list.append(ref_addr)
-    with open(path_mem,'w') as f:
-        blocks=set([(addr>>6)<<6 for addr in addr_list])
-        for block_addr in blocks:
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 56 created")
-def testcase_57(n_set=16):
-    base_path="subsystem_testcase/testcase_57/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=set(range(1<<tag_bits)); selected_tags=random.sample(list(available_tags),4)
-    remaining_tags=list(available_tags-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]; used_blocks=set()
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15); addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15); write_addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000; data=f"0x{random.randint(0,2**32-1):08x}"
-        f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15); read_back=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_back=(read_back&0x0000FFFF)|0x00020000; f.write(f"read\t0x{read_back:08x}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15); addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6); block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 57 created")
-def testcase_58(n_set=16):
-    base_path="subsystem_testcase/testcase_58/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=set(range(1<<tag_bits)); selected_tags=random.sample(list(available_tags),4)
-    remaining_tags=list(available_tags-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_0,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"
-            f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2); write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2); read_addr=(read_addr&0x0000FFFF)|0x00020000
-        f.write(f"read\t0x{read_addr:08x}")
-    with open(path_1,'w') as f:
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2); addr=(addr&0x0000FFFF)|0x00020000
-        f.write(f"read\t0x{addr:08x}")
-    written_blocks=set()
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6); block_addr=(block_addr&0x0000FFC0)|0x00020000
-            if block_addr in written_blocks: continue
-            written_blocks.add(block_addr)
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 58 created")
-def testcase_59(n_set=16):
-    base_path="subsystem_testcase/testcase_59/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,random.randint(1,4))
-    mirror_tag=random.choice(selected_tags); all_tags=selected_tags.copy()
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        read_word_offset=random.randint(0,15)
-        read_addr=(mirror_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(read_word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        write_word_offset=random.randint(0,15)
-        write_addr=(mirror_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(write_word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in list(set(all_tags+[mirror_tag])):
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 59 created")
-def testcase_60(n_set=16):
-    base_path="subsystem_testcase/testcase_60/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_reads=random.randint(1,3)
-    selected_tags=random.sample(available_tags,num_reads)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(random.randint(0,15)<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000; data=f"0x{random.randint(0,2**32-1):08x}"
-        f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 60 created")
-def testcase_61(n_set=16):
-    base_path="subsystem_testcase/testcase_61/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(random.randint(0,15)<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000; data=f"0x{random.randint(0,2**32-1):08x}"
-        f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        all_tags=selected_tags+[new_tag]
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 61 created")
-def testcase_62(n_set=16):
-    base_path="subsystem_testcase/testcase_62/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:  # 4 lệnh write với tag khác nhau
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)  # lệnh read với tag mới
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)  # lệnh write trùng tag với read vừa tạo
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 62 created")
-def testcase_63(n_set=16):
-    base_path="subsystem_testcase/testcase_63/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    num_read=random.randint(1,3); available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,num_read)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 63 created")
-def testcase_64(n_set=16):
-    base_path="subsystem_testcase/testcase_64/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); new_tag=random.choice(remaining_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:  # 4 read khác tag
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000
-            f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)  # read với tag mới
-        read_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)  # write trùng tag với read trên
-        write_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f:  # inst_1 read trùng tag cuối
-        word_offset=random.randint(0,15)
-        inst1_addr=(new_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        inst1_addr=(inst1_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{inst1_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[new_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 64 created")
-def testcase_65(n_set=16):
-    base_path="subsystem_testcase/testcase_65/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); mid_tag=random.choice(remaining_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:  # 4 write khác tag
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)  # read với tag mới
-        read_addr=(mid_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr=(read_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr:08x}\n")
-        word_offset=random.randint(0,15)  # write lại đúng tag của read trên
-        write_addr=(mid_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}")
-    with open(path_0,'w') as f:  # inst_1 đọc lại đúng tag của write cuối
-        word_offset=random.randint(0,15)
-        inst1_addr=(mid_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        inst1_addr=(inst1_addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{inst1_addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in selected_tags+[mid_tag]:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 65 created")
-def testcase_66(n_set=16):
-    base_path="subsystem_testcase/testcase_66/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_reads=random.randint(1,4)
-    selected_tags=random.sample(available_tags,num_reads)
-    shared_tag=random.choice(selected_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(shared_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        read_addr2=(shared_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr2=(read_addr2&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr2:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        all_tags=set(selected_tags+[shared_tag])
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 66 created")
-def testcase_67(n_set=16):
-    base_path="subsystem_testcase/testcase_67/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(int(n_set).bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_reads=random.randint(1,3)
-    selected_tags=random.sample(available_tags,num_reads)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0001FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0001FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        read_addr2=(write_tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_addr2=(read_addr2&0x0001FFFF)|0x00020000; f.write(f"read\t0x{read_addr2:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        all_tags=set(selected_tags+[write_tag])
-        for tag in all_tags:
-            block_addr=(tag<<(4+int(n_set).bit_length()+2))|(set_index<<6)
-            block_addr=(block_addr&0x0001FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 67 created")
-def testcase_68(n_set=16):
-    base_path = "subsystem_testcase/testcase_68/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem"); path_1 = os.path.join(base_path, "instr_mem_B.mem"); path_mem = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2); set_index = random.randint(0, n_set - 1)
-    available_tags = list(range(1 << tag_bits)); selected_tags = random.sample(available_tags, 4)
-    remaining_tags = list(set(available_tags) - set(selected_tags)); write_tag = random.choice(remaining_tags)
-    all_tags = selected_tags + [write_tag]
-    with open(path_1, 'w') as f:
-        for tag in selected_tags:  # 4 read cùng set khác tag
-            word_offset = random.randint(0, 15)
-            addr = (tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6) | (word_offset << 2)
-            addr = (addr & 0x0001FFFF) | 0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset = random.randint(0, 15)  # write cùng set, tag khác
-        write_addr = (write_tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6) | (word_offset << 2)
-        write_addr = (write_addr & 0x0001FFFF) | 0x00020000
-        data = f"0x{random.randint(0, 2 ** 32 - 1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        read_offset = random.randint(0, 15)  # read lại đúng tag của lệnh write
-        read_addr = (write_tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6) | (read_offset << 2)
-        read_addr = (read_addr & 0x0001FFFF) | 0x00020000; f.write(f"read\t0x{read_addr:08x}")
-    with open(path_0, 'w') as f: pass
-    with open(path_mem, 'w') as f:
-        for tag in all_tags:
-            block_addr = (tag << (n_set.bit_length() + 4 + 2)) | (set_index << 6)
-            block_addr = (block_addr & 0x0001FFC0) | 0x00020000
-            data = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
-    print("Testcase 68 created")
-def testcase_69(n_set=16):
-    base_path="subsystem_testcase/testcase_69/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); selected_tags=random.sample(available_tags,4)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags); all_tags=selected_tags+[write_tag]
-    def shared(addr): return (addr&0x0003FFFF)|0x00020000
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15); addr=(tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); addr=shared(addr)
-            data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15); write_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); write_addr=shared(write_addr)
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        read_offset=random.randint(0,15); read_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(read_offset<<2); read_addr=shared(read_addr)
-        f.write(f"read\t0x{read_addr:08x}")
-    with open(path_0,'w') as f: pass
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(n_set.bit_length()+4+2))|(set_index<<6); block_addr=shared(block_addr&0xFFFFFFC0)
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 69 created")
-def testcase_70(n_set=16):
-    base_path="subsystem_testcase/testcase_70/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=list(range(1<<tag_bits)); num_read=random.randint(1,3); selected_tags=random.sample(available_tags,num_read)
-    remaining_tags=list(set(available_tags)-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    def shared(addr): return (addr&0x0003FFFF)|0x00020000
-    addr_list=[]  # thu thập địa chỉ cần tạo mem
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15); addr=(tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); addr=shared(addr)
-            f.write(f"read\t0x{addr:08x}\n"); addr_list.append(addr)
-        word_offset=random.randint(0,15); write_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(word_offset<<2); write_addr=shared(write_addr)
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n"); addr_list.append(write_addr)
-        read_offset=random.randint(0,15); read_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(read_offset<<2); read_addr=shared(read_addr)
-        f.write(f"read\t0x{read_addr:08x}"); addr_list.append(read_addr)
-    with open(path_0,'w') as f:
-        ref_offset=random.randint(0,15); ref_addr=(write_tag<<(n_set.bit_length()+4+2))|(set_index<<6)|(ref_offset<<2); ref_addr=shared(ref_addr)
-        f.write(f"read\t0x{ref_addr:08x}"); addr_list.append(ref_addr)
-    with open(path_mem,'w') as f:
-        blocks=set([(addr>>6)<<6 for addr in addr_list])
-        for block_addr in blocks:
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 70 created")
-def testcase_71(n_set=16):
-    base_path="subsystem_testcase/testcase_71/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=set(range(1<<tag_bits)); selected_tags=random.sample(list(available_tags),4)
-    remaining_tags=list(available_tags-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]; used_blocks=set()
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15); addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}\n")
-        word_offset=random.randint(0,15); write_addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        write_addr=(write_addr&0x0000FFFF)|0x00020000; data=f"0x{random.randint(0,2**32-1):08x}"
-        f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15); read_back=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        read_back=(read_back&0x0000FFFF)|0x00020000; f.write(f"read\t0x{read_back:08x}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15); addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-        addr=(addr&0x0000FFFF)|0x00020000; f.write(f"read\t0x{addr:08x}")
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6); block_addr=(block_addr&0x0000FFC0)|0x00020000
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 71 created")
-def testcase_72(n_set=16):
-    base_path="subsystem_testcase/testcase_72/"; os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem"); path_1=os.path.join(base_path,"instr_mem_B.mem"); path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_index=random.randint(0,n_set-1)
-    available_tags=set(range(1<<tag_bits)); selected_tags=random.sample(list(available_tags),4)
-    remaining_tags=list(available_tags-set(selected_tags)); write_tag=random.choice(remaining_tags)
-    all_tags=selected_tags+[write_tag]
-    with open(path_1,'w') as f:
-        for tag in selected_tags:
-            word_offset=random.randint(0,15)
-            addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2)
-            addr=(addr&0x0000FFFF)|0x00020000
-            data=f"0x{random.randint(0,2**32-1):08x}"
-            f.write(f"write\t0x{addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        write_addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2); write_addr=(write_addr&0x0000FFFF)|0x00020000
-        data=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{write_addr:08x}\t{data}\n")
-        word_offset=random.randint(0,15)
-        read_addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2); read_addr=(read_addr&0x0000FFFF)|0x00020000
-        f.write(f"read\t0x{read_addr:08x}")
-    with open(path_0,'w') as f:
-        word_offset=random.randint(0,15)
-        addr=(write_tag<<(4+n_set.bit_length()+2))|(set_index<<6)|(word_offset<<2); addr=(addr&0x0000FFFF)|0x00020000
-        f.write(f"read\t0x{addr:08x}")
-    written_blocks=set()
-    with open(path_mem,'w') as f:
-        for tag in all_tags:
-            block_addr=(tag<<(4+n_set.bit_length()+2))|(set_index<<6); block_addr=(block_addr&0x0000FFC0)|0x00020000
-            if block_addr in written_blocks: continue
-            written_blocks.add(block_addr)
-            data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            f.write(f"0x{block_addr:08x}\t"+'\t'.join(data)+'\n')
-    print("Testcase 72 created")
-def testcase_73(n_set=16):
-    base="subsystem_testcase/testcase_73/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used=set(tags)
-    rtag=random.choice(list(set(range(1<<tag_bits))-used)); all_addrs=[]
-    with open(p0,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        rwo=random.randint(0,15); ra=(rtag<<(n_set.bit_length()+6))|(set_idx<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-        f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    with open(p1,'w') as f:
-        wwo=random.randint(0,15); wa=(rtag<<(n_set.bit_length()+6))|(set_idx<<6)|(wwo<<2); wa=(wa&0x3FFFF)|0x20000
-        f.write(f"write\t0x{wa:08x}\t0x{random.randint(0,2**32-1):08x}"); all_addrs.append(wa)
-    written_blocks=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written_blocks:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written_blocks.add(block)
-    print("Testcase 73 created")
-def testcase_74(n_set=16):
-    base="subsystem_testcase/testcase_74/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used=set(tags)
-    rtag=random.choice(list(set(range(1<<tag_bits))-used)); all_addrs=[]
-    with open(p0,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        rwo=random.randint(0,15); ra=(rtag<<(n_set.bit_length()+6))|(set_idx<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-        f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    with open(p1,'w') as f:
-        diff_set=(set_idx+1)%n_set; wo=random.randint(0,15)
-        tag=random.choice(list(set(range(1<<tag_bits))-used-{rtag}))
-        a=(tag<<(n_set.bit_length()+6))|(diff_set<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-        f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}"); all_addrs.append(a)
-    written_blocks=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written_blocks:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written_blocks.add(block)
-    print("Testcase 74 created")
-def testcase_75(n_set=16):
-    base="subsystem_testcase/testcase_75/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used=set(tags)
-    wtag=random.choice(list(set(range(1<<tag_bits))-used)); all_addrs=[]
-    with open(p0,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        wwo=random.randint(0,15); wa=(wtag<<(n_set.bit_length()+6))|(set_idx<<6)|(wwo<<2); wa=(wa&0x3FFFF)|0x20000
-        wdata=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{wa:08x}\t{wdata}"); all_addrs.append(wa)
-    with open(p1,'w') as f:
-        rwo=random.randint(0,15); ra=(wtag<<(n_set.bit_length()+6))|(set_idx<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-        f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    written_blocks=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written_blocks:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written_blocks.add(block)
-    print("Testcase 75 created")
-def testcase_76(n_set=16):
-    base="subsystem_testcase/testcase_76/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used_tags=set(tags)
-    wtag=random.choice(list(set(range(1<<tag_bits))-used_tags)); all_addrs=[]
-    with open(p0,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        wwo=random.randint(0,15); wa=(wtag<<(n_set.bit_length()+6))|(set_idx<<6)|(wwo<<2); wa=(wa&0x3FFFF)|0x20000
-        f.write(f"write\t0x{wa:08x}\t0x{random.randint(0,2**32-1):08x}"); all_addrs.append(wa)
-    inst1_set=(set_idx+1)%n_set; rtag=random.randint(0,(1<<tag_bits)-1); rwo=random.randint(0,15)
-    ra=(rtag<<(n_set.bit_length()+6))|(inst1_set<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-    with open(p1,'w') as f: f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    written=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written.add(block)
-    print("Testcase 76 created")
-def testcase_77(n_set=16):
-    base="subsystem_testcase/testcase_77/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used=set(tags)
-    rtag=random.choice(list(set(range(1<<tag_bits))-used)); all_addrs=[]
-    with open(p1,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        rwo=random.randint(0,15); ra=(rtag<<(n_set.bit_length()+6))|(set_idx<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-        f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    with open(p0,'w') as f:
-        wwo=random.randint(0,15); wa=(rtag<<(n_set.bit_length()+6))|(set_idx<<6)|(wwo<<2); wa=(wa&0x3FFFF)|0x20000
-        f.write(f"write\t0x{wa:08x}\t0x{random.randint(0,2**32-1):08x}"); all_addrs.append(wa)
-    written_blocks=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written_blocks:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written_blocks.add(block)
-    print("Testcase 77 created")
-def testcase_78(n_set=16):
-    base="subsystem_testcase/testcase_78/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used=set(tags)
-    rtag=random.choice(list(set(range(1<<tag_bits))-used)); all_addrs=[]
-    with open(p1,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        rwo=random.randint(0,15); ra=(rtag<<(n_set.bit_length()+6))|(set_idx<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-        f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    with open(p0,'w') as f:
-        diff_set=(set_idx+1)%n_set; wo=random.randint(0,15)
-        tag=random.choice(list(set(range(1<<tag_bits))-used-{rtag}))
-        a=(tag<<(n_set.bit_length()+6))|(diff_set<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-        f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}"); all_addrs.append(a)
-    written_blocks=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written_blocks:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written_blocks.add(block)
-    print("Testcase 78 created")
-def testcase_79(n_set=16):
-    base="subsystem_testcase/testcase_79/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used=set(tags)
-    wtag=random.choice(list(set(range(1<<tag_bits))-used)); all_addrs=[]
-    with open(p1,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        wwo=random.randint(0,15); wa=(wtag<<(n_set.bit_length()+6))|(set_idx<<6)|(wwo<<2); wa=(wa&0x3FFFF)|0x20000
-        wdata=f"0x{random.randint(0,2**32-1):08x}"; f.write(f"write\t0x{wa:08x}\t{wdata}"); all_addrs.append(wa)
-    with open(p0,'w') as f:
-        rwo=random.randint(0,15); ra=(wtag<<(n_set.bit_length()+6))|(set_idx<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-        f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    written_blocks=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written_blocks:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written_blocks.add(block)
-    print("Testcase 79 created")
-def testcase_80(n_set=16):
-    base="subsystem_testcase/testcase_80/"; os.makedirs(base,exist_ok=True)
-    p0=os.path.join(base,"instr_mem_A.mem"); p1=os.path.join(base,"instr_mem_B.mem"); pm=os.path.join(base,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2); set_idx=random.randint(0,n_set-1)
-    tags=random.sample(range(1<<tag_bits),4); used_tags=set(tags)
-    wtag=random.choice(list(set(range(1<<tag_bits))-used_tags)); all_addrs=[]
-    with open(p1,'w') as f:
-        for t in tags:
-            wo=random.randint(0,15); a=(t<<(n_set.bit_length()+6))|(set_idx<<6)|(wo<<2); a=(a&0x3FFFF)|0x20000
-            f.write(f"write\t0x{a:08x}\t0x{random.randint(0,2**32-1):08x}\n"); all_addrs.append(a)
-        wwo=random.randint(0,15); wa=(wtag<<(n_set.bit_length()+6))|(set_idx<<6)|(wwo<<2); wa=(wa&0x3FFFF)|0x20000
-        f.write(f"write\t0x{wa:08x}\t0x{random.randint(0,2**32-1):08x}"); all_addrs.append(wa)
-    inst1_set=(set_idx+1)%n_set; rtag=random.randint(0,(1<<tag_bits)-1); rwo=random.randint(0,15)
-    ra=(rtag<<(n_set.bit_length()+6))|(inst1_set<<6)|(rwo<<2); ra=(ra&0x3FFFF)|0x20000
-    with open(p0,'w') as f: f.write(f"read\t0x{ra:08x}"); all_addrs.append(ra)
-    written=set();
-    with open(pm,'w') as f:
-        for addr in all_addrs:
-            block=(addr>>6)<<6; block=(block&0x3FFC0)|0x20000
-            if block not in written:
-                data=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-                f.write(f"0x{block:08x}\t"+'\t'.join(data)+'\n'); written.add(block)
-    print("Testcase 80 created")
-def testcase_81(n_set=16):
+def testcase_1():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_1/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    tag_list = []
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    tag_dup = random.choice(tag_list)
+    off_dup = random.choice(range(0, 64, 4))
+    addr_dup = make_core0(tag_dup, fixed_set, off_dup)
+    instr_A.append(f"read\t{to_hex32(addr_dup)}")
+    addrs.append(addr_dup)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 1 created")
+def testcase_2():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_2/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(2, 4)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 2 created")
+def testcase_3():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_3/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 3 created")
+def testcase_4():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_4/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    while True:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            break
+    off = random.choice(range(0, 64, 4))
+    addr = make_core0(tag, fixed_set, off)
+    instr_A.append(f"read\t{to_hex32(addr)}")
+    addrs.append(addr)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 4 created")
+def testcase_5():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_5/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    tag_list = []
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    tag_w = random.choice(tag_list)
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_core0(tag_w, fixed_set, off_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 5 created")
+def testcase_6():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_6/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_core0(tag_w, fixed_set, off_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 6 created")
+def testcase_7():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_7/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_core0(tag_w, fixed_set, off_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 7 created")
+def testcase_8():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_8/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core0(t, s, o): return (0x0000 << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core0(tag, fixed_set, off)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 8 created")
+def testcase_9():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_9/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    tag_list = []
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    tag_dup = random.choice(tag_list)
+    off_dup = random.choice(range(0, 64, 4))
+    addr_dup = make_core1(tag_dup, fixed_set, off_dup)
+    instr_B.append(f"read\t{to_hex32(addr_dup)}")
+    addrs.append(addr_dup)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 9 created")
+def testcase_10():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_10/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(2, 4)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 10 created")
+def testcase_11():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_11/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 11 created")
+def testcase_12():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_12/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    while True:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            break
+    off = random.choice(range(0, 64, 4))
+    addr = make_core1(tag, fixed_set, off)
+    instr_B.append(f"read\t{to_hex32(addr)}")
+    addrs.append(addr)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 12 created")
+def testcase_13():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_13/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    tag_list = []
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    tag_w = random.choice(tag_list)
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_core1(tag_w, fixed_set, off_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 13 created")
+def testcase_14():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_14/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_core1(tag_w, fixed_set, off_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 14 created")
+def testcase_15():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_15/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_core1(tag_w, fixed_set, off_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 15 created")
+def testcase_16():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_16/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_core1(t, s, o): return (0x0001 << 16) | (t << 10) | (s << 6) | o
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_core1(tag, fixed_set, off)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 16 created")
+def testcase_17():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_17/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    shared_prefix = random.choice([0x0002, 0x0003])
+    tag_list = []
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    tag_dup = random.choice(tag_list)
+    off_dup = random.choice(range(0, 64, 4))
+    addr_dup = make_shared(shared_prefix, tag_dup, fixed_set, off_dup)
+    instr_A.append(f"read\t{to_hex32(addr_dup)}")
+    addrs.append(addr_dup)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 17 created")
+def testcase_18():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_18/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    shared_prefix = random.choice([0x0002, 0x0003])
+    n = random.randint(2, 4)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            b = a & ~0x3F
+            if b in written: continue
+            written.add(b)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(b)] + words) + "\n")
+    print("testcase 18 created")
+def testcase_19():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_19/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+    shared_prefix = random.choice([0x0002, 0x0003])
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 19 created")
+def testcase_20():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_20/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 20 created")
+def testcase_21():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_21/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(2, 4)
+    last_tag = None
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, last_tag, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 21 created")
+def testcase_22():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_22/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    last_tag = None
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, last_tag, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 22 created")
+def testcase_23():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_23/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    last_tag = None
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    while True:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            last_tag = tag
+            break
+    offset = random.choice(range(0, 64, 4))
+    addr_last = make_shared(shared_prefix, last_tag, fixed_set, offset)
+    instr_A.append(f"read\t{to_hex32(addr_last)}")
+    addrs.append(addr_last)
+
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, last_tag, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 23 created")
+def testcase_24():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_24/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    tag_dup = random.choice(tag_list)
+    offset_dup = random.choice(range(0, 64, 4))
+    addr_dup = make_shared(shared_prefix, tag_dup, fixed_set, offset_dup)
+    instr_B.append(f"read\t{to_hex32(addr_dup)}")
+    addrs.append(addr_dup)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 24 created")
+def testcase_25():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_25/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(2, 4)
+
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 25 created")
+def testcase_26():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_26/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 26 created")
+def testcase_27():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_27/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 27 created")
+def testcase_28():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_28/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(2, 4)
+
+    last_tag = None
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, last_tag, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 28 created")
+def testcase_29():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_29/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    last_tag = None
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, last_tag, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 29 created")
+def testcase_30():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_30/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    last_tag = None
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            last_tag = tag_r
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, last_tag, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, last_tag, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 30 created")
+def testcase_31():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_31/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    tag_w = random.choice(tag_list)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 31 created")
+def testcase_32():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_32/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 32 created")
+def testcase_33():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_33/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 33 created")
+def testcase_34():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_34/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 34 created")
+def testcase_35():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_35/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, off_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+
+    off_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, tag_w, fixed_set, off_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 35 created")
+def testcase_36():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_36/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, off)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, off_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    off_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, tag_w, fixed_set, off_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 36 created")
+def testcase_37():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_37/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+        last_tag = tag
+
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, last_tag, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 37 created")
+def testcase_38():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_38/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        off = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, off)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    tag_w = random.choice(tag_list)
+    off_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, off_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 38 created")
+def testcase_39():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_39/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_B, instr_A, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 39 created")
+def testcase_40():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_40/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_B, instr_A, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 40 created")
+def testcase_41():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_41/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_B = []
+    addrs = []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 41 created")
+def testcase_42():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_42/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # Lệnh write với tag mới chưa dùng
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # Lệnh read từ mem A giống địa chỉ logic của write cuối
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, tag_w, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            block_base = a & ~0x3F
+            if block_base in written: continue
+            written.add(block_base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(block_base)] + words) + "\n")
+
+    print("testcase 42 created")
+def testcase_43():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_43/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])  # chia sẻ chung
+    fixed_set = random.randint(0, 0xF)
+
+    # 4 lệnh READ khác tag
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # Lệnh WRITE cuối cùng (tag mới)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # Lệnh READ từ mem A trùng tag, set, prefix với write trên
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, tag_w, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    # Ghi file
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    # Ghi memory data
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 43 created")
+def testcase_44():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_44/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # 5 lệnh WRITE khác tag
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+        last_tag = tag  # lưu tag cuối cùng
+
+    # Lệnh read từ mem A trùng tag/set với write cuối trong B
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, last_tag, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 44 created")
+def testcase_45():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_45/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    chosen_tag = random.choice(tag_list)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, chosen_tag, fixed_set, offset_r2)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, chosen_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 45 created")
+def testcase_46():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_46/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, last_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 46 created")
+def testcase_47():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_47/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, last_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 47 created")
+def testcase_48():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_48/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, addrs = [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    offset_w2 = random.choice(range(0, 64, 4))
+    addr_w2 = make_shared(shared_prefix, tag_r, fixed_set, offset_w2)
+    data2 = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w2)}\t{data2}")
+    addrs.append(addr_w2)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 48 created")
+def testcase_49():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_49/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(2, 4)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, last_tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, last_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, last_tag, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 49 created")
+def testcase_50():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_50/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, last_tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, last_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, last_tag, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 50 created")
+def testcase_51():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_51/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    offset_w2 = random.choice(range(0, 64, 4))
+    addr_w2 = make_shared(shared_prefix, tag_r, fixed_set, offset_w2)
+    data2 = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w2)}\t{data2}")
+    addrs.append(addr_w2)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, tag_r, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 51 created")
+def testcase_52():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_52/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    chosen_tag = random.choice(tag_list)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, chosen_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, chosen_tag, fixed_set, offset_r2)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 52 created")
+def testcase_53():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_53/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 53 created")
+def testcase_54():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_54/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 54 created")
+def testcase_55():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_55/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, last_tag, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f: pass
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 55 created")
+def testcase_56():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_56/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, tag_w, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 56 created")
+def testcase_57():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_57/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, tag_w, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 57 created")
+def testcase_58():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_58/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, last_tag, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, last_tag, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 58 created")
+def testcase_59():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_59/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    chosen_tag = random.choice(tag_list)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, chosen_tag, fixed_set, offset_r2)
+    instr_B.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, chosen_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 59 created")
+def testcase_60():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_60/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, last_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 60 created")
+def testcase_61():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_61/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, last_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 61 created")
+def testcase_62():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_62/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    offset_w2 = random.choice(range(0, 64, 4))
+    addr_w2 = make_shared(shared_prefix, tag_r, fixed_set, offset_w2)
+    data2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w2)}\t{data2}")
+    addrs.append(addr_w2)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 62 created")
+def testcase_63():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_63/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(2, 4)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    chosen_tag = tag_list[-1]
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, chosen_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, chosen_tag, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 63 created")
+def testcase_64():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_64/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, last_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, last_tag, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 64 created")
+def testcase_65():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_65/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    offset_w2 = random.choice(range(0, 64, 4))
+    addr_w2 = make_shared(shared_prefix, tag_r, fixed_set, offset_w2)
+    data2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w2)}\t{data2}")
+    addrs.append(addr_w2)
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, tag_r, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 65 created")
+def testcase_66():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_66/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    tag_list = []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                tag_list.append(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    chosen_tag = random.choice(tag_list)
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, chosen_tag, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, chosen_tag, fixed_set, offset_r2)
+    instr_B.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 66 created")
+def testcase_67():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_67/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_B.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 67 created")
+def testcase_68():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_68/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_B.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 68 created")
+def testcase_69():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_69/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, last_tag, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+    with open(path_A, "w") as f: pass
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 69 created")
+def testcase_70():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_70/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+    n = random.randint(1, 3)
+    for _ in range(n):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+    offset_b = random.choice(range(0, 64, 4))
+    addr_b = make_shared(shared_prefix, tag_w, fixed_set, offset_b)
+    instr_B.append(f"read\t{to_hex32(addr_b)}")
+    addrs.append(addr_b)
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 70 created")
+def testcase_71():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_71/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        if tag_w not in used_tags:
+            used_tags.add(tag_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, fixed_set, offset_w)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data}")
+    addrs.append(addr_w)
+
+    offset_r2 = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_w, fixed_set, offset_r2)
+    instr_B.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, tag_w, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 71 created")
+def testcase_72():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_72/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, last_tag, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    offset_a = random.choice(range(0, 64, 4))
+    addr_a = make_shared(shared_prefix, last_tag, fixed_set, offset_a)
+    instr_A.append(f"read\t{to_hex32(addr_a)}")
+    addrs.append(addr_a)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 72 created")
+def testcase_73():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_73/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # 4 WRITE + 1 READ khác tag trong A
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # 1 READ trong A (tag khác)
+    while True:
+        tag_read = random.randint(0, 0x3F)
+        if tag_read not in used_tags:
+            used_tags.add(tag_read)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_read, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # B: read trùng địa chỉ cuối của A
+    addr_match = make_shared(shared_prefix, tag_read, fixed_set, random.choice(range(0, 64, 4)))
+    instr_B.append(f"read\t{to_hex32(addr_match)}")
+    addrs.append(addr_match)
+
+    # Tạo 5 read/write ngẫu nhiên khác set
+    used_sets.add(fixed_set)
+    for _ in range(5):
+        while True:
+            new_set = random.randint(0, 0xF)
+            if new_set not in used_sets:
+                used_sets.add(new_set)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, new_set, offset)
+        if random.choice([True, False]):
+            instr_B.append(f"read\t{to_hex32(addr)}")
+        else:
+            data = to_hex32(random.getrandbits(32))
+            instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # WRITE cuối cùng trùng tag/set với lệnh READ cuối của A
+    addr_w = make_shared(shared_prefix, tag_read, fixed_set, random.choice(range(0, 64, 4)))
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 73 created")
+def testcase_74():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_74/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # 4 WRITE trong A
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # 1 READ cuối trong A
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # B: 1 read trùng logic với lệnh cuối của A
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_r, fixed_set, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+    used_sets.add(fixed_set)
+
+    # 5 READ khác set
+    for _ in range(5):
+        while True:
+            s = random.randint(0, 0xF)
+            if s not in used_sets:
+                used_sets.add(s)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, s, offset)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # 1 WRITE khác set (với read đầu tiên trong B)
+    while True:
+        s = random.randint(0, 0xF)
+        if s != fixed_set and s not in used_sets:
+            used_sets.add(s)
+            break
+    tag_w = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
+    addr = make_shared(shared_prefix, tag_w, s, offset)
+    data = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+    addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 74 created")
+def testcase_75():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_75/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # 5 WRITE trong A
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, last_tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    used_sets.add(fixed_set)
+
+    # 1 READ khác set trong A
+    while True:
+        read_set_a = random.randint(0, 0xF)
+        if read_set_a not in used_sets:
+            used_sets.add(read_set_a)
+            break
+    tag_read_a = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
+    addr_read_a = make_shared(shared_prefix, tag_read_a, read_set_a, offset)
+    instr_A.append(f"read\t{to_hex32(addr_read_a)}")
+    addrs.append(addr_read_a)
+
+    # 1 READ trong B trùng với WRITE cuối cùng trong A
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, last_tag, fixed_set, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # 5 read/write ngẫu nhiên, khác set
+    for _ in range(5):
+        while True:
+            s = random.randint(0, 0xF)
+            if s not in used_sets:
+                used_sets.add(s)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, s, offset)
+        if random.choice([True, False]):
+            instr_B.append(f"read\t{to_hex32(addr)}")
+        else:
+            data = to_hex32(random.getrandbits(32))
+            instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # 1 READ trong B trùng với READ cuối trong A
+    offset_last = random.choice(range(0, 64, 4))
+    addr_final = make_shared(shared_prefix, tag_read_a, read_set_a, offset_last)
+    instr_B.append(f"read\t{to_hex32(addr_final)}")
+    addrs.append(addr_final)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 75 created")
+def testcase_76():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_76/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # 5 WRITE cùng set, khác tag trong A
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, last_tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    used_sets.add(fixed_set)
+
+    # 1 READ trong B trùng với write cuối của A
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, last_tag, fixed_set, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # 5 lệnh read/write ngẫu nhiên khác set
+    for _ in range(5):
+        while True:
+            s = random.randint(0, 0xF)
+            if s not in used_sets:
+                used_sets.add(s)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, s, offset)
+        if random.choice([True, False]):
+            instr_B.append(f"read\t{to_hex32(addr)}")
+        else:
+            data = to_hex32(random.getrandbits(32))
+            instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # 1 READ cuối trong B với set khác WRITE cuối của A
+    while True:
+        new_set = random.randint(0, 0xF)
+        if new_set != fixed_set and new_set not in used_sets:
+            break
+    tag_r2 = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_r2, new_set, offset)
+    instr_B.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+    print("testcase 76 created")
+def testcase_77():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_77/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # 4 WRITE trong B
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # 1 READ trong B (khác tag)
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # A: 1 READ trùng logic với lệnh cuối của B
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_r, fixed_set, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    used_sets.add(fixed_set)
+
+    # 5 lệnh read/write ngẫu nhiên trong A, khác set
+    for _ in range(5):
+        while True:
+            s = random.randint(0, 0xF)
+            if s not in used_sets:
+                used_sets.add(s)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, s, offset)
+        if random.choice([True, False]):
+            instr_A.append(f"read\t{to_hex32(addr)}")
+        else:
+            data = to_hex32(random.getrandbits(32))
+            instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # 1 WRITE cuối trong A trùng logic với lệnh READ cuối của B
+    offset_a_last = random.choice(range(0, 64, 4))
+    addr_a_last = make_shared(shared_prefix, tag_r, fixed_set, offset_a_last)
+    data_last = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_a_last)}\t{data_last}")
+    addrs.append(addr_a_last)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 77 created")
+def testcase_78():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_78/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # B: 4 write
+    for _ in range(4):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # B: 1 read (khác tag)
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # A: 1 read trùng logic với read cuối của B
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_r, fixed_set, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    used_sets.add(fixed_set)
+
+    # A: 5 read khác set
+    for _ in range(5):
+        while True:
+            s = random.randint(0, 0xF)
+            if s not in used_sets:
+                used_sets.add(s)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, s, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # A: 1 write khác set với lệnh read đầu tiên trong A (set = fixed_set, đã tránh)
+    while True:
+        s = random.randint(0, 0xF)
+        if s not in used_sets:
+            break
+    tag_w = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
+    addr = make_shared(shared_prefix, tag_w, s, offset)
+    data = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+    addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 78 created")
+def testcase_79():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_79/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # B: 5 write cùng set, khác tag
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, last_tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    used_sets.add(fixed_set)
+
+    # B: 1 read khác set
+    while True:
+        read_set_b = random.randint(0, 0xF)
+        if read_set_b not in used_sets:
+            used_sets.add(read_set_b)
+            break
+    tag_rb = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
+    addr_rb = make_shared(shared_prefix, tag_rb, read_set_b, offset)
+    instr_B.append(f"read\t{to_hex32(addr_rb)}")
+    addrs.append(addr_rb)
+
+    # A: 1 read giống write cuối của B
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, last_tag, fixed_set, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A: 5 lệnh read/write khác set
+    for _ in range(5):
+        while True:
+            s = random.randint(0, 0xF)
+            if s not in used_sets:
+                used_sets.add(s)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, s, offset)
+        if random.choice([True, False]):
+            instr_A.append(f"read\t{to_hex32(addr)}")
+        else:
+            data = to_hex32(random.getrandbits(32))
+            instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # A: 1 read giống read cuối của B
+    offset_afinal = random.choice(range(0, 64, 4))
+    addr_afinal = make_shared(shared_prefix, tag_rb, read_set_b, offset_afinal)
+    instr_A.append(f"read\t{to_hex32(addr_afinal)}")
+    addrs.append(addr_afinal)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 79 created")
+def testcase_80():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_80/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    used_tags = set()
+    used_sets = set()
+    shared_prefix = random.choice([0x0002, 0x0003])
+    fixed_set = random.randint(0, 0xF)
+
+    # B: 5 write cùng set, khác tag
+    for _ in range(5):
+        while True:
+            tag = random.randint(0, 0x3F)
+            if tag not in used_tags:
+                used_tags.add(tag)
+                last_tag = tag
+                break
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, last_tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+    used_sets.add(fixed_set)
+
+    # A: 1 read trùng với write cuối của B
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, last_tag, fixed_set, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A: 5 lệnh read/write ngẫu nhiên khác set
+    for _ in range(5):
+        while True:
+            s = random.randint(0, 0xF)
+            if s not in used_sets:
+                used_sets.add(s)
+                break
+        tag = random.randint(0, 0x3F)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, s, offset)
+        if random.choice([True, False]):
+            instr_A.append(f"read\t{to_hex32(addr)}")
+        else:
+            data = to_hex32(random.getrandbits(32))
+            instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
+
+    # A: 1 read có set khác set của write cuối trong B
+    while True:
+        other_set = random.randint(0, 0xF)
+        if other_set != fixed_set and other_set not in used_sets:
+            break
+    tag_r2 = random.randint(0, 0x3F)
+    offset = random.choice(range(0, 64, 4))
+    addr_r2 = make_shared(shared_prefix, tag_r2, other_set, offset)
+    instr_A.append(f"read\t{to_hex32(addr_r2)}")
+    addrs.append(addr_r2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 80 created")
+def testcase_81():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_81/"
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA = random.randint(0, n_set - 1)
-    tagA = random.randint(0, (1 << tag_bits) - 1)
-    wordA = random.randint(0, 15)
-    readA = shared((tagA << (n_set.bit_length() + 4 + 2)) | (setA << 6) | (wordA << 2))
-    setB = random.randint(0, n_set - 1)
-    tagB = random.randint(0, (1 << tag_bits) - 1)
-    wordB = random.randint(0, 15)
-    readB = shared((tagB << (n_set.bit_length() + 4 + 2)) | (setB << 6) | (wordB << 2))
-    wordB2 = random.randint(0, 15)
-    readB2 = shared((tagB << (n_set.bit_length() + 4 + 2)) | (setB << 6) | (wordB2 << 2))
-    wordA2 = random.randint(0, 15)
-    readA2 = shared((tagA << (n_set.bit_length() + 4 + 2)) | (setA << 6) | (wordA2 << 2))
-    with open(path_0, "w") as f0:
-        f0.write(f"read\t0x{readA:08x}\nread\t0x{readB:08x}\n")
-    with open(path_1, "w") as f1:
-        f1.write(f"read\t0x{readB2:08x}\nread\t0x{readA2:08x}\n")
-    blocks = {block_addr(readA), block_addr(readB)}
-    with open(path_mem, "w") as fm:
-        for blk in blocks:
-            data_words = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_words) + "\n")
-    print("Testcase 81 created")
-def testcase_82(n_set=16):
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+
+    # A: 2 read, khác set và tag
+    read_refs = []
+    while len(read_refs) < 2:
+        tag = random.randint(0, 0x3F)
+        set_ = random.randint(0, 0xF)
+        if (tag, set_) not in used_pairs:
+            used_pairs.add((tag, set_))
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, set_, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+            read_refs.append((tag, set_))
+
+    # B: 1 read giống với A[1]
+    tag1, set1 = read_refs[1]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag1, set1, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    # B: 1 read giống với A[0]
+    tag0, set0 = read_refs[0]
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag0, set0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 81 created")
+def testcase_82():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_82/"
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path,"instr_mem_A.mem")
-    path_1 = os.path.join(base_path,"instr_mem_B.mem")
-    path_mem = os.path.join(base_path,"main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA = random.randint(0,n_set-1)
-    tagA = random.randint(0,(1<<tag_bits)-1)
-    wordA = random.randint(0,15)
-    readA = shared((tagA<<(n_set.bit_length()+4+2)) | (setA<<6) | (wordA<<2))
-    setB = random.randint(0,n_set-1)
-    tagB = random.randint(0,(1<<tag_bits)-1)
-    wordB = random.randint(0,15)
-    readB = shared((tagB<<(n_set.bit_length()+4+2)) | (setB<<6) | (wordB<<2))
-    wordB2 = random.randint(0,15)
-    readB2 = shared((tagB<<(n_set.bit_length()+4+2)) | (setB<<6) | (wordB2<<2))
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+    used_sets = set()
+
+    # A: 2 read, khác set và tag
+    read_refs = []
+    while len(read_refs) < 2:
+        tag = random.randint(0, 0x3F)
+        set_ = random.randint(0, 0xF)
+        if (tag, set_) not in used_pairs:
+            used_pairs.add((tag, set_))
+            used_sets.add(set_)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, set_, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+            read_refs.append((tag, set_))
+
+    # B: 1 read giống với A[1]
+    tag1, set1 = read_refs[1]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag1, set1, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    # B: 1 read khác set với A[0]
+    tag2 = random.randint(0, 0x3F)
     while True:
-        setX = random.randint(0,n_set-1)
-        if setX!=setA and setX!=setB:
+        set2 = random.randint(0, 0xF)
+        if set2 != read_refs[0][1] and set2 not in used_sets:
             break
-    tagX = random.randint(0,(1<<tag_bits)-1)
-    wordX = random.randint(0,15)
-    readX = shared((tagX<<(n_set.bit_length()+4+2)) | (setX<<6) | (wordX<<2))
-    with open(path_0,"w") as f0:
-        f0.write(f"read\t0x{readA:08x}\nread\t0x{readB:08x}\n")
-    with open(path_1,"w") as f1:
-        f1.write(f"read\t0x{readB2:08x}\nread\t0x{readX:08x}\n")
-    blocks = {block_addr(readA), block_addr(readB), block_addr(readX)}
-    with open(path_mem,"w") as fm:
-        for blk in blocks:
-            data_words = [f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_words) + "\n")
-    print("Testcase 82 created")
-def testcase_83(n_set=16):
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag2, set2, offset_b2)
+    instr_B.append(f"read\t{to_hex32(addr_b2)}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 82 created")
+def testcase_83():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_83/"
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA = random.randint(0, n_set - 1)
-    tagA = random.randint(0, (1 << tag_bits) - 1)
-    wordA = random.randint(0, 15)
-    readA = shared((tagA << (n_set.bit_length()+4+2)) | (setA << 6) | (wordA << 2))
-    setB = random.randint(0, n_set - 1)
-    tagB = random.randint(0, (1 << tag_bits) - 1)
-    wordB = random.randint(0, 15)
-    readB = shared((tagB << (n_set.bit_length()+4+2)) | (setB << 6) | (wordB << 2))
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+    used_sets = set()
+
+    # B: 2 read, khác set và tag
+    read_refs = []
+    while len(read_refs) < 2:
+        tag = random.randint(0, 0x3F)
+        set_ = random.randint(0, 0xF)
+        if (tag, set_) not in used_pairs:
+            used_pairs.add((tag, set_))
+            used_sets.add(set_)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, set_, offset)
+            instr_B.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+            read_refs.append((tag, set_))
+
+    # A: 1 read giống với B[1]
+    tag1, set1 = read_refs[1]
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag1, set1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # A: 1 read khác set với B[0]
     while True:
-        setX = random.randint(0, n_set - 1)
-        if setX != setA and setX != setB:
+        set2 = random.randint(0, 0xF)
+        if set2 != read_refs[0][1] and set2 not in used_sets:
             break
-    tagX = random.randint(0, (1 << tag_bits) - 1)
-    wordX = random.randint(0, 15)
-    readX = shared((tagX << (n_set.bit_length()+4+2)) | (setX << 6) | (wordX << 2))
-    wordA2 = random.randint(0, 15)
-    readA2 = shared((tagA << (n_set.bit_length()+4+2)) | (setA << 6) | (wordA2 << 2))
-    with open(path_0, "w") as f0:
-        f0.write(f"read\t0x{readA:08x}\nread\t0x{readB:08x}\n")
-    with open(path_1, "w") as f1:
-        f1.write(f"read\t0x{readX:08x}\nread\t0x{readA2:08x}\n")
-    blocks = {block_addr(readA), block_addr(readB), block_addr(readX), block_addr(readA2)}
-    with open(path_mem, "w") as fm:
-        for blk in blocks:
-            data_words = [f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_words) + "\n")
-    print("Testcase 83 created")
-def testcase_84(n_set=16):
+    tag2 = random.randint(0, 0x3F)
+    offset_a2 = random.choice(range(0, 64, 4))
+    addr_a2 = make_shared(shared_prefix, tag2, set2, offset_a2)
+    instr_A.append(f"read\t{to_hex32(addr_a2)}")
+    addrs.append(addr_a2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 83 created")
+def testcase_84():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_84/"
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA = random.randint(0, n_set - 1)
-    tagA = random.randint(0, (1 << tag_bits) - 1)
-    wordA = random.randint(0, 15)
-    readA = shared((tagA << (n_set.bit_length() + 4 + 2)) | (setA << 6) | (wordA << 2))
-    setB = random.randint(0, n_set - 1)
-    tagB = random.randint(0, (1 << tag_bits) - 1)
-    wordB = random.randint(0, 15)
-    writeB = shared((tagB << (n_set.bit_length() + 4 + 2)) | (setB << 6) | (wordB << 2))
-    dataB = f"0x{random.randint(0, 2**32 - 1):08x}"
-    wordB2 = random.randint(0, 15)
-    readB = shared((tagB << (n_set.bit_length() + 4 + 2)) | (setB << 6) | (wordB2 << 2))
-    wordA2 = random.randint(0, 15)
-    writeA = shared((tagA << (n_set.bit_length() + 4 + 2)) | (setA << 6) | (wordA2 << 2))
-    dataA = f"0x{random.randint(0, 2**32 - 1):08x}"
-    with open(path_0, "w") as f0: f0.write(f"read\t0x{readA:08x}\nwrite\t0x{writeB:08x}\t{dataB}\n")
-    with open(path_1, "w") as f1: f1.write(f"read\t0x{readB:08x}\nwrite\t0x{writeA:08x}\t{dataA}\n")
-    blocks = {block_addr(readA), block_addr(writeB)}
-    with open(path_mem, "w") as fm:
-        for blk in blocks:
-            data_words = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_words) + "\n")
-    print("Testcase 84 created")
-def testcase_85(n_set=16):
-    base_path="subsystem_testcase/testcase_85/"
-    os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem")
-    path_1=os.path.join(base_path,"instr_mem_B.mem")
-    path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA=random.randint(0,n_set-1)
-    tagA=random.randint(0,(1<<tag_bits)-1)
-    wordA=random.randint(0,15)
-    readA=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA<<2))
-    setB=random.randint(0,n_set-1)
-    tagB=random.randint(0,(1<<tag_bits)-1)
-    wordB=random.randint(0,15)
-    writeB=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB<<2))
-    dataB=f"0x{random.randint(0,2**32-1):08x}"
-    wordB2=random.randint(0,15)
-    readB=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB2<<2))
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+
+    # A: 1 read
     while True:
-        setX=random.randint(0,n_set-1)
-        if setX!=setA and setX!=setB: break
-    tagX=random.randint(0,(1<<tag_bits)-1)
-    wordX=random.randint(0,15)
-    writeX=shared((tagX<<(n_set.bit_length()+4+2))|(setX<<6)|(wordX<<2))
-    dataX=f"0x{random.randint(0,2**32-1):08x}"
-    with open(path_0,"w") as f0: f0.write(f"read\t0x{readA:08x}\nwrite\t0x{writeB:08x}\t{dataB}\n")
-    with open(path_1,"w") as f1: f1.write(f"read\t0x{readB:08x}\nwrite\t0x{writeX:08x}\t{dataX}\n")
-    blocks={block_addr(readA),block_addr(writeB),block_addr(readB),block_addr(writeX)}
-    with open(path_mem,"w") as fm:
-        for blk in blocks:
-            fm.write(f"0x{blk:08x}\t"+'\t'.join(f"0x{random.randint(0,2**32-1):08x}"for _ in range(16))+"\n")
-    print("Testcase 85 created")
-def testcase_86(n_set=16):
-    base_path="subsystem_testcase/testcase_86/"
-    os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem")
-    path_1=os.path.join(base_path,"instr_mem_B.mem")
-    path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA=random.randint(0,n_set-1)
-    tagA=random.randint(0,(1<<tag_bits)-1)
-    wordA=random.randint(0,15)
-    readA=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA<<2))
-    setB=random.randint(0,n_set-1)
-    tagB=random.randint(0,(1<<tag_bits)-1)
-    wordB=random.randint(0,15)
-    writeB=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB<<2))
-    dataB=f"0x{random.randint(0,2**32-1):08x}"
+        tag_r = random.randint(0, 0x3F)
+        set_r = random.randint(0, 0xF)
+        if (tag_r, set_r) not in used_pairs:
+            used_pairs.add((tag_r, set_r))
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, set_r, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # A: 1 write (khác tag + set)
     while True:
-        setX=random.randint(0,n_set-1)
-        if setX!=setA and setX!=setB: break
-    tagX=random.randint(0,(1<<tag_bits)-1)
-    wordX=random.randint(0,15)
-    readX=shared((tagX<<(n_set.bit_length()+4+2))|(setX<<6)|(wordX<<2))
-    wordA2=random.randint(0,15)
-    writeA2=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA2<<2))
-    dataA2=f"0x{random.randint(0,2**32-1):08x}"
-    with open(path_0,"w")as f0: f0.write(f"read\t0x{readA:08x}\nwrite\t0x{writeB:08x}\t{dataB}\n")
-    with open(path_1,"w")as f1: f1.write(f"read\t0x{readX:08x}\nwrite\t0x{writeA2:08x}\t{dataA2}\n")
-    blocks={block_addr(readA),block_addr(writeB),block_addr(readX),block_addr(writeA2)}
-    with open(path_mem,"w")as fm:
-        for blk in blocks: fm.write(f"0x{blk:08x}\t"+'\t'.join(f"0x{random.randint(0,2**32-1):08x}"for _ in range(16))+"\n")
-    print("Testcase 86 created")
-def testcase_87(n_set=16):
-    base_path="subsystem_testcase/testcase_87/"
-    os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem")
-    path_1=os.path.join(base_path,"instr_mem_B.mem")
-    path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA=random.randint(0,n_set-1)
-    tagA=random.randint(0,(1<<tag_bits)-1)
-    wordA=random.randint(0,15)
-    readA=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA<<2))
-    setB=random.randint(0,n_set-1)
-    tagB=random.randint(0,(1<<tag_bits)-1)
-    wordB=random.randint(0,15)
-    readB=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB<<2))
-    wordB2=random.randint(0,15)
-    readB2=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB2<<2))
-    wordA2=random.randint(0,15)
-    writeA2=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA2<<2))
-    dataA2=f"0x{random.randint(0,2**32-1):08x}"
-    with open(path_0,"w")as f0:
-        f0.write(f"read\t0x{readA:08x}\nread\t0x{readB:08x}\n")
-    with open(path_1,"w")as f1:
-        f1.write(f"read\t0x{readB2:08x}\nwrite\t0x{writeA2:08x}\t{dataA2}\n")
-    blocks={block_addr(readA),block_addr(readB),block_addr(readB2),block_addr(writeA2)}
-    with open(path_mem,"w")as fm:
-        for blk in blocks: fm.write(f"0x{blk:08x}\t"+'\t'.join(f"0x{random.randint(0,2**32-1):08x}"for _ in range(16))+"\n")
-    print("Testcase 87 created")
-def testcase_88(n_set=16):
-    base_path="subsystem_testcase/testcase_88/"
-    os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem")
-    path_1=os.path.join(base_path,"instr_mem_B.mem")
-    path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA=random.randint(0,n_set-1)
-    tagA=random.randint(0,(1<<tag_bits)-1)
-    wordA=random.randint(0,15)
-    readA=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA<<2))
-    setB=random.randint(0,n_set-1)
-    tagB=random.randint(0,(1<<tag_bits)-1)
-    wordB=random.randint(0,15)
-    readB=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB<<2))
-    wordB2=random.randint(0,15)
-    readB2=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB2<<2))
+        tag_w = random.randint(0, 0x3F)
+        set_w = random.randint(0, 0xF)
+        if (tag_w, set_w) not in used_pairs:
+            used_pairs.add((tag_w, set_w))
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, set_w, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # B: 1 read trùng với write cuối của A
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_w, set_w, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    # B: 1 write trùng với read đầu của A
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag_r, set_r, offset_b2)
+    data_b2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b2)}\t{data_b2}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 84 created")
+def testcase_85():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_85/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+    used_sets = set()
+
+    # A: 1 read
     while True:
-        setX=random.randint(0,n_set-1)
-        if setX!=setA and setX!=setB: break
-    tagX=random.randint(0,(1<<tag_bits)-1)
-    wordX=random.randint(0,15)
-    writeX=shared((tagX<<(n_set.bit_length()+4+2))|(setX<<6)|(wordX<<2))
-    dataX=f"0x{random.randint(0,2**32-1):08x}"
-    with open(path_0,"w")as f0:
-        f0.write(f"read\t0x{readA:08x}\nread\t0x{readB:08x}\n")
-    with open(path_1,"w")as f1:
-        f1.write(f"read\t0x{readB2:08x}\nwrite\t0x{writeX:08x}\t{dataX}\n")
-    blocks={block_addr(readA),block_addr(readB),block_addr(readB2),block_addr(writeX)}
-    with open(path_mem,"w")as fm:
-        for blk in blocks:
-            fm.write(f"0x{blk:08x}\t"+'\t'.join(f"0x{random.randint(0,2**32-1):08x}"for _ in range(16))+"\n")
-    print("Testcase 88 created")
-def testcase_89(n_set=16):
-    base_path="subsystem_testcase/testcase_89/"
-    os.makedirs(base_path,exist_ok=True)
-    path_0=os.path.join(base_path,"instr_mem_A.mem")
-    path_1=os.path.join(base_path,"instr_mem_B.mem")
-    path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_addr(addr): return addr & 0xFFFFFFC0
-    setA=random.randint(0,n_set-1)
-    tagA=random.randint(0,(1<<tag_bits)-1)
-    wordA=random.randint(0,15)
-    readA=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA<<2))
-    setB=random.randint(0,n_set-1)
-    tagB=random.randint(0,(1<<tag_bits)-1)
-    wordB=random.randint(0,15)
-    readB=shared((tagB<<(n_set.bit_length()+4+2))|(setB<<6)|(wordB<<2))
+        tag_r = random.randint(0, 0x3F)
+        set_r = random.randint(0, 0xF)
+        if (tag_r, set_r) not in used_pairs:
+            used_pairs.add((tag_r, set_r))
+            used_sets.add(set_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, set_r, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # A: 1 write (khác tag + set)
     while True:
-        setX=random.randint(0,n_set-1)
-        if setX!=setA and setX!=setB: break
-    tagX=random.randint(0,(1<<tag_bits)-1)
-    wordX=random.randint(0,15)
-    readX=shared((tagX<<(n_set.bit_length()+4+2))|(setX<<6)|(wordX<<2))
-    wordA2=random.randint(0,15)
-    writeA2=shared((tagA<<(n_set.bit_length()+4+2))|(setA<<6)|(wordA2<<2))
-    dataA2=f"0x{random.randint(0,2**32-1):08x}"
-    with open(path_0,"w")as f0:
-        f0.write(f"read\t0x{readA:08x}\nread\t0x{readB:08x}\n")
-    with open(path_1,"w")as f1:
-        f1.write(f"read\t0x{readX:08x}\nwrite\t0x{writeA2:08x}\t{dataA2}\n")
-    blocks={block_addr(readA),block_addr(readB),block_addr(readX),block_addr(writeA2)}
-    with open(path_mem,"w")as fm:
-        for blk in blocks:
-            fm.write(f"0x{blk:08x}\t"+'\t'.join(f"0x{random.randint(0,2**32-1):08x}"for _ in range(16))+"\n")
-    print("Testcase 89 created")
-def testcase_90(n_set=16):
+        tag_w = random.randint(0, 0x3F)
+        set_w = random.randint(0, 0xF)
+        if (tag_w, set_w) not in used_pairs:
+            used_pairs.add((tag_w, set_w))
+            used_sets.add(set_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, set_w, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # B: 1 read trùng với write cuối của A
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_w, set_w, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    # B: 1 write khác set với read đầu trong A
+    while True:
+        set_b2 = random.randint(0, 0xF)
+        if set_b2 != set_r and set_b2 not in used_sets:
+            break
+    tag_b2 = random.randint(0, 0x3F)
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag_b2, set_b2, offset_b2)
+    data_b2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b2)}\t{data_b2}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 85 created")
+def testcase_86():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_86/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+    used_sets = set()
+
+    # B: 1 read
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        set_r = random.randint(0, 0xF)
+        if (tag_r, set_r) not in used_pairs:
+            used_pairs.add((tag_r, set_r))
+            used_sets.add(set_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, set_r, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # B: 1 write (khác tag + set)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        set_w = random.randint(0, 0xF)
+        if (tag_w, set_w) not in used_pairs:
+            used_pairs.add((tag_w, set_w))
+            used_sets.add(set_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, set_w, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # A: 1 read trùng với write trong B
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_w, set_w, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A: 1 write khác set với read trong B
+    while True:
+        set_a1 = random.randint(0, 0xF)
+        if set_a1 != set_r and set_a1 not in used_sets:
+            break
+    tag_a1 = random.randint(0, 0x3F)
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    data_a1 = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_a1)}\t{data_a1}")
+    addrs.append(addr_a1)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 86 created")
+def testcase_87():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_87/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+
+    # A: 2 read khác set, khác tag
+    read_refs = []
+    while len(read_refs) < 2:
+        tag = random.randint(0, 0x3F)
+        set_ = random.randint(0, 0xF)
+        if (tag, set_) not in used_pairs:
+            used_pairs.add((tag, set_))
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, set_, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+            read_refs.append((tag, set_))
+
+    # B: 1 read trùng logic với A[1]
+    tag_b1, set_b1 = read_refs[1]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_b1, set_b1, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    # B: 1 write trùng logic với A[0]
+    tag_b2, set_b2 = read_refs[0]
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag_b2, set_b2, offset_b2)
+    data_b2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b2)}\t{data_b2}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 87 created")
+def testcase_88():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_88/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+    used_sets = set()
+
+    # A: 2 lệnh read khác tag và set
+    read_refs = []
+    while len(read_refs) < 2:
+        tag = random.randint(0, 0x3F)
+        set_ = random.randint(0, 0xF)
+        if (tag, set_) not in used_pairs:
+            used_pairs.add((tag, set_))
+            used_sets.add(set_)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, set_, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+            read_refs.append((tag, set_))
+
+    # B: 1 read trùng logic với read cuối của A
+    tag_b1, set_b1 = read_refs[1]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_b1, set_b1, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    # B: 1 write khác set với read đầu tiên của A
+    while True:
+        set_b2 = random.randint(0, 0xF)
+        if set_b2 != read_refs[0][1] and set_b2 not in used_sets:
+            break
+    tag_b2 = random.randint(0, 0x3F)
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag_b2, set_b2, offset_b2)
+    data_b2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b2)}\t{data_b2}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 88 created")
+def testcase_89():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_89/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_pairs = set()
+    used_sets = set()
+
+    # B: 1 read
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        set_r = random.randint(0, 0xF)
+        if (tag_r, set_r) not in used_pairs:
+            used_pairs.add((tag_r, set_r))
+            used_sets.add(set_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, set_r, offset_r)
+    instr_B.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
+
+    # B: 1 write (khác tag + set)
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        set_w = random.randint(0, 0xF)
+        if (tag_w, set_w) not in used_pairs:
+            used_pairs.add((tag_w, set_w))
+            used_sets.add(set_w)
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, set_w, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # A: 1 read trùng logic với write cuối của B
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_w, set_w, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A: 1 read khác set với read đầu của B
+    while True:
+        set_a1 = random.randint(0, 0xF)
+        if set_a1 != set_r and set_a1 not in used_sets:
+            break
+    tag_a1 = random.randint(0, 0x3F)
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    with open(path_A, "w") as f:
+        for l in instr_A: f.write(l + "\n")
+    with open(path_B, "w") as f:
+        for l in instr_B: f.write(l + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for a in addrs:
+            base = a & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 89 created")
+def testcase_90():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_90/"
     os.makedirs(base_path, exist_ok=True)
-    path_inst0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_inst1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared_address(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_address(addr): return addr & 0xFFFFFFC0
-    set_inst0_1 = random.randint(0, n_set - 1)
-    tag_inst0_1 = random.randint(0, (1 << tag_bits) - 1)
-    word_inst0_1 = random.randint(0, 15)
-    inst0_read1 = shared_address((tag_inst0_1 << (n_set.bit_length() + 4 + 2)) | (set_inst0_1 << 6) | (word_inst0_1 << 2))
-    set_inst0_2 = random.randint(0, n_set - 1)
-    tag_inst0_2 = random.randint(0, (1 << tag_bits) - 1)
-    word_inst0_2 = random.randint(0, 15)
-    inst0_read2 = shared_address((tag_inst0_2 << (n_set.bit_length() + 4 + 2)) | (set_inst0_2 << 6) | (word_inst0_2 << 2))
-    word_inst0_3 = random.randint(0, 15)
-    inst0_read3 = shared_address((tag_inst0_2 << (n_set.bit_length() + 4 + 2)) | (set_inst0_2 << 6) | (word_inst0_3 << 2))
-    word_inst1 = random.randint(0, 15)
-    inst1_read = shared_address((tag_inst0_1 << (n_set.bit_length() + 4 + 2)) | (set_inst0_1 << 6) | (word_inst1 << 2))
-    with open(path_inst0, "w") as file_inst0: file_inst0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nread\t0x{inst0_read3:08x}\n")
-    with open(path_inst1, "w") as file_inst1: file_inst1.write(f"read\t0x{inst1_read:08x}\n")
-    blocks = {block_address(inst0_read1), block_address(inst0_read2), block_address(inst0_read3)}
-    with open(path_mem, "w") as file_mem:
-        for block in blocks: file_mem.write(f"0x{block:08x}\t" + "\t".join(f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)) + "\n")
-    print("Testcase 90 created")
-def testcase_91(n_set=16):
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_sets = set()
+
+    # A[0]: 1 read đầu tiên
+    tag_a0 = random.randint(0, 0x3F)
+    set_a0 = random.randint(0, 0xF)
+    used_sets.add(set_a0)
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1-2]: 2 read cùng tag + set với nhau, khác tag + set A[0]
+    while True:
+        tag_shared = random.randint(0, 0x3F)
+        set_shared = random.randint(0, 0xF)
+        if tag_shared != tag_a0 or set_shared != set_a0:
+            break
+    for _ in range(2):
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag_shared, set_shared, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[0-1]: 2 read khác set với mọi lệnh trong A
+    b_read_sets = set()
+    while len(b_read_sets) < 2:
+        s = random.randint(0, 0xF)
+        if s != set_a0 and s != set_shared:
+            b_read_sets.add(s)
+    for s in b_read_sets:
+        t = random.randint(0, 0x3F)
+        o = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, t, s, o)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[2]: read trùng logic với A[0]
+    offset_match = random.choice(range(0, 64, 4))
+    addr_b3 = make_shared(shared_prefix, tag_a0, set_a0, offset_match)
+    instr_B.append(f"read\t{to_hex32(addr_b3)}")
+    addrs.append(addr_b3)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 90 created")
+def testcase_91():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_91/"
     os.makedirs(base_path, exist_ok=True)
-    path_inst0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_inst1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_address(addr): return addr & 0xFFFFFFC0
-    set_inst0_first = random.randint(0, n_set - 1)
-    tag_inst0_first = random.randint(0, (1 << tag_bits) - 1)
-    word_inst0_first = random.randint(0, 15)
-    inst0_read1 = shared((tag_inst0_first << (n_set.bit_length() + 4 + 2)) | (set_inst0_first << 6) | (word_inst0_first << 2))
-    set_inst0_second = random.randint(0, n_set - 1)
-    tag_inst0_second = random.randint(0, (1 << tag_bits) - 1)
-    word_inst0_second = random.randint(0, 15)
-    inst0_read2 = shared((tag_inst0_second << (n_set.bit_length() + 4 + 2)) | (set_inst0_second << 6) | (word_inst0_second << 2))
-    word_inst0_third = random.randint(0, 15)
-    inst0_read3 = shared((tag_inst0_second << (n_set.bit_length() + 4 + 2)) | (set_inst0_second << 6) | (word_inst0_third << 2))
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_sets = set()
+
+    # A[0]: 1 read đầu tiên
+    tag_a0 = random.randint(0, 0x3F)
+    set_a0 = random.randint(0, 0xF)
+    used_sets.add(set_a0)
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1-2]: 2 read cùng tag + set với nhau, khác với A[0]
     while True:
-        set_inst1 = random.randint(0, n_set - 1)
-        if set_inst1 != set_inst0_first and set_inst1 != set_inst0_second:
+        tag_shared = random.randint(0, 0x3F)
+        set_shared = random.randint(0, 0xF)
+        if (tag_shared != tag_a0 or set_shared != set_a0):
             break
-    tag_inst1 = random.randint(0, (1 << tag_bits) - 1)
-    word_inst1 = random.randint(0, 15)
-    inst1_read = shared((tag_inst1 << (n_set.bit_length() + 4 + 2)) | (set_inst1 << 6) | (word_inst1 << 2))
-    with open(path_inst0, "w") as file_inst0:
-        file_inst0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nread\t0x{inst0_read3:08x}\n")
-    with open(path_inst1, "w") as file_inst1:
-        file_inst1.write(f"read\t0x{inst1_read:08x}\n")
-    blocks = {block_address(inst0_read1), block_address(inst0_read2), block_address(inst0_read3), block_address(inst1_read)}
-    with open(path_mem, "w") as file_mem:
-        for block in blocks:
-            file_mem.write(f"0x{block:08x}\t" + "\t".join(f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)) + "\n")
-    print("Testcase 91 created")
-def testcase_92(n_set=16):
+    for _ in range(2):
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag_shared, set_shared, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[0-1]: 2 read khác set với A
+    b_sets = set()
+    while len(b_sets) < 2:
+        s = random.randint(0, 0xF)
+        if s != set_a0 and s != set_shared:
+            b_sets.add(s)
+    for s in b_sets:
+        t = random.randint(0, 0x3F)
+        o = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, t, s, o)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[2]: read khác logic hoàn toàn với A[0]
+    while True:
+        tag_b3 = random.randint(0, 0x3F)
+        set_b3 = random.randint(0, 0xF)
+        if tag_b3 != tag_a0 or set_b3 != set_a0:
+            break
+    offset_b3 = random.choice(range(0, 64, 4))
+    addr_b3 = make_shared(shared_prefix, tag_b3, set_b3, offset_b3)
+    instr_B.append(f"read\t{to_hex32(addr_b3)}")
+    addrs.append(addr_b3)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 91 created")
+def testcase_92():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_92/"
     os.makedirs(base_path, exist_ok=True)
-    inst0_path = os.path.join(base_path, "instr_mem_A.mem")
-    inst1_path = os.path.join(base_path, "instr_mem_B.mem")
-    mem_data_path = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared_address(address): return (address & 0x3FFFF) | 0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    inst0_set1 = random.randint(0, n_set - 1)
-    inst0_tag1 = random.randint(0, (1 << tag_bits) - 1)
-    inst0_word1 = random.randint(0, 15)
-    inst0_read1 = shared_address((inst0_tag1 << (n_set.bit_length() + 4 + 2)) | (inst0_set1 << 6) | (inst0_word1 << 2))
-    inst0_set2 = random.randint(0, n_set - 1)
-    inst0_tag2 = random.randint(0, (1 << tag_bits) - 1)
-    inst0_word2 = random.randint(0, 15)
-    inst0_read2 = shared_address((inst0_tag2 << (n_set.bit_length() + 4 + 2)) | (inst0_set2 << 6) | (inst0_word2 << 2))
-    inst0_word3 = random.randint(0, 15)
-    inst0_read3 = shared_address((inst0_tag2 << (n_set.bit_length() + 4 + 2)) | (inst0_set2 << 6) | (inst0_word3 << 2))
-    inst1_word = random.randint(0, 15)
-    inst1_write = shared_address((inst0_tag1 << (n_set.bit_length() + 4 + 2)) | (inst0_set1 << 6) | (inst1_word << 2))
-    inst1_data = f"0x{random.randint(0, 2**32-1):08x}"
-    with open(inst0_path, "w") as file_inst0: file_inst0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nread\t0x{inst0_read3:08x}\n")
-    with open(inst1_path, "w") as file_inst1: file_inst1.write(f"write\t0x{inst1_write:08x}\t{inst1_data}\n")
-    blocks = {block_address(inst0_read1), block_address(inst0_read2), block_address(inst0_read3)}
-    with open(mem_data_path, "w") as file_mem:
-        for block in blocks: file_mem.write(f"0x{block:08x}\t" + "\t".join(f"0x{random.randint(0, 2**32-1):08x}" for _ in range(16)) + "\n")
-    print("Testcase 92 created")
-def testcase_93(n_set=16):
-    base_path="subsystem_testcase/testcase_93/"
-    os.makedirs(base_path,exist_ok=True)
-    path_inst0=os.path.join(base_path,"instr_mem_A.mem")
-    path_inst1=os.path.join(base_path,"instr_mem_B.mem")
-    path_mem=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(addr): return (addr & 0x3FFFF)|0x20000
-    def block_address(addr): return addr & 0xFFFFFFC0
-    inst0_set1=random.randint(0,n_set-1)
-    inst0_tag1=random.randint(0,(1<<tag_bits)-1)
-    inst0_word1=random.randint(0,15)
-    inst0_read1=shared_address((inst0_tag1<<(n_set.bit_length()+4+2))|(inst0_set1<<6)|(inst0_word1<<2))
-    inst0_set2=random.randint(0,n_set-1)
-    inst0_tag2=random.randint(0,(1<<tag_bits)-1)
-    inst0_word2=random.randint(0,15)
-    inst0_read2=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word2<<2))
-    inst0_word3=random.randint(0,15)
-    inst0_read3=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word3<<2))
-    inst1_set=random.randint(0,n_set-1)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_sets = set()
+
+    # A[0]: 1 read đầu tiên
+    tag_a0 = random.randint(0, 0x3F)
+    set_a0 = random.randint(0, 0xF)
+    used_sets.add(set_a0)
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1-2]: 2 read cùng tag + set với nhau, khác với A[0]
     while True:
-        inst1_tag=random.randint(0,(1<<tag_bits)-1)
-        if inst1_tag!=inst0_tag1 and inst1_tag!=inst0_tag2: break
-    inst1_word=random.randint(0,15)
-    inst1_write=shared_address((inst1_tag<<(n_set.bit_length()+4+2))|(inst1_set<<6)|(inst1_word<<2))
-    inst1_data=f"0x{random.randint(0,2**32-1):08x}"
-    with open(path_inst0,"w") as f_inst0: f_inst0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nread\t0x{inst0_read3:08x}\n")
-    with open(path_inst1,"w") as f_inst1: f_inst1.write(f"write\t0x{inst1_write:08x}\t{inst1_data}\n")
-    blocks={block_address(inst0_read1),block_address(inst0_read2),block_address(inst0_read3)}
-    with open(path_mem,"w") as f_mem:
-        for block in blocks: f_mem.write(f"0x{block:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 93 created")
-def testcase_94(n_set=16):
+        tag_shared = random.randint(0, 0x3F)
+        set_shared = random.randint(0, 0xF)
+        if tag_shared != tag_a0 or set_shared != set_a0:
+            break
+    for _ in range(2):
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag_shared, set_shared, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[0-1]: 2 read khác set với A
+    b_sets = set()
+    while len(b_sets) < 2:
+        s = random.randint(0, 0xF)
+        if s != set_a0 and s != set_shared:
+            b_sets.add(s)
+    for s in b_sets:
+        t = random.randint(0, 0x3F)
+        o = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, t, s, o)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[2]: write trùng logic với A[0]
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag_a0, set_a0, offset_b2)
+    data_b2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b2)}\t{data_b2}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 92 created")
+def testcase_93():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_93/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_sets = set()
+
+    # A[0]: read đầu tiên
+    tag_a0 = random.randint(0, 0x3F)
+    set_a0 = random.randint(0, 0xF)
+    used_sets.add(set_a0)
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1-2]: 2 read cùng tag/set khác với A[0]
+    while True:
+        tag_shared = random.randint(0, 0x3F)
+        set_shared = random.randint(0, 0xF)
+        if tag_shared != tag_a0 or set_shared != set_a0:
+            break
+    for _ in range(2):
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag_shared, set_shared, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+    used_sets.add(set_shared)
+
+    # B[0-1]: 2 read với set khác A
+    b_sets = set()
+    while len(b_sets) < 2:
+        s = random.randint(0, 0xF)
+        if s != set_a0 and s != set_shared:
+            b_sets.add(s)
+    for s in b_sets:
+        t = random.randint(0, 0x3F)
+        o = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, t, s, o)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[2]: write khác tag, set với A[0]
+    while True:
+        tag_w = random.randint(0, 0x3F)
+        set_w = random.randint(0, 0xF)
+        if tag_w != tag_a0 or set_w != set_a0:
+            break
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_w, set_w, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 93 created")
+def testcase_94():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_94/"
     os.makedirs(base_path, exist_ok=True)
-    inst0_path = os.path.join(base_path, "instr_mem_A.mem")
-    inst1_path = os.path.join(base_path, "instr_mem_B.mem")
-    mem_data_path = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared_address(addr): return (addr & 0x3FFFF) | 0x20000
-    def block_address(addr): return addr & 0xFFFFFFC0
-    tagA = random.randint(0, (1 << tag_bits) - 1)
-    setA = random.randint(0, n_set - 1)
-    wordA = random.randint(0, 15)
-    inst0_read1 = shared_address((tagA << (n_set.bit_length() + 4 + 2)) | (setA << 6) | (wordA << 2))
-    tagB = random.randint(0, (1 << tag_bits) - 1)
-    setB = random.randint(0, n_set - 1)
-    wordB = random.randint(0, 15)
-    inst0_read2 = shared_address((tagB << (n_set.bit_length() + 4 + 2)) | (setB << 6) | (wordB << 2))
-    wordB2 = random.randint(0, 15)
-    inst0_write = shared_address((tagB << (n_set.bit_length() + 4 + 2)) | (setB << 6) | (wordB2 << 2))
-    inst0_write_data = f"0x{random.randint(0, 2**32-1):08x}"
-    wordA2 = random.randint(0, 15)
-    inst1_read = shared_address((tagA << (n_set.bit_length() + 4 + 2)) | (setA << 6) | (wordA2 << 2))
-    with open(inst0_path, "w") as f0:
-        f0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nwrite\t0x{inst0_write:08x}\t{inst0_write_data}\n")
-    with open(inst1_path, "w") as f1:
-        f1.write(f"read\t0x{inst1_read:08x}\n")
-    blocks = {block_address(inst0_read1), block_address(inst0_read2), block_address(inst0_write)}
-    with open(mem_data_path, "w") as fmem:
-        for block in blocks:
-            data_words = [f"0x{random.randint(0, 2**32-1):08x}" for _ in range(16)]
-            fmem.write(f"0x{block:08x}\t" + "\t".join(data_words) + "\n")
-    print("Testcase 94 created")
-def testcase_95(n_set=16):
-    base_path="subsystem_testcase/testcase_95/"
-    os.makedirs(base_path,exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem")
-    inst1_path=os.path.join(base_path,"instr_mem_B.mem")
-    mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(address): return (address & 0x3FFFF)|0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    inst0_set1=random.randint(0,n_set-1)
-    inst0_tag1=random.randint(0,(1<<tag_bits)-1)
-    inst0_word1=random.randint(0,15)
-    inst0_read1=shared_address((inst0_tag1<<(n_set.bit_length()+4+2))|(inst0_set1<<6)|(inst0_word1<<2))
-    inst0_set2=random.randint(0,n_set-1)
-    inst0_tag2=random.randint(0,(1<<tag_bits)-1)
-    inst0_word2=random.randint(0,15)
-    inst0_read2=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word2<<2))
-    inst0_word3=random.randint(0,15)
-    inst0_write=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word3<<2))
-    inst0_write_data=f"0x{random.randint(0,2**32-1):08x}"
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_sets = set()
+
+    # A[0]: read1
+    tag_a0 = random.randint(0, 0x3F)
+    set_a0 = random.randint(0, 0xF)
+    used_sets.add(set_a0)
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read2 (khác set/tag với A[0])
     while True:
-        inst1_set=random.randint(0,n_set-1)
-        if inst1_set!=inst0_set1 and inst1_set!=inst0_set2: break
-    inst1_tag=random.randint(0,(1<<tag_bits)-1)
-    inst1_word=random.randint(0,15)
-    inst1_read=shared_address((inst1_tag<<(n_set.bit_length()+4+2))|(inst1_set<<6)|(inst1_word<<2))
-    with open(inst0_path,"w") as file_inst0: file_inst0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nwrite\t0x{inst0_write:08x}\t{inst0_write_data}\n")
-    with open(inst1_path,"w") as file_inst1: file_inst1.write(f"read\t0x{inst1_read:08x}\n")
-    blocks={block_address(inst0_read1),block_address(inst0_read2),block_address(inst0_write),block_address(inst1_read)}
-    with open(mem_data_path,"w") as file_mem:
-        for block in blocks: file_mem.write(f"0x{block:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 95 created")
-def testcase_96(n_set=16):
-    base_path="subsystem_testcase/testcase_96/"
-    os.makedirs(base_path,exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem")
-    inst1_path=os.path.join(base_path,"instr_mem_B.mem")
-    mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(address): return (address & 0x3FFFF)|0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    inst0_set1=random.randint(0,n_set-1)
-    inst0_tag1=random.randint(0,(1<<tag_bits)-1)
-    inst0_word1=random.randint(0,15)
-    inst0_read1=shared_address((inst0_tag1<<(n_set.bit_length()+4+2))|(inst0_set1<<6)|(inst0_word1<<2))
-    inst0_set2=random.randint(0,n_set-1)
-    inst0_tag2=random.randint(0,(1<<tag_bits)-1)
-    inst0_word2=random.randint(0,15)
-    inst0_read2=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word2<<2))
-    inst0_word_write=random.randint(0,15)
-    inst0_write=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word_write<<2))
-    inst0_write_data=f"0x{random.randint(0,2**32-1):08x}"
-    inst1_word=random.randint(0,15)
-    inst1_write=shared_address((inst0_tag1<<(n_set.bit_length()+4+2))|(inst0_set1<<6)|(inst1_word<<2))
-    inst1_write_data=f"0x{random.randint(0,2**32-1):08x}"
-    with open(inst0_path,"w") as f0: f0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nwrite\t0x{inst0_write:08x}\t{inst0_write_data}\n")
-    with open(inst1_path,"w") as f1: f1.write(f"write\t0x{inst1_write:08x}\t{inst1_write_data}\n")
-    blocks={block_address(inst0_read1),block_address(inst0_read2),block_address(inst0_write)}
-    with open(mem_data_path,"w") as fm:
-        for blk in blocks: fm.write(f"0x{blk:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 96 created")
-def testcase_97(n_set=16):
-    base_path="subsystem_testcase/testcase_97/"
-    os.makedirs(base_path,exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem")
-    inst1_path=os.path.join(base_path,"instr_mem_B.mem")
-    mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(address): return (address & 0x3FFFF)|0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    inst0_set1=random.randint(0,n_set-1)
-    inst0_tag1=random.randint(0,(1<<tag_bits)-1)
-    inst0_word1=random.randint(0,15)
-    inst0_read1=shared_address((inst0_tag1<<(n_set.bit_length()+4+2))|(inst0_set1<<6)|(inst0_word1<<2))
-    inst0_set2=random.randint(0,n_set-1)
-    inst0_tag2=random.randint(0,(1<<tag_bits)-1)
-    inst0_word2=random.randint(0,15)
-    inst0_read2=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word2<<2))
-    inst0_word_write=random.randint(0,15)
-    inst0_write=shared_address((inst0_tag2<<(n_set.bit_length()+4+2))|(inst0_set2<<6)|(inst0_word_write<<2))
-    inst0_write_data=f"0x{random.randint(0,2**32-1):08x}"
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if tag_a1 != tag_a0 or set_a1 != set_a0:
+            break
+    used_sets.add(set_a1)
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # A[2]: write trùng tag/set với A[1]
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_a1, set_a1, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # B[0-1]: read khác set với cả A[0] và A[1]
+    b_sets = set()
+    while len(b_sets) < 2:
+        s = random.randint(0, 0xF)
+        if s != set_a0 and s != set_a1:
+            b_sets.add(s)
+    for s in b_sets:
+        t = random.randint(0, 0x3F)
+        o = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, t, s, o)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[2]: read trùng logic với A[0]
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag_a0, set_a0, offset_b2)
+    instr_B.append(f"read\t{to_hex32(addr_b2)}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 94 created")
+def testcase_95():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_95/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read 1
     while True:
-        inst1_set=random.randint(0,n_set-1)
-        if inst1_set!=inst0_set1 and inst1_set!=inst0_set2: break
-    inst1_tag=random.randint(0,(1<<tag_bits)-1)
-    inst1_word=random.randint(0,15)
-    inst1_write=shared_address((inst1_tag<<(n_set.bit_length()+4+2))|(inst1_set<<6)|(inst1_word<<2))
-    inst1_write_data=f"0x{random.randint(0,2**32-1):08x}"
-    with open(inst0_path,"w") as f0: f0.write(f"read\t0x{inst0_read1:08x}\nread\t0x{inst0_read2:08x}\nwrite\t0x{inst0_write:08x}\t{inst0_write_data}\n")
-    with open(inst1_path,"w") as f1: f1.write(f"write\t0x{inst1_write:08x}\t{inst1_write_data}\n")
-    blocks={block_address(inst0_read1),block_address(inst0_read2),block_address(inst0_write),block_address(inst1_write)}
-    with open(mem_data_path,"w") as fm:
-        for block in blocks: fm.write(f"0x{block:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 97 created")
-def testcase_98(n_set=16):
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read 2 (khác set/tag với A[0])
+    while True:
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # A[2]: write giống A[1]
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_a1, set_a1, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # B[0-2]: 3 read khác tag/set với toàn bộ A
+    while len(instr_B) < 3:
+        tag_b = random.randint(0, 0x3F)
+        set_b = random.randint(0, 0xF)
+        if (tag_b, set_b) not in used_combos:
+            used_combos.add((tag_b, set_b))
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag_b, set_b, offset)
+            instr_B.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 95 created")
+def testcase_96():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_96/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read1
+    while True:
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read2 khác tag/set với A[0]
+    while True:
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # A[2]: write cùng tag/set với A[1]
+    offset_w = random.choice(range(0, 64, 4))
+    addr_w = make_shared(shared_prefix, tag_a1, set_a1, offset_w)
+    data_w = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w)}\t{data_w}")
+    addrs.append(addr_w)
+
+    # B[0-1]: 2 read khác set với A[0] và A[1]
+    b_sets = set()
+    while len(b_sets) < 2:
+        s = random.randint(0, 0xF)
+        if s != set_a0 and s != set_a1:
+            b_sets.add(s)
+    for s in b_sets:
+        t = random.randint(0, 0x3F)
+        o = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, t, s, o)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[2]: write trùng tag/set với A[0]
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(shared_prefix, tag_a0, set_a0, offset_b2)
+    data_b2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b2)}\t{data_b2}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 96 created")
+def testcase_97():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_97/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read1
+    while True:
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read2 khác set/tag với A[0]
+    while True:
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # A[2]: write cùng tag/set với A[1]
+    offset_w_a = random.choice(range(0, 64, 4))
+    addr_w_a = make_shared(shared_prefix, tag_a1, set_a1, offset_w_a)
+    data_w_a = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_w_a)}\t{data_w_a}")
+    addrs.append(addr_w_a)
+
+    # B[0-1]: 2 read khác set với A[0] và A[1]
+    b_sets = set()
+    while len(b_sets) < 2:
+        s = random.randint(0, 0xF)
+        if s != set_a0 and s != set_a1:
+            b_sets.add(s)
+    for s in b_sets:
+        t = random.randint(0, 0x3F)
+        o = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, t, s, o)
+        instr_B.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
+
+    # B[2]: write với set/tag khác A[0], và prefix cũng khác
+    while True:
+        new_prefix = random.choice([0x0002, 0x0003])
+        tag_b2 = random.randint(0, 0x3F)
+        set_b2 = random.randint(0, 0xF)
+        if (tag_b2 != tag_a0 or set_b2 != set_a0) or new_prefix != shared_prefix:
+            break
+    offset_b2 = random.choice(range(0, 64, 4))
+    addr_b2 = make_shared(new_prefix, tag_b2, set_b2, offset_b2)
+    data_b2 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b2)}\t{data_b2}")
+    addrs.append(addr_b2)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 97 created")
+def testcase_98():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_98/"
     os.makedirs(base_path, exist_ok=True)
-    inst0_path = os.path.join(base_path, "instr_mem_A.mem")
-    inst1_path = os.path.join(base_path, "instr_mem_B.mem")
-    mem_data_path = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared_address(address): return (address & 0x3FFFF) | 0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    set_read0 = random.randint(0, n_set - 1)
-    tag_read0 = random.randint(0, (1 << tag_bits) - 1)
-    word_read0 = random.randint(0, 15)
-    inst0_read0 = shared_address((tag_read0 << (n_set.bit_length() + 4 + 2)) | (set_read0 << 6) | (word_read0 << 2))
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read1
     while True:
-        set_write = random.randint(0, n_set - 1)
-        if set_write != set_read0:
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
             break
-    write_tags = []
-    inst0_writes = []
-    for _ in range(4):
-        tag_write = random.randint(0, (1 << tag_bits) - 1)
-        write_tags.append(tag_write)
-        word_write = random.randint(0, 15)
-        inst0_writes.append(shared_address((tag_write << (n_set.bit_length() + 4 + 2)) | (set_write << 6) | (word_write << 2)))
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read2 khác set/tag
     while True:
-        tag_read_last = random.randint(0, (1 << tag_bits) - 1)
-        if tag_read_last not in write_tags:
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
             break
-    word_read_last = random.randint(0, 15)
-    inst0_read_last = shared_address((tag_read_last << (n_set.bit_length() + 4 + 2)) | (set_write << 6) | (word_read_last << 2))
-    word_inst1 = random.randint(0, 15)
-    inst1_read = shared_address((tag_read0 << (n_set.bit_length() + 4 + 2)) | (set_read0 << 6) | (word_inst1 << 2))
-    with open(inst0_path, "w") as f0:
-        f0.write(f"read\t0x{inst0_read0:08x}\n")
-        for write_inst in inst0_writes:
-            f0.write(f"write\t0x{write_inst:08x}\t0x{random.randint(0,2**32-1):08x}\n")
-        f0.write(f"read\t0x{inst0_read_last:08x}\n")
-    with open(inst1_path, "w") as f1:
-        f1.write(f"read\t0x{inst1_read:08x}\n")
-    blocks = set([block_address(inst0_read0), block_address(inst0_read_last)] + [block_address(x) for x in inst0_writes])
-    with open(mem_data_path, "w") as fmem:
-        for blk in blocks:
-            fmem.write(f"0x{blk:08x}\t" + "\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)) + "\n")
-    print("Testcase 98 created")
-def testcase_99(n_set=16):
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # B[0]: read khác set/tag với A
+    while True:
+        tag_b0 = random.randint(0, 0x3F)
+        set_b0 = random.randint(0, 0xF)
+        if (tag_b0, set_b0) not in used_combos:
+            used_combos.add((tag_b0, set_b0))
+            break
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag_b0, set_b0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # B[1]: read giống tag/set với A[0]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_a0, set_a0, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 98 created")
+def testcase_99():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_99/"
     os.makedirs(base_path, exist_ok=True)
-    inst0_path = os.path.join(base_path, "instr_mem_A.mem")
-    inst1_path = os.path.join(base_path, "instr_mem_B.mem")
-    mem_data_path = os.path.join(base_path, "main_memory_init.mem")
-    tag_bits = 32 - (n_set.bit_length() + 4 + 2)
-    def shared_address(address): return (address & 0x3FFFF) | 0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    read_set = random.randint(0, n_set - 1)
-    read_tag = random.randint(0, (1 << tag_bits) - 1)
-    read_word = random.randint(0, 15)
-    inst0_read0 = shared_address((read_tag << (n_set.bit_length() + 4 + 2)) | (read_set << 6) | (read_word << 2))
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read1
     while True:
-        write_set = random.randint(0, n_set - 1)
-        if write_set != read_set: break
-    write_instructions = []
-    write_tags = []
-    for _ in range(4):
-        write_tag = random.randint(0, (1 << tag_bits) - 1)
-        write_tags.append(write_tag)
-        write_word = random.randint(0, 15)
-        inst0_write = shared_address((write_tag << (n_set.bit_length() + 4 + 2)) | (write_set << 6) | (write_word << 2))
-        write_instructions.append((inst0_write, f"0x{random.randint(0,2**32-1):08x}"))
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read2 khác set/tag
     while True:
-        final_read_tag = random.randint(0, (1 << tag_bits) - 1)
-        if final_read_tag not in write_tags: break
-    final_read_word = random.randint(0, 15)
-    inst0_final_read = shared_address((final_read_tag << (n_set.bit_length() + 4 + 2)) | (write_set << 6) | (final_read_word << 2))
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # B[0-1]: read khác hoàn toàn với A
+    while len(instr_B) < 2:
+        tag_b = random.randint(0, 0x3F)
+        set_b = random.randint(0, 0xF)
+        if (tag_b, set_b) not in used_combos:
+            used_combos.add((tag_b, set_b))
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag_b, set_b, offset)
+            instr_B.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 99 created")
+def testcase_100():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_100/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read1
     while True:
-        inst1_set = random.randint(0, n_set - 1)
-        if inst1_set != read_set and inst1_set != write_set: break
-    inst1_tag = random.randint(0, (1 << tag_bits) - 1)
-    inst1_word = random.randint(0, 15)
-    inst1_read = shared_address((inst1_tag << (n_set.bit_length() + 4 + 2)) | (inst1_set << 6) | (inst1_word << 2))
-    with open(inst0_path, "w") as f0:
-        f0.write(f"read\t0x{inst0_read0:08x}\n")
-        for write_inst, data in write_instructions:
-            f0.write(f"write\t0x{write_inst:08x}\t{data}\n")
-        f0.write(f"read\t0x{inst0_final_read:08x}\n")
-    with open(inst1_path, "w") as f1:
-        f1.write(f"read\t0x{inst1_read:08x}\n")
-    all_blocks = {block_address(inst0_read0), block_address(inst0_final_read), block_address(inst1_read)}
-    for write_inst, _ in write_instructions:
-        all_blocks.add(block_address(write_inst))
-    with open(mem_data_path, "w") as fm:
-        for block in all_blocks:
-            fm.write(f"0x{block:08x}\t" + "\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)) + "\n")
-    print("Testcase 99 created")
-def testcase_100(n_set=16):
-    base_path="subsystem_testcase/testcase_100/";os.makedirs(base_path,exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem");inst1_path=os.path.join(base_path,"instr_mem_B.mem");mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(address): return (address & 0x3FFFF)|0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    read_set=random.randint(0,n_set-1)
-    read_tag=random.randint(0,(1<<tag_bits)-1)
-    read_word=random.randint(0,15)
-    inst0_read0=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(read_word<<2))
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read2 khác set/tag
     while True:
-        write_set=random.randint(0,n_set-1)
-        if write_set!=read_set: break
-    write_insts=[];write_tags=[]
-    for _ in range(4):
-        tag_write=random.randint(0,(1<<tag_bits)-1)
-        write_tags.append(tag_write)
-        word_write=random.randint(0,15)
-        addr_write=shared_address((tag_write<<(n_set.bit_length()+4+2))|(write_set<<6)|(word_write<<2))
-        data_write=f"0x{random.randint(0,2**32-1):08x}"
-        write_insts.append((addr_write,data_write))
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # B[0]: read khác tag/set với A
     while True:
-        final_read_tag=random.randint(0,(1<<tag_bits)-1)
-        if final_read_tag not in write_tags: break
-    final_read_word=random.randint(0,15)
-    inst0_final_read=shared_address((final_read_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(final_read_word<<2))
-    inst1_word=random.randint(0,15)
-    inst1_write=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(inst1_word<<2))
-    inst1_write_data=f"0x{random.randint(0,2**32-1):08x}"
-    with open(inst0_path,"w") as f0:
-        f0.write(f"read\t0x{inst0_read0:08x}\n")
-        for addr,data in write_insts:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        f0.write(f"read\t0x{inst0_final_read:08x}\n")
-    with open(inst1_path,"w") as f1:
-        f1.write(f"write\t0x{inst1_write:08x}\t{inst1_write_data}\n")
-    blocks={block_address(inst0_read0),block_address(inst0_final_read)}
-    for addr,data in write_insts:
-        blocks.add(block_address(addr))
-    with open(mem_data_path,"w") as fmem:
-        for blk in blocks: fmem.write(f"0x{blk:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 100 created")
-def testcase_101(n_set=16):
-    base_path="subsystem_testcase/testcase_101/"
-    os.makedirs(base_path,exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem")
-    inst1_path=os.path.join(base_path,"instr_mem_B.mem")
-    mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(address): return (address & 0x3FFFF)|0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    read_set=random.randint(0,n_set-1)
-    read_tag=random.randint(0,(1<<tag_bits)-1)
-    read_word=random.randint(0,15)
-    inst0_read0=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(read_word<<2))
+        tag_b0 = random.randint(0, 0x3F)
+        set_b0 = random.randint(0, 0xF)
+        if (tag_b0, set_b0) not in used_combos:
+            used_combos.add((tag_b0, set_b0))
+            break
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag_b0, set_b0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # B[1]: write cùng tag/set với A[0]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_a0, set_a0, offset_b1)
+    data_b1 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b1)}\t{data_b1}")
+    addrs.append(addr_b1)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 100 created")
+def testcase_101():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_101/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read
     while True:
-        write_set=random.randint(0,n_set-1)
-        if write_set!=read_set: break
-    write_insts=[]
-    write_tags=[]
-    for _ in range(4):
-        w_tag=random.randint(0,(1<<tag_bits)-1)
-        write_tags.append(w_tag)
-        w_word=random.randint(0,15)
-        addr=shared_address((w_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(w_word<<2))
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        write_insts.append((addr,data))
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: read khác set/tag với A[0]
     while True:
-        final_read_tag=random.randint(0,(1<<tag_bits)-1)
-        if final_read_tag not in write_tags: break
-    final_read_word=random.randint(0,15)
-    inst0_final_read=shared_address((final_read_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(final_read_word<<2))
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
+
+    # B[0]: read khác với A
     while True:
-        inst1_set=random.randint(0,n_set-1)
-        if inst1_set!=read_set and inst1_set!=write_set: break
-    inst1_tag=random.randint(0,(1<<tag_bits)-1)
-    inst1_word=random.randint(0,15)
-    inst1_write=shared_address((inst1_tag<<(n_set.bit_length()+4+2))|(inst1_set<<6)|(inst1_word<<2))
-    inst1_data=f"0x{random.randint(0,2**32-1):08x}"
-    with open(inst0_path,"w") as f0:
-        f0.write(f"read\t0x{inst0_read0:08x}\n")
-        for addr,data in write_insts:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        f0.write(f"read\t0x{inst0_final_read:08x}\n")
-    with open(inst1_path,"w") as f1:
-        f1.write(f"write\t0x{inst1_write:08x}\t{inst1_data}\n")
-    blocks=set([block_address(inst0_read0),block_address(inst0_final_read),block_address(inst1_write)])
-    for addr,_ in write_insts:
-        blocks.add(block_address(addr))
-    with open(mem_data_path,"w") as fmem:
-        for blk in blocks:
-            fmem.write(f"0x{blk:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 101 created")
-def testcase_102(n_set=16):
-    base_path="subsystem_testcase/testcase_102/"
-    os.makedirs(base_path,exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem")
-    inst1_path=os.path.join(base_path,"instr_mem_B.mem")
-    mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(address): return (address & 0x3FFFF)|0x20000
-    def block_address(address): return address & 0xFFFFFFC0
-    read_set=random.randint(0,n_set-1)
-    read_tag=random.randint(0,(1<<tag_bits)-1)
-    read_word=random.randint(0,15)
-    inst0_read0=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(read_word<<2))
+        tag_b0 = random.randint(0, 0x3F)
+        set_b0 = random.randint(0, 0xF)
+        if (tag_b0, set_b0) not in used_combos:
+            used_combos.add((tag_b0, set_b0))
+            break
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag_b0, set_b0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # B[1]: write khác tag/set với A[0]
     while True:
-        write_set=random.randint(0,n_set-1)
-        if write_set!=read_set: break
-    write_insts=[]
-    write_tags=[]
-    for _ in range(4):
-        tag_write=random.randint(0,(1<<tag_bits)-1)
-        write_tags.append(tag_write)
-        write_word=random.randint(0,15)
-        addr_write=shared_address((tag_write<<(n_set.bit_length()+4+2))|(write_set<<6)|(write_word<<2))
-        data_write=f"0x{random.randint(0,2**32-1):08x}"
-        write_insts.append((addr_write,data_write))
+        tag_b1 = random.randint(0, 0x3F)
+        set_b1 = random.randint(0, 0xF)
+        if (tag_b1 != tag_a0 or set_b1 != set_a0) and (tag_b1, set_b1) not in used_combos:
+            used_combos.add((tag_b1, set_b1))
+            break
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_b1, set_b1, offset_b1)
+    data_b1 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b1)}\t{data_b1}")
+    addrs.append(addr_b1)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 101 created")
+def testcase_102():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_102/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read
     while True:
-        final_write_tag=random.randint(0,(1<<tag_bits)-1)
-        if final_write_tag not in write_tags: break
-    final_write_word=random.randint(0,15)
-    inst0_final_write=shared_address((final_write_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(final_write_word<<2))
-    final_write_data=f"0x{random.randint(0,2**32-1):08x}"
-    inst1_word=random.randint(0,15)
-    inst1_read=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(inst1_word<<2))
-    with open(inst0_path,"w") as f0:
-        f0.write(f"read\t0x{inst0_read0:08x}\n")
-        for addr,data in write_insts:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        f0.write(f"write\t0x{inst0_final_write:08x}\t{final_write_data}\n")
-    with open(inst1_path,"w") as f1:
-        f1.write(f"read\t0x{inst1_read:08x}\n")
-    blocks={block_address(inst0_read0),block_address(inst0_final_write)}
-    for addr,_ in write_insts:
-        blocks.add(block_address(addr))
-    with open(mem_data_path,"w") as fmem:
-        for block in blocks:
-            data_words="\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))
-            fmem.write(f"0x{block:08x}\t{data_words}\n")
-    print("Testcase 102 created")
-def testcase_103(n_set=16):
-    base_path="subsystem_testcase/testcase_103/"
-    os.makedirs(base_path,exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem")
-    inst1_path=os.path.join(base_path,"instr_mem_B.mem")
-    mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(addr): return (addr & 0x3FFFF)|0x20000
-    def block_address(addr): return addr & 0xFFFFFFC0
-    read_set=random.randint(0,n_set-1)
-    read_tag=random.randint(0,(1<<tag_bits)-1)
-    read_word=random.randint(0,15)
-    inst0_read=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(read_word<<2))
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: write khác set/tag với A[0]
     while True:
-        write_set=random.randint(0,n_set-1)
-        if write_set!=read_set: break
-    write_insts=[]
-    write_tags=[]
-    for _ in range(4):
-        w_tag=random.randint(0,(1<<tag_bits)-1)
-        write_tags.append(w_tag)
-        w_word=random.randint(0,15)
-        addr=shared_address((w_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(w_word<<2))
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        write_insts.append((addr,data))
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    data_a1 = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_a1)}\t{data_a1}")
+    addrs.append(addr_a1)
+
+    # B[0]: read khác với tất cả A
     while True:
-        extra_write_tag=random.randint(0,(1<<tag_bits)-1)
-        if extra_write_tag not in write_tags: break
-    extra_write_word=random.randint(0,15)
-    inst0_extra_write=shared_address((extra_write_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(extra_write_word<<2))
-    extra_write_data=f"0x{random.randint(0,2**32-1):08x}"
+        tag_b0 = random.randint(0, 0x3F)
+        set_b0 = random.randint(0, 0xF)
+        if (tag_b0, set_b0) not in used_combos:
+            used_combos.add((tag_b0, set_b0))
+            break
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag_b0, set_b0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # B[1]: read giống tag/set với A[0]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_a0, set_a0, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 102 created")
+def testcase_103():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_103/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read
     while True:
-        inst1_set=random.randint(0,n_set-1)
-        if inst1_set!=read_set and inst1_set!=write_set: break
-    inst1_tag=random.randint(0,(1<<tag_bits)-1)
-    inst1_word=random.randint(0,15)
-    inst1_read=shared_address((inst1_tag<<(n_set.bit_length()+4+2))|(inst1_set<<6)|(inst1_word<<2))
-    with open(inst0_path,"w") as f0:
-        f0.write(f"read\t0x{inst0_read:08x}\n")
-        for addr,data in write_insts:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        f0.write(f"write\t0x{inst0_extra_write:08x}\t{extra_write_data}\n")
-    with open(inst1_path,"w") as f1:
-        f1.write(f"read\t0x{inst1_read:08x}\n")
-    blocks=set([block_address(inst0_read),block_address(inst0_extra_write),block_address(inst1_read)])
-    for addr,_ in write_insts:
-        blocks.add(block_address(addr))
-    with open(mem_data_path,"w") as fmem:
-        for blk in blocks:
-            fmem.write(f"0x{blk:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 103 created")
-def testcase_104(n_set=16):
-    base_path="subsystem_testcase/testcase_104/"; os.makedirs(base_path, exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem"); inst1_path=os.path.join(base_path,"instr_mem_B.mem"); mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(addr): return (addr & 0x3FFFF)|0x20000
-    def block_address(addr): return addr & 0xFFFFFFC0
-    read_set=random.randint(0,n_set-1)
-    read_tag=random.randint(0,(1<<tag_bits)-1)
-    read_word=random.randint(0,15)
-    inst0_read=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(read_word<<2))
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: write khác set/tag
     while True:
-        write_set=random.randint(0,n_set-1)
-        if write_set!=read_set: break
-    write_insts=[]; write_tags=[]
-    for _ in range(4):
-        w_tag=random.randint(0,(1<<tag_bits)-1)
-        write_tags.append(w_tag)
-        w_word=random.randint(0,15)
-        addr=shared_address((w_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(w_word<<2))
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        write_insts.append((addr,data))
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    data_a1 = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_a1)}\t{data_a1}")
+    addrs.append(addr_a1)
+
+    # B[0-1]: 2 read khác hoàn toàn với A
+    while len(instr_B) < 2:
+        tag_b = random.randint(0, 0x3F)
+        set_b = random.randint(0, 0xF)
+        if (tag_b, set_b) not in used_combos:
+            used_combos.add((tag_b, set_b))
+            offset_b = random.choice(range(0, 64, 4))
+            addr_b = make_shared(shared_prefix, tag_b, set_b, offset_b)
+            instr_B.append(f"read\t{to_hex32(addr_b)}")
+            addrs.append(addr_b)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 103 created")
+def testcase_104():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_104/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read
     while True:
-        extra_tag=random.randint(0,(1<<tag_bits)-1)
-        if extra_tag not in write_tags: break
-    extra_word=random.randint(0,15)
-    inst0_extra_write=shared_address((extra_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(extra_word<<2))
-    extra_data=f"0x{random.randint(0,2**32-1):08x}"
-    inst1_word=random.randint(0,15)
-    inst1_write=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(inst1_word<<2))
-    inst1_data=f"0x{random.randint(0,2**32-1):08x}"
-    with open(inst0_path,"w") as f0:
-        f0.write(f"read\t0x{inst0_read:08x}\n")
-        for addr,data in write_insts:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        f0.write(f"write\t0x{inst0_extra_write:08x}\t{extra_data}\n")
-    with open(inst1_path,"w") as f1:
-        f1.write(f"write\t0x{inst1_write:08x}\t{inst1_data}\n")
-    blocks=set([block_address(inst0_read),block_address(inst0_extra_write)])
-    for addr,_ in write_insts: blocks.add(block_address(addr))
-    with open(mem_data_path,"w") as fm:
-        for blk in blocks:
-            fm.write(f"0x{blk:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 104 created")
-def testcase_105(n_set=16):
-    base_path="subsystem_testcase/testcase_105/"; os.makedirs(base_path, exist_ok=True)
-    inst0_path=os.path.join(base_path,"instr_mem_A.mem"); inst1_path=os.path.join(base_path,"instr_mem_B.mem"); mem_data_path=os.path.join(base_path,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)
-    def shared_address(addr): return (addr & 0x3FFFF)|0x20000
-    def block_address(addr): return addr & 0xFFFFFFC0
-    read_set=random.randint(0,n_set-1)
-    read_tag=random.randint(0,(1<<tag_bits)-1)
-    read_word=random.randint(0,15)
-    inst0_read=shared_address((read_tag<<(n_set.bit_length()+4+2))|(read_set<<6)|(read_word<<2))
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: write khác set/tag
     while True:
-        write_set=random.randint(0,n_set-1)
-        if write_set!=read_set: break
-    write_insts=[]; write_tags=[]
-    for _ in range(4):
-        write_tag=random.randint(0,(1<<tag_bits)-1)
-        write_tags.append(write_tag)
-        write_word=random.randint(0,15)
-        addr=shared_address((write_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(write_word<<2))
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        write_insts.append((addr,data))
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    data_a1 = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_a1)}\t{data_a1}")
+    addrs.append(addr_a1)
+
+    # B[0]: read khác với tất cả A
     while True:
-        extra_write_tag=random.randint(0,(1<<tag_bits)-1)
-        if extra_write_tag not in write_tags: break
-    extra_write_word=random.randint(0,15)
-    inst0_extra_write=shared_address((extra_write_tag<<(n_set.bit_length()+4+2))|(write_set<<6)|(extra_write_word<<2))
-    extra_write_data=f"0x{random.randint(0,2**32-1):08x}"
+        tag_b0 = random.randint(0, 0x3F)
+        set_b0 = random.randint(0, 0xF)
+        if (tag_b0, set_b0) not in used_combos:
+            used_combos.add((tag_b0, set_b0))
+            break
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag_b0, set_b0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # B[1]: write giống set/tag của A[0]
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_a0, set_a0, offset_b1)
+    data_b1 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b1)}\t{data_b1}")
+    addrs.append(addr_b1)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 104 created")
+def testcase_105():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_105/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
+
+    # A[0]: read
     while True:
-        inst1_set=random.randint(0,n_set-1)
-        if inst1_set!=read_set and inst1_set!=write_set: break
-    inst1_tag=random.randint(0,(1<<tag_bits)-1)
-    inst1_word=random.randint(0,15)
-    inst1_write=shared_address((inst1_tag<<(n_set.bit_length()+4+2))|(inst1_set<<6)|(inst1_word<<2))
-    inst1_data=f"0x{random.randint(0,2**32-1):08x}"
-    with open(inst0_path,"w") as f0:
-        f0.write(f"read\t0x{inst0_read:08x}\n")
-        for addr,data in write_insts:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        f0.write(f"write\t0x{inst0_extra_write:08x}\t{extra_write_data}\n")
-    with open(inst1_path,"w") as f1:
-        f1.write(f"write\t0x{inst1_write:08x}\t{inst1_data}\n")
-    blocks=set([block_address(inst0_read), block_address(inst0_extra_write), block_address(inst1_write)])
-    for addr,_ in write_insts:
-        blocks.add(block_address(addr))
-    with open(mem_data_path,"w") as fm:
-        for blk in blocks:
-            fm.write(f"0x{blk:08x}\t"+"\t".join(f"0x{random.randint(0,2**32-1):08x}" for _ in range(16))+"\n")
-    print("Testcase 105 created")
-def testcase_106(n_set=16):
+        tag_a0 = random.randint(0, 0x3F)
+        set_a0 = random.randint(0, 0xF)
+        if (tag_a0, set_a0) not in used_combos:
+            used_combos.add((tag_a0, set_a0))
+            break
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a0, set_a0, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
+
+    # A[1]: write khác set/tag
+    while True:
+        tag_a1 = random.randint(0, 0x3F)
+        set_a1 = random.randint(0, 0xF)
+        if (tag_a1, set_a1) not in used_combos:
+            used_combos.add((tag_a1, set_a1))
+            break
+    offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a1, set_a1, offset_a1)
+    data_a1 = to_hex32(random.getrandbits(32))
+    instr_A.append(f"write\t{to_hex32(addr_a1)}\t{data_a1}")
+    addrs.append(addr_a1)
+
+    # B[0]: read khác hoàn toàn với A
+    while True:
+        tag_b0 = random.randint(0, 0x3F)
+        set_b0 = random.randint(0, 0xF)
+        if (tag_b0, set_b0) not in used_combos:
+            used_combos.add((tag_b0, set_b0))
+            break
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag_b0, set_b0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
+
+    # B[1]: write khác set/tag với A[0]
+    while True:
+        tag_b1 = random.randint(0, 0x3F)
+        set_b1 = random.randint(0, 0xF)
+        if (tag_b1 != tag_a0 or set_b1 != set_a0) and (tag_b1, set_b1) not in used_combos:
+            used_combos.add((tag_b1, set_b1))
+            break
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_b1, set_b1, offset_b1)
+    data_b1 = to_hex32(random.getrandbits(32))
+    instr_B.append(f"write\t{to_hex32(addr_b1)}\t{data_b1}")
+    addrs.append(addr_b1)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 105 created")
+def testcase_106():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_106/"
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    # Số bit tag = 32 - (log2(n_set) + 4 + 2) nhưng ta chỉ cần 7 bit tag (0..127) để không vượt 0x3FFFF
-    # Layout addr: 0x20000 + (tag << 10) + (set << 6) + (word_offset << 2)
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_combos = set()
 
-    tag_limit = 128  # Đảm bảo không vượt 0x3FFFF
-    def block_addr(a): return a & 0xFFFFFFC0
+    # A[0] and A[1]: same set/tag, different offset
+    tag_a = random.randint(0, 0x3F)
+    set_a = random.randint(0, 0xF)
+    used_combos.add((tag_a, set_a))
 
-    # 1) Chọn set duy nhất
-    chosen_set = random.randint(0, n_set - 1)
+    offset_a0 = random.choice(range(0, 64, 4))
+    addr_a0 = make_shared(shared_prefix, tag_a, set_a, offset_a0)
+    instr_A.append(f"read\t{to_hex32(addr_a0)}")
+    addrs.append(addr_a0)
 
-    # 2) Tạo 8 tag duy nhất cho 8 lệnh write
-    all_8_tags = random.sample(range(tag_limit), 8)
+    offset_a1 = offset_a0
+    while offset_a1 == offset_a0:
+        offset_a1 = random.choice(range(0, 64, 4))
+    addr_a1 = make_shared(shared_prefix, tag_a, set_a, offset_a1)
+    instr_A.append(f"read\t{to_hex32(addr_a1)}")
+    addrs.append(addr_a1)
 
-    # 3) Chia 8 tag -> 4 cho inst_0, 4 cho inst_1
-    tags_inst0 = all_8_tags[:4]
-    tags_inst1 = all_8_tags[4:]
-
-    # 4) Tạo 4 lệnh write inst_0
-    writes_inst0 = []
-    for t in tags_inst0:
-        wofs = random.randint(0, 15)
-        addr = 0x00020000 + (t << 10) + (chosen_set << 6) + (wofs << 2)
-        data = f"0x{random.randint(0, 2**32 - 1):08x}"
-        writes_inst0.append((addr, data))
-
-    # 5) Tạo 4 lệnh write inst_1
-    writes_inst1 = []
-    for t in tags_inst1:
-        wofs = random.randint(0, 15)
-        addr = 0x00020000 + (t << 10) + (chosen_set << 6) + (wofs << 2)
-        data = f"0x{random.randint(0, 2**32 - 1):08x}"
-        writes_inst1.append((addr, data))
-
-    # 6) Tạo 1 tag dành cho 2 lệnh read (chắc chắn khác 8 tag trên)
+    # B[0]: read khác với A
     while True:
-        read_tag = random.randint(0, tag_limit - 1)
-        if read_tag not in all_8_tags:
+        tag_b0 = random.randint(0, 0x3F)
+        set_b0 = random.randint(0, 0xF)
+        if (tag_b0, set_b0) not in used_combos:
+            used_combos.add((tag_b0, set_b0))
             break
+    offset_b0 = random.choice(range(0, 64, 4))
+    addr_b0 = make_shared(shared_prefix, tag_b0, set_b0, offset_b0)
+    instr_B.append(f"read\t{to_hex32(addr_b0)}")
+    addrs.append(addr_b0)
 
-    # Tạo read cho inst_0
-    rd_word_0 = random.randint(0, 15)
-    read_addr_0 = 0x00020000 + (read_tag << 10) + (chosen_set << 6) + (rd_word_0 << 2)
+    # B[1]: read giống với A[0] (same tag, set, 16-bit prefix)
+    offset_b1 = random.choice(range(0, 64, 4))
+    addr_b1 = make_shared(shared_prefix, tag_a, set_a, offset_b1)
+    instr_B.append(f"read\t{to_hex32(addr_b1)}")
+    addrs.append(addr_b1)
 
-    # Tạo read cho inst_1 (cùng tag, cùng set)
-    rd_word_1 = random.randint(0, 15)
-    read_addr_1 = 0x00020000 + (read_tag << 10) + (chosen_set << 6) + (rd_word_1 << 2)
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
 
-    # 7) Ghi file inst_0
-    with open(path_0, "w") as f0:
-        # 4 write
-        for (addr, data) in writes_inst0:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        # 1 read
-        f0.write(f"read\t0x{read_addr_0:08x}\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
 
-    # 8) Ghi file inst_1
-    with open(path_1, "w") as f1:
-        # 4 write
-        for (addr, data) in writes_inst1:
-            f1.write(f"write\t0x{addr:08x}\t{data}\n")
-        # 1 read
-        f1.write(f"read\t0x{read_addr_1:08x}\n")
+    print("testcase 106 created")
+def testcase_107():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_107/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    # 9) Tạo mem_data: cho tất cả địa chỉ (8 writes + 2 reads)
-    all_addrs = [x[0] for x in writes_inst0] + [x[0] for x in writes_inst1] + [read_addr_0, read_addr_1]
-    blocks = {block_addr(a) for a in all_addrs}
+    instr_A, instr_B, addrs = [], [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_tags = set()
 
-    with open(path_mem, "w") as fm:
-        for blk in blocks:
-            data_words = [f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_words) + "\n")
+    # Chọn set chung
+    fixed_set = random.randint(0, 0xF)
 
-    print("Testcase 106 created")
-def testcase_107(n_set=16):  # tạo 4 read khác tag + 4 read trùng tag
-    import os,random
-    bp="subsystem_testcase/testcase_107/";os.makedirs(bp,exist_ok=True)  # tạo folder
-    p0=os.path.join(bp,"instr_mem_A.mem");p1=os.path.join(bp,"instr_mem_B.mem");pm=os.path.join(bp,"main_memory_init.mem")
-    tg_lim=128  # giới hạn tag
-    def blk(a):return a&0xFFFFFFC0  # block address
-    cs=random.randint(0,n_set-1)  # chosen set
-    t4=random.sample(range(tg_lim),4)  # 4 tag khác nhau
-    r0=[]
-    for t in t4:  # 4 lệnh read khác tag
-        wofs=random.randint(0,15)
-        a=0x20000+(t<<10)+(cs<<6)+(wofs<<2)
-        r0.append(a)
-    for t in t4:  # 4 lệnh read trùng tag
-        wofs=random.randint(0,15)
-        a=0x20000+(t<<10)+(cs<<6)+(wofs<<2)
-        r0.append(a)
-    with open(p0,"w") as f0:  # ghi inst_0
-        for a in r0:f0.write(f"read\t0x{a:08x}\n")
-    with open(p1,"w"): pass  # inst_1 để trống
-    blocks={blk(a)for a in r0}
-    with open(pm,"w") as fm:  # mem_data
-        for b in blocks:
-            d=[f"0x{random.randint(0,2**32-1):08x}"for _ in range(16)]
-            fm.write(f"0x{b:08x}\t"+"\t".join(d)+"\n")
-    print("Testcase 107 created")
-def testcase_108(n_set=16):  # 4 read khác tag + 4 write trùng tag
-    import os,random
-    bp="subsystem_testcase/testcase_108/";os.makedirs(bp,exist_ok=True)  # folder
-    p0=os.path.join(bp,"instr_mem_A.mem");p1=os.path.join(bp,"instr_mem_B.mem");pm=os.path.join(bp,"main_memory_init.mem")
-    tg_lim=128  # giới hạn tag
-    def blk(a):return a&0xFFFFFFC0
-    cs=random.randint(0,n_set-1)  # chosen set
-    t4=random.sample(range(tg_lim),4)  # 4 tag cho 4 lệnh read
-    reads=[];writes=[]
-    for t in t4:  # tạo địa chỉ 4 read
-        wofs=random.randint(0,15)
-        a=0x20000+(t<<10)+(cs<<6)+(wofs<<2)
-        reads.append(a)
-    for t in t4:  # tạo địa chỉ 4 write trùng tag
-        wofs=random.randint(0,15)
-        a=0x20000+(t<<10)+(cs<<6)+(wofs<<2)
-        d=f"0x{random.randint(0,2**32-1):08x}"
-        writes.append((a,d))
-    with open(p0,"w") as f0:
-        for a in reads:f0.write(f"read\t0x{a:08x}\n")  # ghi 4 read
-        for a,d in writes:f0.write(f"write\t0x{a:08x}\t{d}\n")  # ghi 4 write
-    with open(p1,"w"): pass  # inst_1 rỗng
-    blocks={blk(a)for a in reads}|{blk(a)for a,_ in writes}
-    with open(pm,"w") as fm:
-        for b in blocks:
-            d=[f"0x{random.randint(0,2**32-1):08x}"for _ in range(16)]
-            fm.write(f"0x{b:08x}\t"+"\t".join(d)+"\n")
-    print("Testcase 108 created")
-def testcase_109(n_set=16):  # 4 read cùng set, khác tag
-    import os, random
-    bp = "subsystem_testcase/testcase_109/"
-    os.makedirs(bp, exist_ok=True)
-    p0 = os.path.join(bp, "instr_mem_A.mem")
-    p1 = os.path.join(bp, "instr_mem_B.mem")
-    pm = os.path.join(bp, "main_memory_init.mem")
-    tag_limit = 128  # giới hạn tag để đảm bảo địa chỉ nằm trong 0x20000..0x3FFFF
-    def block_addr(a): return a & 0xFFFFFFC0
-    chosen_set = random.randint(0, n_set - 1)
-    tags_4 = random.sample(range(tag_limit), 4)  # 4 tag khác nhau
-    reads = []
-    for t in tags_4:
-        word_offset = random.randint(0, 15)
-        addr = 0x20000 + (t << 10) + (chosen_set << 6) + (word_offset << 2)
-        reads.append(addr)
-    with open(p0, "w") as f0:
-        for a in reads:
-            f0.write(f"read\t0x{a:08x}\n")
-    with open(p1, "w"): pass
-    blocks = {block_addr(a) for a in reads}
-    with open(pm, "w") as fm:
-        for b in blocks:
-            data_line = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            fm.write(f"0x{b:08x}\t" + "\t".join(data_line) + "\n")
-    print("Testcase 109 created")
-def testcase_110(n_set=16):  # 4 write inst_0 + 4 read inst_1, cùng set, tag cặp đôi
-    import os, random
-    bp = "subsystem_testcase/testcase_110/"
-    os.makedirs(bp, exist_ok=True)
-    p0 = os.path.join(bp, "instr_mem_A.mem")
-    p1 = os.path.join(bp, "instr_mem_B.mem")
-    pm = os.path.join(bp, "main_memory_init.mem")
-    tag_limit = 128  # giới hạn tag đảm bảo vùng 0x20000..0x3FFFF
-    def block_addr(a): return a & 0xFFFFFFC0
+    # A: 4 write khác tag
+    tag_a_list = []
+    while len(tag_a_list) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            tag_a_list.append(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            data = to_hex32(random.getrandbits(32))
+            instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+            addrs.append(addr)
 
-    chosen_set = random.randint(0, n_set - 1)  # cùng set
-    tags_4 = random.sample(range(tag_limit), 4)  # 4 tag khác nhau
+    # A[4]: read khác tag hoàn toàn
+    while True:
+        tag_r = random.randint(0, 0x3F)
+        if tag_r not in used_tags:
+            used_tags.add(tag_r)
+            break
+    offset_r = random.choice(range(0, 64, 4))
+    addr_r = make_shared(shared_prefix, tag_r, fixed_set, offset_r)
+    instr_A.append(f"read\t{to_hex32(addr_r)}")
+    addrs.append(addr_r)
 
-    # Tạo 4 write cho inst_0
-    writes_0 = []
-    for t in tags_4:
-        word_offset = random.randint(0, 15)
-        addr = 0x20000 + (t << 10) + (chosen_set << 6) + (word_offset << 2)
-        data_val = f"0x{random.randint(0, 2**32 - 1):08x}"
-        writes_0.append((addr, data_val))
+    # B: 4 write với tag khác hoàn toàn với A, cùng set
+    tag_b_list = []
+    while len(tag_b_list) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            tag_b_list.append(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            data = to_hex32(random.getrandbits(32))
+            instr_B.append(f"write\t{to_hex32(addr)}\t{data}")
+            addrs.append(addr)
 
-    # Tạo 4 read cho inst_1 (cùng tag với từng write)
-    reads_1 = []
-    for t in tags_4:
-        word_offset = random.randint(0, 15)
-        addr = 0x20000 + (t << 10) + (chosen_set << 6) + (word_offset << 2)
-        reads_1.append(addr)
+    # B[4]: read giống A[4]
+    offset_match = random.choice(range(0, 64, 4))
+    addr_match = make_shared(shared_prefix, tag_r, fixed_set, offset_match)
+    instr_B.append(f"read\t{to_hex32(addr_match)}")
+    addrs.append(addr_match)
 
-    with open(p0, "w") as f0:
-        for (a, d) in writes_0:
-            f0.write(f"write\t0x{a:08x}\t{d}\n")
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instr_B: f.write(line + "\n")
 
-    with open(p1, "w") as f1:
-        for a in reads_1:
-            f1.write(f"read\t0x{a:08x}\n")
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
 
-    # Tạo mem_data cho tất cả lệnh trong inst_0
-    blocks = {block_addr(a) for (a, _) in writes_0}
-    with open(pm, "w") as fm:
-        for blk in blocks:
-            data_line = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_line) + "\n")
+    print("testcase 107 created")
+def testcase_108():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_108/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    print("Testcase 110 created")
-def testcase_111(n_set=16):  # 4 write (unique tags) + 4 read (unique tags, different from writes)
-    import os, random
-    bp = "subsystem_testcase/testcase_111/"
-    os.makedirs(bp, exist_ok=True)
-    p0 = os.path.join(bp, "instr_mem_A.mem")
-    p1 = os.path.join(bp, "instr_mem_B.mem")
-    pm = os.path.join(bp, "main_memory_init.mem")
-    tag_limit = 128
-    def block_addr(a): return a & 0xFFFFFFC0
+    instr_A, addrs = [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
 
-    chosen_set = random.randint(0, n_set - 1)
+    # 4 lệnh read: cùng set, khác tag
+    read_tags = []
+    while len(read_tags) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            read_tags.append(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
 
-    # Lấy 8 tag: 4 cho write, 4 cho read
-    all_tags_8 = random.sample(range(tag_limit), 8)
-    w_tags = all_tags_8[:4]
-    r_tags = all_tags_8[4:]
+    # Chọn 1 tag từ 4 cái trên
+    repeat_tag = random.choice(read_tags)
+    # 4 lệnh read: cùng tag vừa chọn, cùng set, khác offset
+    for _ in range(4):
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, repeat_tag, fixed_set, offset)
+        instr_A.append(f"read\t{to_hex32(addr)}")
+        addrs.append(addr)
 
-    writes = []
-    for t in w_tags:
-        word_offset = random.randint(0, 15)
-        addr = 0x20000 + (t << 10) + (chosen_set << 6) + (word_offset << 2)
-        data_val = f"0x{random.randint(0, 2**32 - 1):08x}"
-        writes.append((addr, data_val))
+    # Ghi file
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        f.write("")
 
-    reads = []
-    for t in r_tags:
-        word_offset = random.randint(0, 15)
-        addr = 0x20000 + (t << 10) + (chosen_set << 6) + (word_offset << 2)
-        reads.append(addr)
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
 
-    with open(p0, "w") as f0:
-        for (a, d) in writes:
-            f0.write(f"write\t0x{a:08x}\t{d}\n")
-        for a in reads:
-            f0.write(f"read\t0x{a:08x}\n")
+    print("testcase 108 created")
+def testcase_109():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_109/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    with open(p1, "w"): pass
+    instr_A, addrs = [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
 
-    blocks = {block_addr(a) for (a, _) in writes} | {block_addr(a) for a in reads}
-    with open(pm, "w") as fm:
-        for blk in blocks:
-            dline = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(dline) + "\n")
+    # 4 lệnh read: cùng set, khác tag
+    read_tags = []
+    while len(read_tags) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            read_tags.append(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
 
-    print("Testcase 111 created")
-def testcase_112(n_set=16):  # 8 writes in inst_0 (all same set, distinct tags), then 4 reads in inst_1 (matching last 4 writes' tags)
-    import os, random
-    bp="subsystem_testcase/testcase_112/"
-    os.makedirs(bp,exist_ok=True)
-    p0=os.path.join(bp,"instr_mem_A.mem")
-    p1=os.path.join(bp,"instr_mem_B.mem")
-    pm=os.path.join(bp,"main_memory_init.mem")
-    tag_lim=128
-    def blk(a):return a&0xFFFFFFC0
-    chosen_set=random.randint(0,n_set-1)
-    # 8 tags for inst_0: first 4 writes, next 4 writes
-    all_tags_8=random.sample(range(tag_lim),8)
-    tags_0_1=all_tags_8[:4]  # first 4 writes
-    tags_0_2=all_tags_8[4:]  # second 4 writes
-    writes_0_1=[]
-    writes_0_2=[]
-    for t in tags_0_1:
-        wofs=random.randint(0,15)
-        addr=0x20000+(t<<10)+(chosen_set<<6)+(wofs<<2)
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        writes_0_1.append((addr,data))
-    for t in tags_0_2:
-        wofs=random.randint(0,15)
-        addr=0x20000+(t<<10)+(chosen_set<<6)+(wofs<<2)
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        writes_0_2.append((addr,data))
-    # inst_1: 4 reads matching the second 4 writes
-    reads_1=[]
-    for t in tags_0_2:
-        wofs=random.randint(0,15)
-        addr=0x20000+(t<<10)+(chosen_set<<6)+(wofs<<2)
-        reads_1.append(addr)
-    with open(p0,"w") as f0:
-        for(a,d)in writes_0_1:f0.write(f"write\t0x{a:08x}\t{d}\n")
-        for(a,d)in writes_0_2:f0.write(f"write\t0x{a:08x}\t{d}\n")
-    with open(p1,"w") as f1:
-        for a in reads_1:f1.write(f"read\t0x{a:08x}\n")
-    # mem_data: addresses from inst_0 only
-    all_writes_0=[x[0]for x in writes_0_1]+[x[0]for x in writes_0_2]
-    blocks={blk(a)for a in all_writes_0}
-    with open(pm,"w") as fm:
-        for b in blocks:
-            d=[f"0x{random.randint(0,2**32-1):08x}"for _ in range(16)]
-            fm.write(f"0x{b:08x}\t"+"\t".join(d)+"\n")
-    print("Testcase 112 created")
-def testcase_113(n_set=16):  # 4 writes + 2 reads in inst_0, 4 writes + 2 reads in inst_1, all same set, no overlapping tags
-    import os, random
-    bp = "subsystem_testcase/testcase_113/"
-    os.makedirs(bp, exist_ok=True)
-    p0 = os.path.join(bp, "instr_mem_A.mem")
-    p1 = os.path.join(bp, "instr_mem_B.mem")
-    pm = os.path.join(bp, "main_memory_init.mem")
+    # Chọn tag từ 4 tag đã đọc
+    chosen_tag = random.choice(read_tags)
 
-    # Mỗi địa chỉ: 0x20000 + (tag << 10) + (set << 6) + (word_offset << 2), đảm bảo vùng chung 0x20000..0x3FFFF
-    # Tạo tổng cộng 12 tag duy nhất: 4 write + 2 read (inst_0), 4 write + 2 read (inst_1)
-    # -> Không trùng tag giữa tất cả lệnh
-    tag_limit = 128
-    all_tags_12 = random.sample(range(tag_limit), 12)
+    # 4 lệnh write: cùng tag vừa chọn, cùng set
+    for _ in range(4):
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, chosen_tag, fixed_set, offset)
+        data = to_hex32(random.getrandbits(32))
+        instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        addrs.append(addr)
 
-    # Chia:
-    #  - w0_tags (4 lệnh write inst_0)
-    #  - r0_tags (2 lệnh read inst_0)
-    #  - w1_tags (4 lệnh write inst_1)
-    #  - r1_tags (2 lệnh read inst_1)
-    w0_tags = all_tags_12[0:4]
-    r0_tags = all_tags_12[4:6]
-    w1_tags = all_tags_12[6:10]
-    r1_tags = all_tags_12[10:12]
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        f.write("")
 
-    def block_addr(a): return a & 0xFFFFFFC0
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
 
-    # Tất cả lệnh đều dùng chung 1 set (user yêu cầu set của inst_1 = set lệnh cuối inst_0 => tương đương 1 set)
-    chosen_set = random.randint(0, n_set - 1)
+    print("testcase 109 created")
+def testcase_110():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_110/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    # Sinh địa chỉ + data cho writes, địa chỉ cho reads
-    def make_addr(tag):
-        word_off = random.randint(0,15)
-        return 0x20000 + (tag<<10) + (chosen_set<<6) + (word_off<<2)
+    instr_A, addrs = [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
 
-    writes_0 = []
-    for t in w0_tags:
-        addr = make_addr(t)
-        data = f"0x{random.randint(0,2**32-1):08x}"
-        writes_0.append((addr, data))
+    # 4 lệnh read: cùng set, khác tag
+    while len(used_tags) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
 
-    reads_0 = []
-    for t in r0_tags:
-        addr = make_addr(t)
-        reads_0.append(addr)
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        f.write("")
 
-    writes_1 = []
-    for t in w1_tags:
-        addr = make_addr(t)
-        data = f"0x{random.randint(0,2**32-1):08x}"
-        writes_1.append((addr, data))
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
 
-    reads_1 = []
-    for t in r1_tags:
-        addr = make_addr(t)
-        reads_1.append(addr)
+    print("testcase 110 created")
+def testcase_111():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_111/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    # Ghi inst_0: 4 write (w0_tags) + 2 read (r0_tags)
-    with open(p0,"w") as f0:
-        for (addr, data) in writes_0:
-            f0.write(f"write\t0x{addr:08x}\t{data}\n")
-        for addr in reads_0:
-            f0.write(f"read\t0x{addr:08x}\n")
+    instr_A, addrs = [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
 
-    # Ghi inst_1: 4 write (w1_tags) + 2 read (r1_tags)
-    with open(p1,"w") as f1:
-        for (addr, data) in writes_1:
-            f1.write(f"write\t0x{addr:08x}\t{data}\n")
-        for addr in reads_1:
-            f1.write(f"read\t0x{addr:08x}\n")
+    # 4 lệnh write: cùng set, khác tag
+    while len(used_tags) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            data = to_hex32(random.getrandbits(32))
+            instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+            addrs.append(addr)
 
-    # Tạo mem_data cho tất cả (inst_0 + inst_1)
-    all_addresses = [a for (a,_) in writes_0] + reads_0 + [a for (a,_) in writes_1] + reads_1
-    blocks = {block_addr(a) for a in all_addresses}
-    with open(pm,"w") as fm:
-        for blk in blocks:
-            data_line = [f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_line) + "\n")
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        f.write("")
 
-    print("Testcase 113 created")
-def testcase_114(n_set=16):
-    import os,random
-    bp="subsystem_testcase/testcase_114/"
-    os.makedirs(bp,exist_ok=True)
-    p0=os.path.join(bp,"instr_mem_A.mem");p1=os.path.join(bp,"instr_mem_B.mem");pm=os.path.join(bp,"main_memory_init.mem")
-    tag_lim=128
-    def blk(a):return a&0xFFFFFFC0
-    cs=random.randint(0,n_set-1)  # set cho toàn bộ
-    # Tổng cộng 12 lệnh write: inst_0 có 6, inst_1 có 6, tất cả khác tag
-    all_tags_12=random.sample(range(tag_lim),12)
-    w0_4=all_tags_12[:4]   # 4 lệnh write đầu inst_0
-    w0_2=all_tags_12[4:6]  # 2 lệnh write kế tiếp inst_0
-    w1_4=all_tags_12[6:10] # 4 lệnh write đầu inst_1
-    w1_2=all_tags_12[10:]  # 2 lệnh write kế tiếp inst_1
-    def make_addr(t):
-        wofs=random.randint(0,15)
-        return 0x20000+(t<<10)+(cs<<6)+(wofs<<2)
-    writes_0_4=[];writes_0_2=[]
-    for t in w0_4:
-        addr=make_addr(t)
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        writes_0_4.append((addr,data))
-    for t in w0_2:
-        addr=make_addr(t)
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        writes_0_2.append((addr,data))
-    writes_1_4=[];writes_1_2=[]
-    for t in w1_4:
-        addr=make_addr(t)
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        writes_1_4.append((addr,data))
-    for t in w1_2:
-        addr=make_addr(t)
-        data=f"0x{random.randint(0,2**32-1):08x}"
-        writes_1_2.append((addr,data))
-    # Ghi inst_0
-    with open(p0,"w")as f0:
-        for(a,d)in writes_0_4:f0.write(f"write\t0x{a:08x}\t{d}\n")
-        for(a,d)in writes_0_2:f0.write(f"write\t0x{a:08x}\t{d}\n")
-    # Ghi inst_1
-    with open(p1,"w")as f1:
-        for(a,d)in writes_1_4:f1.write(f"write\t0x{a:08x}\t{d}\n")
-        for(a,d)in writes_1_2:f1.write(f"write\t0x{a:08x}\t{d}\n")
-    # mem_data cho tất cả writes
-    all_addrs_0=[x[0]for x in writes_0_4]+[x[0]for x in writes_0_2]
-    all_addrs_1=[x[0]for x in writes_1_4]+[x[0]for x in writes_1_2]
-    blocks={blk(a)for a in all_addrs_0+all_addrs_1}
-    with open(pm,"w")as fm:
-        for b in blocks:
-            d=[f"0x{random.randint(0,2**32-1):08x}"for _ in range(16)]
-            fm.write(f"0x{b:08x}\t"+"\t".join(d)+"\n")
-    print("Testcase 114 created")
-def testcase_115(n_set=16):
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 111 created")
+def testcase_112():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_112/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, addrs = [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+
+    # 4 lệnh write: cùng set, khác tag
+    while len(used_tags) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            data = to_hex32(random.getrandbits(32))
+            instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+            addrs.append(addr)
+
+    # 4 lệnh read: cùng set, khác tag (khác với 4 tag đã dùng)
+    while len(used_tags) < 8:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            instr_A.append(f"read\t{to_hex32(addr)}")
+            addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        f.write("")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 112 created")
+def testcase_113():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_113/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    instr_A, addrs = [], []
+    shared_prefix = random.choice([0x0002, 0x0003])
+    used_tags = set()
+    fixed_set = random.randint(0, 0xF)
+
+    while len(used_tags) < 8:
+        tag = random.randint(0, 0x3F)
+        if tag not in used_tags:
+            used_tags.add(tag)
+            offset = random.choice(range(0, 64, 4))
+            addr = make_shared(shared_prefix, tag, fixed_set, offset)
+            data = to_hex32(random.getrandbits(32))
+            instr_A.append(f"write\t{to_hex32(addr)}\t{data}")
+            addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for line in instr_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        f.write("")
+
+    written = set()
+    with open(path_mem, "w") as f:
+        for addr in addrs:
+            base = addr & ~0x3F
+            if base in written: continue
+            written.add(base)
+            words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + words) + "\n")
+
+    print("testcase 113 created")
+def testcase_114():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_114/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    shared_prefix = random.choice([0x0002, 0x0003])
+    tag = random.randint(0, 0x3F)
+    set_ = random.randint(0, 0xF)
+    offset_A = random.choice(range(0, 64, 4))
+    offset_B = random.choice(range(0, 64, 4))
+
+    addr_A = make_shared(shared_prefix, tag, set_, offset_A)
+    addr_B = make_shared(shared_prefix, tag, set_, offset_B)
+
+    with open(path_A, "w") as f:
+        f.write(f"read\t{to_hex32(addr_A)}\n")
+    with open(path_B, "w") as f:
+        f.write(f"read\t{to_hex32(addr_B)}\n")
+
+    base_addr = addr_A & ~0x3F
+    with open(path_mem, "w") as f:
+        words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+        f.write("\t".join([to_hex32(base_addr)] + words) + "\n")
+
+    print("testcase 114 created")
+def testcase_115():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_115/"
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    # Địa chỉ: 0x20000 + (tag << 10) + (set << 6) + (word_offset << 2)
-    # => Tất cả nằm trong [0x20000..0x3FFFF]
-    tag_limit = 128  # đảm bảo (tag << 10) <= (127 << 10) = 130048, cộng 0x20000 (131072) vẫn <= 0x3FFFF (262143)
+    shared_prefix = random.choice([0x0002, 0x0003])
+    tag = random.randint(0, 0x3F)
+    set_ = random.randint(0, 0xF)
+    offset_A = random.choice(range(0, 64, 4))
+    offset_B = random.choice([o for o in range(0, 64, 4) if o != offset_A])
 
-    def block_addr(a): return a & 0xFFFFFFC0
+    addr_A = make_shared(shared_prefix, tag, set_, offset_A)
+    addr_B = make_shared(shared_prefix, tag, set_, offset_B)
+    data_A = to_hex32(random.getrandbits(32))
+    data_B = to_hex32(random.getrandbits(32))
 
-    # Chọn set, tag
-    chosen_set = random.randint(0, n_set - 1)
-    chosen_tag = random.randint(0, tag_limit - 1)
+    with open(path_A, "w") as f:
+        f.write(f"write\t{to_hex32(addr_A)}\t{data_A}\n")
+    with open(path_B, "w") as f:
+        f.write(f"write\t{to_hex32(addr_B)}\t{data_B}\n")
 
-    # inst_0:
-    # 1) read addr0
-    # 2) read addr1 (cùng set+tag, khác word_offset)
-    word0 = random.randint(0, 15)
-    addr0 = 0x20000 + (chosen_tag << 10) + (chosen_set << 6) + (word0 << 2)
+    base_addr = addr_A & ~0x3F
+    with open(path_mem, "w") as f:
+        words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+        f.write("\t".join([to_hex32(base_addr)] + words) + "\n")
 
-    word1 = random.randint(0, 15)
-    addr1 = 0x20000 + (chosen_tag << 10) + (chosen_set << 6) + (word1 << 2)
-
-    # inst_1:
-    # 1) read addr2 (cùng set+tag với lệnh thứ 2 trong inst_0)
-    word2 = random.randint(0, 15)
-    addr2 = 0x20000 + (chosen_tag << 10) + (chosen_set << 6) + (word2 << 2)
-
-    with open(path_0, "w") as f0:
-        f0.write(f"read\t0x{addr0:08x}\n")
-        f0.write(f"read\t0x{addr1:08x}\n")
-
-    with open(path_1, "w") as f1:
-        f1.write(f"read\t0x{addr2:08x}\n")
-
-    # mem_data: tạo dữ liệu cho tất cả lệnh trong inst_0 (addr0, addr1)
-    blocks = {block_addr(addr0), block_addr(addr1)}
-    with open(path_mem, "w") as fm:
-        for blk in blocks:
-            data_words = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_words) + "\n")
-
-    print("Testcase 115 created")
-def testcase_116(n_set=16):
-    import os, random
+    print("testcase 115 created")
+def testcase_116():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_116/"
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
     path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    # Địa chỉ: 0x20000 + (tag << 10) + (set << 6) + (word_offset << 2)
-    # => Nằm trong vùng [0x20000..0x3FFFF]
-    tag_limit = 128
-    def block_addr(a): return a & 0xFFFFFFC0
+    shared_prefix = random.choice([0x0002, 0x0003])
+    tag = random.randint(0, 0x3F)
+    set_ = random.randint(0, 0xF)
+    offset_A = random.choice(range(0, 64, 4))
+    offset_B = random.choice([o for o in range(0, 64, 4) if o != offset_A])
 
-    chosen_set = random.randint(0, n_set - 1)
-    chosen_tag = random.randint(0, tag_limit - 1)
+    addr_A = make_shared(shared_prefix, tag, set_, offset_A)
+    addr_B = make_shared(shared_prefix, tag, set_, offset_B)
+    data_B = to_hex32(random.getrandbits(32))
 
-    # inst_0: 1 read
-    word0 = random.randint(0, 15)
-    addr0 = 0x20000 + (chosen_tag << 10) + (chosen_set << 6) + (word0 << 2)
+    with open(path_A, "w") as f:
+        f.write(f"read\t{to_hex32(addr_A)}\n")
+    with open(path_B, "w") as f:
+        f.write(f"write\t{to_hex32(addr_B)}\t{data_B}\n")
 
-    # inst_1: 1 read (cùng set+tag với lệnh trong inst_0)
-    word1 = random.randint(0, 15)
-    addr1 = 0x20000 + (chosen_tag << 10) + (chosen_set << 6) + (word1 << 2)
+    base_addr = addr_A & ~0x3F
+    with open(path_mem, "w") as f:
+        words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+        f.write("\t".join([to_hex32(base_addr)] + words) + "\n")
 
-    with open(path_0, "w") as f0:
-        f0.write(f"read\t0x{addr0:08x}\n")
-
-    with open(path_1, "w") as f1:
-        f1.write(f"read\t0x{addr1:08x}\n")
-
-    # mem_data: tạo dữ liệu cho lệnh trong inst_0
-    blocks = {block_addr(addr0)}
-    with open(path_mem, "w") as fm:
-        for blk in blocks:
-            data_words = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
-            fm.write(f"0x{blk:08x}\t" + "\t".join(data_words) + "\n")
-
-    print("Testcase 116 created")
-def testcase_117(n_set=16):
-    import os, random
+    print("testcase 116 created")
+def testcase_117():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_117/"
     os.makedirs(base_path, exist_ok=True)
-    p0 = os.path.join(base_path, "instr_mem_A.mem")
-    p1 = os.path.join(base_path, "instr_mem_B.mem")
-    pm = os.path.join(base_path, "main_memory_init.mem")
-    tag_limit = 128
-    def blk(a):return a & 0xFFFFFFC0
-    cs = random.randint(0, n_set - 1)
-    tg = random.randint(0, tag_limit - 1)
-    w0 = random.randint(0, 15)
-    addr0 = 0x20000 + (tg << 10) + (cs << 6) + (w0 << 2)
-    data0 = f"0x{random.randint(0,2**32-1):08x}"
-    w1 = random.randint(0, 15)
-    addr1 = 0x20000 + (tg << 10) + (cs << 6) + (w1 << 2)
-    data1 = f"0x{random.randint(0,2**32-1):08x}"
-    with open(p0,"w") as f0:f0.write(f"write\t0x{addr0:08x}\t{data0}\n")
-    with open(p1,"w") as f1:f1.write(f"write\t0x{addr1:08x}\t{data1}\n")
-    blocks = {blk(addr0)}
-    with open(pm,"w") as fm:
-        for b in blocks:
-            d=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            fm.write(f"0x{b:08x}\t"+"\t".join(d)+"\n")
-    print("Testcase 117 created")
-def testcase_118(n_set=16):
-    import os, random
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
+
+    shared_prefix = random.choice([0x0002, 0x0003])
+    tag = random.randint(0, 0x3F)
+    set_ = random.randint(0, 0xF)
+    offset_A = random.choice(range(0, 64, 4))
+    offset_B = random.choice([o for o in range(0, 64, 4) if o != offset_A])
+
+    addr_A = make_shared(shared_prefix, tag, set_, offset_A)
+    addr_B = make_shared(shared_prefix, tag, set_, offset_B)
+    data_A = to_hex32(random.getrandbits(32))
+
+    with open(path_A, "w") as f:
+        f.write(f"write\t{to_hex32(addr_A)}\t{data_A}\n")
+    with open(path_B, "w") as f:
+        f.write(f"read\t{to_hex32(addr_B)}\n")
+
+    base_addr = addr_A & ~0x3F
+    with open(path_mem, "w") as f:
+        words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+        f.write("\t".join([to_hex32(base_addr)] + words) + "\n")
+
+    print("testcase 117 created")
+def testcase_118():
+    def to_hex32(v): return f"0x{v:08X}"
     base_path = "subsystem_testcase/testcase_118/"
     os.makedirs(base_path, exist_ok=True)
-    p0 = os.path.join(base_path, "instr_mem_A.mem")
-    p1 = os.path.join(base_path, "instr_mem_B.mem")
-    pm = os.path.join(base_path, "main_memory_init.mem")
-    tag_limit = 128
-    def blk(a): return a & 0xFFFFFFC0
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    chosen_set = random.randint(0, n_set - 1)
-    chosen_tag = random.randint(0, tag_limit - 1)
+    shared_prefix = random.choice([0x0002, 0x0003])
+    set_ = random.randint(0, 0xF)
+    used_tags = set()
+    instructions_A, instructions_B, all_addrs = [], [], []
 
-    # inst_0: 1 read
-    word0 = random.randint(0, 15)
-    addr0 = 0x20000 + (chosen_tag << 10) + (chosen_set << 6) + (word0 << 2)
+    # Tạo 2 lệnh read cho memA: cùng set, khác tag
+    while len(used_tags) < 2:
+        tag = random.randint(0, 0x3F)
+        if tag in used_tags: continue
+        used_tags.add(tag)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, set_, offset)
+        instructions_A.append(f"read\t{to_hex32(addr)}")
+        all_addrs.append(addr)
 
-    # inst_1: 1 write (cùng set + tag)
-    word1 = random.randint(0, 15)
-    addr1 = 0x20000 + (chosen_tag << 10) + (chosen_set << 6) + (word1 << 2)
-    data1 = f"0x{random.randint(0, 2**32-1):08x}"
+    # Tạo 2 lệnh read cho memB: cùng set, tag khác memA
+    while len(used_tags) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag in used_tags: continue
+        used_tags.add(tag)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, set_, offset)
+        instructions_B.append(f"read\t{to_hex32(addr)}")
+        all_addrs.append(addr)
 
-    with open(p0, "w") as f0:
-        f0.write(f"read\t0x{addr0:08x}\n")
+    with open(path_A, "w") as f:
+        for line in instructions_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instructions_B: f.write(line + "\n")
 
-    with open(p1, "w") as f1:
-        f1.write(f"write\t0x{addr1:08x}\t{data1}\n")
+    written_blocks = set()
+    with open(path_mem, "w") as f:
+        for addr in all_addrs:
+            base = addr & ~0x3F
+            if base in written_blocks: continue
+            written_blocks.add(base)
+            data_words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + data_words) + "\n")
 
-    # mem_data: cho lệnh inst_0
-    blocks = {blk(addr0)}
-    with open(pm, "w") as fm:
-        for b in blocks:
-            d = [f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            fm.write(f"0x{b:08x}\t" + "\t".join(d) + "\n")
+    print("testcase 118 created")
+def testcase_119():
+    def to_hex32(v): return f"0x{v:08X}"
+    base_path = "subsystem_testcase/testcase_119/"
+    os.makedirs(base_path, exist_ok=True)
+    path_A = os.path.join(base_path, "instr_mem_A.mem")
+    path_B = os.path.join(base_path, "instr_mem_B.mem")
+    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    def make_shared(p, t, s, o): return (p << 16) | (t << 10) | (s << 6) | o
 
-    print("Testcase 118 created")
-def testcase_119(n_set=16):  # inst_0: 1 write; inst_1: 1 read (same set & tag as inst_0 write)
-    import os,random
-    bp="subsystem_testcase/testcase_119/";os.makedirs(bp,exist_ok=True)
-    p0=os.path.join(bp,"instr_mem_A.mem");p1=os.path.join(bp,"instr_mem_B.mem");pm=os.path.join(bp,"main_memory_init.mem")
-    tag_bits=32-(n_set.bit_length()+4+2)  # số bit tag
-    def blk(a): return a & 0xFFFFFFC0  # lấy block address
-    cs=random.randint(0,n_set-1)  # set được chọn
-    tg=random.randint(0,(1<<tag_bits)-1)  # tag được chọn
-    w0=random.randint(0,15); addr0=0x20000+(tg<<10)+(cs<<6)+(w0<<2)  # địa chỉ write cho inst_0
-    data0=f"0x{random.randint(0,2**32-1):08x}"
-    w1=random.randint(0,15); addr1=0x20000+(tg<<10)+(cs<<6)+(w1<<2)  # địa chỉ read cho inst_1
-    with open(p0,"w") as f0: f0.write(f"write\t0x{addr0:08x}\t{data0}\n")
-    with open(p1,"w") as f1: f1.write(f"read\t0x{addr1:08x}\n")
-    blocks={blk(addr0)}
-    with open(pm,"w") as fm:
-        for b in blocks:
-            d=[f"0x{random.randint(0,2**32-1):08x}" for _ in range(16)]
-            fm.write(f"0x{b:08x}\t"+"\t".join(d)+"\n")
-    print("Testcase 119 created")
+    shared_prefix = random.choice([0x0002, 0x0003])
+    set_ = random.randint(0, 0xF)
+    used_tags = set()
+    instructions_A, instructions_B, all_addrs = [], [], []
+
+    # memA: 2 lệnh write
+    while len(used_tags) < 2:
+        tag = random.randint(0, 0x3F)
+        if tag in used_tags: continue
+        used_tags.add(tag)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, set_, offset)
+        data = to_hex32(random.getrandbits(32))
+        instructions_A.append(f"write\t{to_hex32(addr)}\t{data}")
+        all_addrs.append(addr)
+
+    # memB: 2 lệnh write khác tag
+    while len(used_tags) < 4:
+        tag = random.randint(0, 0x3F)
+        if tag in used_tags: continue
+        used_tags.add(tag)
+        offset = random.choice(range(0, 64, 4))
+        addr = make_shared(shared_prefix, tag, set_, offset)
+        data = to_hex32(random.getrandbits(32))
+        instructions_B.append(f"write\t{to_hex32(addr)}\t{data}")
+        all_addrs.append(addr)
+
+    with open(path_A, "w") as f:
+        for line in instructions_A: f.write(line + "\n")
+    with open(path_B, "w") as f:
+        for line in instructions_B: f.write(line + "\n")
+
+    written_blocks = set()
+    with open(path_mem, "w") as f:
+        for addr in all_addrs:
+            base = addr & ~0x3F
+            if base in written_blocks: continue
+            written_blocks.add(base)
+            data_words = [to_hex32(random.getrandbits(32)) for _ in range(16)]
+            f.write("\t".join([to_hex32(base)] + data_words) + "\n")
+
+    print("testcase 119 created")
+
+
+
+
+
 
 
 def main():
     # Danh sách các hàm testcase
     list_testcases = [
-        testcase_1, testcase_2, testcase_3, testcase_4, testcase_5, testcase_6, testcase_7, testcase_8, testcase_9,
-        testcase_10, testcase_11, testcase_12, testcase_13, testcase_14, testcase_15, testcase_16, testcase_17,
-        testcase_18, testcase_19, testcase_20, testcase_21, testcase_22, testcase_23, testcase_24, testcase_25,
-        testcase_26, testcase_27, testcase_28, testcase_29, testcase_30, testcase_31, testcase_32, testcase_33,
-        testcase_34, testcase_35, testcase_36, testcase_37, testcase_38, testcase_39, testcase_40, testcase_41,
-        testcase_42, testcase_43, testcase_44, testcase_45, testcase_46, testcase_47, testcase_48, testcase_49,
-        testcase_50, testcase_51, testcase_52, testcase_53, testcase_54, testcase_55, testcase_56, testcase_57,
-        testcase_58, testcase_59, testcase_60, testcase_61, testcase_62, testcase_63, testcase_64, testcase_65,
-        testcase_66, testcase_67, testcase_68, testcase_69, testcase_70, testcase_71, testcase_72, testcase_73,
-        testcase_74, testcase_75, testcase_76, testcase_77, testcase_78, testcase_79, testcase_80, testcase_81,
-        testcase_82, testcase_83, testcase_84, testcase_85, testcase_86, testcase_87, testcase_88, testcase_89,
-        testcase_90, testcase_91, testcase_92, testcase_93, testcase_94, testcase_95, testcase_96, testcase_97,
-        testcase_98, testcase_99, testcase_100, testcase_101, testcase_102, testcase_103, testcase_104, testcase_105,
-        testcase_106, testcase_107, testcase_108, testcase_109, testcase_110, testcase_111, testcase_112, testcase_113,
-        testcase_114, testcase_115, testcase_116, testcase_117, testcase_118, testcase_119
+        testcase_1, testcase_2, testcase_3, testcase_4, testcase_5, testcase_6, testcase_7, testcase_8,
+        testcase_9, testcase_10, testcase_11, testcase_12, testcase_13, testcase_14, testcase_15, testcase_16,
+        testcase_17, testcase_18, testcase_19, testcase_20, testcase_21, testcase_22, testcase_23, testcase_24,
+        testcase_25, testcase_26, testcase_27, testcase_28, testcase_29, testcase_30, testcase_31, testcase_32,
+        testcase_33, testcase_34, testcase_35, testcase_36, testcase_37, testcase_38, testcase_39, testcase_40,
+        testcase_41, testcase_42, testcase_43, testcase_44, testcase_45, testcase_46, testcase_47, testcase_48,
+        testcase_49, testcase_50, testcase_51, testcase_52, testcase_53, testcase_54, testcase_55, testcase_56,
+        testcase_57, testcase_58, testcase_59, testcase_60, testcase_61, testcase_62, testcase_63, testcase_64,
+        testcase_65, testcase_66, testcase_67, testcase_68, testcase_69, testcase_70, testcase_71, testcase_72,
+        testcase_73, testcase_74, testcase_75, testcase_76, testcase_77, testcase_78, testcase_79, testcase_80,
+        testcase_81, testcase_82, testcase_83, testcase_84, testcase_85, testcase_86, testcase_87, testcase_88,
+        testcase_89, testcase_90, testcase_91, testcase_92, testcase_93, testcase_94, testcase_95, testcase_96,
+        testcase_97, testcase_98, testcase_99, testcase_100, testcase_101, testcase_102, testcase_103,
+        testcase_104, testcase_105, testcase_106, testcase_107, testcase_108, testcase_109, testcase_110,
+        testcase_111, testcase_112, testcase_113, testcase_114, testcase_115, testcase_116, testcase_117,
+        testcase_118, testcase_119
     ]
 
 
     print("========== MENU TẠO TESTCASE ==========")
-    print("1. Tạo tất cả 119 testcase")
+    print("1. Tạo tất cả 16 testcase")
     print("2. Tạo testcase cụ thể")
 
     choice = input("Nhập lựa chọn (1 hoặc 2): ")
@@ -3576,12 +6422,13 @@ def main():
             func()
     elif choice == '2':
         # Yêu cầu người dùng nhập số testcase mong muốn
-        tc_number = input("Nhập testcase muốn tạo (1-120): ")
+        tc_number = input("Nhập testcase muốn tạo (1-16): ")
         if tc_number.isdigit():
             tc_number = int(tc_number)
             if 1 <= tc_number <= 200:
                 # Gọi hàm tương ứng (do index trong list bắt đầu từ 0)
                 list_testcases[tc_number - 1]()
+                inspect_testcase(f"subsystem_testcase/{list_testcases[tc_number - 1].__name__}")
             else:
                 print("Số testcase không hợp lệ!")
         else:

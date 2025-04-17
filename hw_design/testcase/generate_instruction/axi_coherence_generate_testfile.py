@@ -1,9 +1,9 @@
 import os
 import random
 
-def testcase_1(n_set=16):
+def testcase_1(n_set=4):
     base_path = "axi_coherence_testcase/testcase_1/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem"); path_1 = os.path.join(base_path, "instr_mem_B.mem"); path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt"); path_1 = os.path.join(base_path, "inst_1.txt"); path_mem = os.path.join(base_path, "mem_data")
     tag_bits = 32 - (int(n_set).bit_length() + 4 + 2)
     set_index = random.randint(0, n_set - 1)
     tag = random.randint(0, (1 << tag_bits) - 1)
@@ -16,9 +16,9 @@ def testcase_1(n_set=16):
         data = '\t'.join(f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16))
         f_mem.write(f"0x{addr:08x}\t{data}\n")
     print("Testcase 1 created")
-def testcase_2(n_set=16):
+def testcase_2(n_set=4):
     base_path = "axi_coherence_testcase/testcase_2/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem"); path_1 = os.path.join(base_path, "instr_mem_B.mem"); path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt"); path_1 = os.path.join(base_path, "inst_1.txt"); path_mem = os.path.join(base_path, "mem_data")
     tag_bits = 32 - (int(n_set).bit_length() + 4 + 2)
     set_index = random.randint(0, n_set - 1)
     tag = random.randint(0, (1 << tag_bits) - 1)
@@ -32,11 +32,11 @@ def testcase_2(n_set=16):
         data = '\t'.join(f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16))
         f_mem.write(f"0x{addr:08x}\t{data}\n")
     print("Testcase 2 created")
-def testcase_3(n_set=16):
+def testcase_3(n_set=4):
     base_path = "axi_coherence_testcase/testcase_3/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     set_index = random.randint(0, n_set - 1)
     word_offset = random.randint(0, 15)
     addr = (random.randint(0x00010000, 0x0001FFFF) & 0xFFFFFF00) | (word_offset << 2)  # Đảm bảo 6 bit cuối bằng 0
@@ -48,11 +48,11 @@ def testcase_3(n_set=16):
         data = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
         f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
     print("Testcase 3 created")
-def testcase_4(n_set=16):
+def testcase_4(n_set=4):
     base_path = "axi_coherence_testcase/testcase_4/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     set_index = random.randint(0, n_set - 1)
     word_offset = random.randint(0, 15)
     addr = (random.randint(0x00010000, 0x0001FFFF) & 0xFFFFFF00) | (word_offset << 2)  # Đảm bảo 6 bit cuối bằng 0
@@ -64,11 +64,11 @@ def testcase_4(n_set=16):
         data = [f"0x{random.randint(0, 2**32 - 1):08x}" for _ in range(16)]
         f.write(f"0x{block_addr:08x}\t" + '\t'.join(data) + '\n')
     print("Testcase 4 created")
-def testcase_5(n_set=16):
+def testcase_5(n_set=4):
     base_path = "axi_coherence_testcase/testcase_5/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     set_index = random.randint(0, n_set - 1)
     word_offset_read = random.randint(0, 15)
     word_offset_write = random.randint(0, 15)
@@ -91,11 +91,11 @@ def testcase_5(n_set=16):
         else:
             f.write(f"0x{block_addr_read:08x}\t" + '\t'.join(data_read) + '\n')
     print("Testcase 5 created")
-def testcase_6(n_set=16):
+def testcase_6(n_set=4):
     base_path = "axi_coherence_testcase/testcase_6/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     set_index = random.randint(0, n_set - 1)
     word_offset_write = random.randint(0, 15)
     word_offset_read = random.randint(0, 15)
@@ -118,11 +118,11 @@ def testcase_6(n_set=16):
         else:
             f.write(f"0x{block_addr_write:08x}\t" + '\t'.join(data_write) + '\n')
     print("Testcase 6 created")
-def testcase_7(n_set=16):
+def testcase_7(n_set=4):
     base_path = "axi_coherence_testcase/testcase_7/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     with open(path_0, 'w') as f0: pass
     set_index = random.randint(0, n_set - 1)
     word_offset_read = random.randint(0, 15)
@@ -143,11 +143,11 @@ def testcase_7(n_set=16):
         else:
             f_mem.write(f"0x{block_addr_read:08x}\t" + '\t'.join(data_read) + '\n')
     print("Testcase 7 created")
-def testcase_8(n_set=16):
+def testcase_8(n_set=4):
     base_path = "axi_coherence_testcase/testcase_8/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     with open(path_0, 'w') as f0: pass
     set_index = random.randint(0, n_set - 1)
     word_offset_write = random.randint(0, 15)
@@ -168,11 +168,11 @@ def testcase_8(n_set=16):
         else:
             f_mem.write(f"0x{block_addr_write:08x}\t" + '\t'.join(data_write) + '\n')
     print("Testcase 8 created")
-def testcase_9(n_set=16):
+def testcase_9(n_set=4):
     base_path = "axi_coherence_testcase/testcase_9/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     word_offset_read = random.randint(0, 15)
     word_offset_write = random.randint(0, 15)
     addr_read = (random.randint(0x00000000, 0x0000FFFF) & 0xFFFFFF00) | (word_offset_read << 2) & 0xFFFFFFC0
@@ -192,11 +192,11 @@ def testcase_9(n_set=16):
         else:
             f_mem.write(f"0x{block_addr_read:08x}\t" + '\t'.join(data_read) + '\n')
     print("Testcase 9 created")
-def testcase_10(n_set=16):
+def testcase_10(n_set=4):
     base_path = "axi_coherence_testcase/testcase_10/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     word_offset_write = random.randint(0, 15)
     word_offset_read = random.randint(0, 15)
     addr_write = (random.randint(0x00000000, 0x0000FFFF) & 0xFFFFFF00) | (word_offset_write << 2) & 0xFFFFFFC0
@@ -216,11 +216,11 @@ def testcase_10(n_set=16):
         else:
             f_mem.write(f"0x{block_addr_write:08x}\t" + '\t'.join(data_write) + '\n')
     print("Testcase 10 created")
-def testcase_11(n_set=16):
+def testcase_11(n_set=4):
     base_path = "axi_coherence_testcase/testcase_11/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     word_offset_read_0 = random.randint(0, 15)
     word_offset_read_1 = random.randint(0, 15)
     addr_read_0 = (random.randint(0x00000000, 0x0000FFFF) & 0xFFFFFF00) | (word_offset_read_0 << 2) & 0xFFFFFFC0
@@ -240,11 +240,11 @@ def testcase_11(n_set=16):
         else:
             f_mem.write(f"0x{block_addr_read_0:08x}\t" + '\t'.join(data_read_0) + '\n')
     print("Testcase 11 created")
-def testcase_12(n_set=16):
+def testcase_12(n_set=4):
     base_path = "axi_coherence_testcase/testcase_12/"; os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     word_offset_write_0 = random.randint(0, 15)
     word_offset_write_1 = random.randint(0, 15)
     addr_write_0 = (random.randint(0x00000000, 0x0000FFFF) & 0xFFFFFF00) | (word_offset_write_0 << 2) & 0xFFFFFFC0
@@ -264,12 +264,12 @@ def testcase_12(n_set=16):
         else:
             f_mem.write(f"0x{block_addr_write_0:08x}\t" + '\t'.join(data_write_0) + '\n')
     print("Testcase 12 created")
-def testcase_13(n_set=16):
+def testcase_13(n_set=4):
     base_path = "axi_coherence_testcase/testcase_13/";
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     word_offset_read_0 = random.randint(0, 15)
     word_offset_write_1 = random.randint(0, 15)
     word_offset_read_1 = random.randint(0, 15)
@@ -299,12 +299,12 @@ def testcase_13(n_set=16):
             f_mem.write(f"0x{block_addr_write_1:08x}\t" + '\t'.join(data_write_1) + '\n')
         f_mem.write(f"0x{block_addr_read_1:08x}\t" + '\t'.join(data_read_1) + '\n')
     print("Testcase 13 created")
-def testcase_14(n_set=16):
+def testcase_14(n_set=4):
     base_path = "axi_coherence_testcase/testcase_14/";
     os.makedirs(base_path, exist_ok=True)
-    path_0 = os.path.join(base_path, "instr_mem_A.mem")
-    path_1 = os.path.join(base_path, "instr_mem_B.mem")
-    path_mem = os.path.join(base_path, "main_memory_init.mem")
+    path_0 = os.path.join(base_path, "inst_0.txt")
+    path_1 = os.path.join(base_path, "inst_1.txt")
+    path_mem = os.path.join(base_path, "mem_data")
     word_offset_read_0 = random.randint(0, 15)
     word_offset_write_0 = random.randint(0, 15)
     word_offset_write_1 = random.randint(0, 15)
