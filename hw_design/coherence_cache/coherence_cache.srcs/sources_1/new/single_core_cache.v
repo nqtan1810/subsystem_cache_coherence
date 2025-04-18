@@ -40,16 +40,14 @@ module single_core_cache
     output                      m_AWREADY,
     
     // W Channel
-    // input                       m_WID,
     input   [DATA_WIDTH-1:0]    m_WDATA,
-    input   [STRB_WIDTH-1:0]    m_WSTRB, // use default value: 0xF
+    input   [STRB_WIDTH-1:0]    m_WSTRB, // can use to 1-byte, 2-byte, 4-byte access
     input                       m_WLAST,
     input   [USER_WIDTH-1:0]    m_WUSER,
     input                       m_WVALID,
     output                      m_WREADY,
     
     // B Channel
-    
     output  [ID_WIDTH-1:0]      m_BID,
     output  [1:0]               m_BRESP,
     output  [USER_WIDTH-1:0]    m_BUSER,
@@ -73,7 +71,6 @@ module single_core_cache
     output                      m_ARREADY,
     
     // R Channel
-    
     output  [ID_WIDTH-1:0]      m_RID,
     output  reg[DATA_WIDTH-1:0] m_RDATA,
     output  [1:0]               m_RRESP,
@@ -102,7 +99,6 @@ module single_core_cache
     input                       s_AWREADY,
     
     // W Channel
-    // output  s_WID,  // use default value: 0x0
     output  [DATA_WIDTH-1:0]    s_WDATA,
     output  [STRB_WIDTH-1:0]    s_WSTRB,  // use default value: 0xF
     output                      s_WLAST,

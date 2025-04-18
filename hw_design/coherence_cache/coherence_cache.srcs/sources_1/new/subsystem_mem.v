@@ -43,16 +43,14 @@ module subsystem_mem
     output                      m0_AWREADY,
     
     // W Channel
-    // input                       m_WID,
     input   [DATA_WIDTH-1:0]    m0_WDATA,
-    input   [STRB_WIDTH-1:0]    m0_WSTRB, // use default value: 0xF
+    input   [STRB_WIDTH-1:0]    m0_WSTRB, 
     input                       m0_WLAST,
     input   [USER_WIDTH-1:0]    m0_WUSER,
     input                       m0_WVALID,
     output                      m0_WREADY,
     
     // B Channel
-    
     output  [ID_WIDTH-1:0]      m0_BID,
     output  [1:0]               m0_BRESP,
     output  [USER_WIDTH-1:0]    m0_BUSER,
@@ -76,7 +74,6 @@ module subsystem_mem
     output                      m0_ARREADY,
     
     // R Channel
-    
     output  [ID_WIDTH-1:0]      m0_RID,
     output  [DATA_WIDTH-1:0]    m0_RDATA,
     output  [1:0]               m0_RRESP,
@@ -108,16 +105,14 @@ module subsystem_mem
     output                      m1_AWREADY,
     
     // W Channel
-    // input                       m_WID,
     input   [DATA_WIDTH-1:0]    m1_WDATA,
-    input   [STRB_WIDTH-1:0]    m1_WSTRB, // use default value: 0xF
+    input   [STRB_WIDTH-1:0]    m1_WSTRB, 
     input                       m1_WLAST,
     input   [USER_WIDTH-1:0]    m1_WUSER,
     input                       m1_WVALID,
     output                      m1_WREADY,
     
     // B Channel
-    
     output  [ID_WIDTH-1:0]      m1_BID,
     output  [1:0]               m1_BRESP,
     output  [USER_WIDTH-1:0]    m1_BUSER,
@@ -141,7 +136,6 @@ module subsystem_mem
     output                      m1_ARREADY,
     
     // R Channel
-    
     output  [ID_WIDTH-1:0]      m1_RID,
     output  [DATA_WIDTH-1:0]    m1_RDATA,
     output  [1:0]               m1_RRESP,
