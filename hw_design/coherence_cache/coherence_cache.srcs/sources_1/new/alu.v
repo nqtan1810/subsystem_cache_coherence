@@ -11,7 +11,7 @@ module alu
     input  [31:0]     i_alusrcA,
     input  [31:0]     i_alusrcB,
     output reg [31:0] o_alu_result,
-    output reg [31:0] o_sign_bit
+    output reg        o_sign_bit
 );
 
     always @(*) begin
