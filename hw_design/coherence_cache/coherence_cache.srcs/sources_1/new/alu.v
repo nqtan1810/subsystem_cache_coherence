@@ -18,12 +18,12 @@ module alu
         casex (i_alu_control)
             `ALU_ADD : {o_sign_bit, o_alu_result} = i_alusrcA + i_alusrcB;
             `ALU_SUB : {o_sign_bit, o_alu_result} = i_alusrcA - i_alusrcB;
-            `ALU_SLL : {o_sign_bit, o_alu_result} = i_alusrcA << i_alusrcB;
+            `ALU_SLL : {o_sign_bit, o_alu_result} = i_alusrcA << i_alusrcB[4:0];
             `ALU_SSUB: {o_sign_bit, o_alu_result} = $signed(i_alusrcA) - $signed(i_alusrcB);
             `ALU_USUB: {o_sign_bit, o_alu_result} = $unsigned(i_alusrcA) - $unsigned(i_alusrcB);
             `ALU_XOR : {o_sign_bit, o_alu_result} = i_alusrcA ^ i_alusrcB;
-            `ALU_SRL : {o_sign_bit, o_alu_result} = $unsigned(i_alusrcA) >> $unsigned(i_alusrcB);
-            `ALU_SRA : {o_sign_bit, o_alu_result} = $signed(i_alusrcA) >> $signed(i_alusrcB);
+            `ALU_SRL : {o_sign_bit, o_alu_result} = $unsigned(i_alusrcA) >> $unsigned(i_alusrcB[4:0]);
+            `ALU_SRA : {o_sign_bit, o_alu_result} = $signed(i_alusrcA) >> $signed(i_alusrcB[4:0]);
             `ALU_OR  : {o_sign_bit, o_alu_result} = i_alusrcA | i_alusrcB;
             `ALU_AND : {o_sign_bit, o_alu_result} = i_alusrcA & i_alusrcB;
             default  : {o_sign_bit, o_alu_result} = 0;
