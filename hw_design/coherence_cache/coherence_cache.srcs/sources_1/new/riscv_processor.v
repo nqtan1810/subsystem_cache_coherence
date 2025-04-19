@@ -99,6 +99,7 @@ module riscv_processor
     wire [31:0] pc_incr4_MEM;
     wire [31:0] pc_incr4_WB;
     wire        stall;
+    wire        flush_IF;
     wire        pcsel1;
     wire        pcsel2;
     wire [31:0] instr;
@@ -234,8 +235,9 @@ module riscv_processor
     end
 
     assign pc_incr4 = pc + 4;
-    assign pc1 = pc_ID + (imm << 1);
-    assign pc2 = rs1_data + imm;
+    assign pc1      = pc_ID + (imm << 1);
+    assign pc2      = rs1_data + imm;
+    assign flush_IF = pcsel1 | pcsel2;
     
     imem #(
         .DATA_WIDTH (DATA_WIDTH), 
@@ -251,6 +253,7 @@ module riscv_processor
         .i_rst_n       (ARESETn),
         .i_enable      (pipeline_enable),
         .i_blocking    (stall),
+        .i_flush_IF    (flush_IF),
         .i_pc_incr4_IF (pc_incr4),
         .i_pc_IF       (pc),
         .i_inst_IF     (instr),
