@@ -30,7 +30,7 @@ module riscv_top_tb
         ARESETn = 0;
         #10;
         ARESETn = 1;
-        repeat(500) @(posedge ACLK);
+        repeat(1000) @(posedge ACLK);
         $finish;
     end
     
