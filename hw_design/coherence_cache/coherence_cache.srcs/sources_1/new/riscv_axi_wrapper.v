@@ -238,8 +238,8 @@ module riscv_axi_wrapper
                 d_AWVALID   = 0;
                 
                 // W Channel
-                d_WDATA     = i_wdata_dmem << (i_waddr_dmem & 32'h3);
-                d_WSTRB     = (i_ls_b ? 4'h1 : (i_ls_h ? 4'h2 : 4'hF)) << (i_waddr_dmem & 32'h3); 
+                d_WDATA     = i_wdata_dmem << ((i_waddr_dmem & 32'h3) * 8);
+                d_WSTRB     = (i_ls_b ? 4'h1 : (i_ls_h ? 4'h3 : 4'hF)) << (i_waddr_dmem & 32'h3); 
                 d_WLAST     = 1;
                 d_WUSER     = 0;
                 d_WVALID    = 1;
