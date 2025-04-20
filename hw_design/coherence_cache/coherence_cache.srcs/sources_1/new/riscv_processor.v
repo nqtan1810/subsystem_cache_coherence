@@ -224,7 +224,8 @@ module riscv_processor
         if(!ARESETn) begin
             pc <= 0;
         end
-        else begin
+        else 
+        if (pipeline_enable) begin
             if(stall) begin
                 pc <= pc;
             end
@@ -451,6 +452,9 @@ module riscv_processor
     
     // select data for slt_data
     assign slt_data = (sign_bit) ? 1 : 0;
+    
+    // write dato to mem
+    assign dataW = alusrcB_temp;
         
     alu u_alu (
         .i_alu_control  (alu_control),
@@ -602,11 +606,11 @@ module riscv_processor
         .d_RREADY              (d_RREADY),
         
         // interface connect with Data Ram
-        .i_write_dmem          (memwrite_MEM),
+        .i_write_dmem          (memwrite_EX),
         .i_waddr_dmem          (alu_result_MEM),
         .i_wdata_dmem          (dataW_MEM),
         
-        .i_read_dmem           (memread_MEM),
+        .i_read_dmem           (memread_EX),
         .i_raddr_dmem          (alu_result_MEM),
         
         .i_ls_b                (ls_b_MEM),
