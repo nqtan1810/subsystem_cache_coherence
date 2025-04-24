@@ -99,7 +99,7 @@ module riscv_processor
     wire [31:0] pc_incr4_MEM;
     wire [31:0] pc_incr4_WB;
     wire        stall;
-    wire        flush_IF;
+    wire        flush_IF_ID;
     wire        pcsel1;
     wire        pcsel2;
     wire [31:0] instr;
@@ -235,10 +235,10 @@ module riscv_processor
         end
     end
 
-    assign pc_incr4 = pc + 4;
-    assign pc1      = pc_ID + (imm << 1);
-    assign pc2      = rs1_data + imm;
-    assign flush_IF = pcsel1 | pcsel2;
+    assign pc_incr4    = pc + 4;
+    assign pc1         = pc_EX + (imm_EX << 1);
+    assign pc2         = rs1_data + imm_EX;
+    assign flush_IF_ID = pcsel1 | pcsel2;
     
     imem #(
         .DATA_WIDTH (DATA_WIDTH), 
@@ -254,7 +254,7 @@ module riscv_processor
         .i_rst_n       (ARESETn),
         .i_enable      (pipeline_enable),
         .i_blocking    (stall),
-        .i_flush_IF    (flush_IF),
+        .i_flush_IF    (flush_IF_ID),
         .i_pc_incr4_IF (pc_incr4),
         .i_pc_IF       (pc),
         .i_inst_IF     (instr),
@@ -301,51 +301,7 @@ module riscv_processor
         .o_branch      (branch)
     );
     
-    branch_unit u_branch_unit (
-        .i_jump               (jump  ),
-        .i_jalr               (jalr  ),
-        .i_branch             (branch),
-        .i_funct3             (funct3),
-        .i_rs1                (rs1   ),
-        .i_rs2                (rs2   ),
     
-        .i_write_reg_EX       (w_reg_EX      ),
-        .i_jump_EX            (jump_EX       ),
-        .i_wb_EX              (wb_EX         ),
-        .i_slt_EX             (slt_EX        ),
-        .i_pc_incr4_EX        (pc_incr4_EX   ),
-        .i_auipc_lui_data     (auipc_lui_data),
-        .i_slt_data           (slt_data      ),
-        .i_alu_result         (alu_result    ),
-    
-        .i_write_reg_MEM      (w_reg_MEM         ),
-        .i_jump_MEM           (jump_MEM          ),
-        .i_wb_MEM             (wb_MEM            ),
-        .i_slt_MEM            (slt_MEM           ),
-        .i_memread_MEM        (memread_MEM       ),
-        .i_pc_incr4_MEM       (pc_incr4_MEM      ),
-        .i_auipc_lui_data_MEM (auipc_lui_data_MEM),
-        .i_slt_data_MEM       (slt_data_MEM      ),
-        .i_alu_result_MEM     (alu_result_MEM    ),
-        .i_dataR_gen          (dataR_gen         ),
-    
-        .i_write_reg_WB       (w_reg_WB         ),
-        .i_jump_WB            (jump_WB          ),
-        .i_wb_WB              (wb_WB            ),
-        .i_slt_WB             (slt_WB           ),
-        .i_pc_incr4_WB        (pc_incr4_WB      ),
-        .i_auipc_lui_data_WB  (auipc_lui_data_WB),
-        .i_slt_data_WB        (slt_data_WB      ),
-        .i_alu_result_WB      (alu_result_WB    ),
-    
-        .i_dataA              (dataA),
-        .i_dataB              (dataB),
-    
-        .o_rs1_data           (rs1_data),
-        .o_pcsel1             (pcsel1  ),
-        .o_pcsel2             (pcsel2  )
-    );
-
     register_file u_register_file (
         .clk         (ACLK),
         .rst_n       (ARESETn),
@@ -369,6 +325,7 @@ module riscv_processor
         .i_clk             (ACLK),
         .i_rst_n           (ARESETn),
         .i_enable          (pipeline_enable),
+        .i_flush_ID        (flush_IF_ID),
         .i_regwrite_ID     (regwrite),
         .i_wb_ID           (wb),
         .i_slt_ID          (slt),
@@ -455,6 +412,46 @@ module riscv_processor
     
     // write dato to mem
     assign dataW = alusrcB_temp;
+    
+    branch_unit u_branch_unit (
+        .i_jalr_EX            (jalr_EX  ),
+        .i_branch_EX          (branch_EX),
+        .i_funct3_EX          (funct3_EX),
+     
+        .i_rs1_EX             (rs1_EX   ),
+        .i_rs2_EX             (rs2_EX   ),
+    
+        .i_jump_EX            (jump_EX       ),
+    
+        .i_write_reg_MEM      (w_reg_MEM         ),
+        .i_jump_MEM           (jump_MEM          ),
+        .i_wb_MEM             (wb_MEM            ),
+        .i_slt_MEM            (slt_MEM           ),
+        .i_memread_MEM        (memread_MEM       ),
+        .i_pc_incr4_MEM       (pc_incr4_MEM      ),
+        .i_auipc_lui_data_MEM (auipc_lui_data_MEM),
+        .i_slt_data_MEM       (slt_data_MEM      ),
+        .i_alu_result_MEM     (alu_result_MEM    ),
+        .i_dataR_gen          (dataR_gen         ),
+    
+        .i_write_reg_WB       (w_reg_WB         ),
+        .i_jump_WB            (jump_WB          ),
+        .i_wb_WB              (wb_WB            ),
+        .i_slt_WB             (slt_WB           ),
+        .i_regwrite_WB        (regwrite_WB      ),
+        .i_pc_incr4_WB        (pc_incr4_WB      ),
+        .i_auipc_lui_data_WB  (auipc_lui_data_WB),
+        .i_slt_data_WB        (slt_data_WB      ),
+        .i_alu_result_WB      (alu_result_WB    ),
+        .i_dataD              (dataD            ),
+    
+        .i_dataA_EX           (dataA_EX),
+        .i_dataB_EX           (dataB_EX),
+    
+        .o_rs1_data           (rs1_data),
+        .o_pcsel1             (pcsel1  ),
+        .o_pcsel2             (pcsel2  )
+    );
         
     alu u_alu (
         .i_alu_control  (alu_control),
