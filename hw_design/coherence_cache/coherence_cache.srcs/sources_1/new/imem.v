@@ -15,7 +15,7 @@ module imem
     output  [31:0] o_data
 );
 
-    (*rom_style = "block" *) reg [31:0] rom[0:127];
+    (*rom_style = "block" *) reg [31:0] rom[0:255];
 
     initial begin
         $readmemh(IMEM_PATH, rom);
