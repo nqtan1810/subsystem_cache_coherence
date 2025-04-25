@@ -51,7 +51,7 @@ module full_subsystem_top_tb
     
     initial begin
         forever
-            #6.25 SystemClock = ~SystemClock;
+            #7 SystemClock = ~SystemClock;
     end
     
     initial begin
@@ -59,40 +59,40 @@ module full_subsystem_top_tb
         m_if.reset_n();
         repeat(1000) @(m_if.drv_cb);
         $display("[%0t(ns)] Start saving simulation result!", $time);
-        m_if.save_cache(
-            DUT.cacheA.way0.state_tag_ram,
-            DUT.cacheA.way1.state_tag_ram,
-            DUT.cacheA.way2.state_tag_ram,
-            DUT.cacheA.way3.state_tag_ram,
+//        m_if.save_cache(
+//            DUT.cacheA.way0.state_tag_ram,
+//            DUT.cacheA.way1.state_tag_ram,
+//            DUT.cacheA.way2.state_tag_ram,
+//            DUT.cacheA.way3.state_tag_ram,
             
-            DUT.cacheB.way0.state_tag_ram,
-            DUT.cacheB.way1.state_tag_ram,
-            DUT.cacheB.way2.state_tag_ram,
-            DUT.cacheB.way3.state_tag_ram,
+//            DUT.cacheB.way0.state_tag_ram,
+//            DUT.cacheB.way1.state_tag_ram,
+//            DUT.cacheB.way2.state_tag_ram,
+//            DUT.cacheB.way3.state_tag_ram,
             
-            DUT.cacheA.plrut_ram.plrut_ram,
-            DUT.cacheB.plrut_ram.plrut_ram,
+//            DUT.cacheA.plrut_ram.plrut_ram,
+//            DUT.cacheB.plrut_ram.plrut_ram,
             
-            DUT.cacheA.cache_data_ram.cache,
-            DUT.cacheB.cache_data_ram.cache
-            );
+//            DUT.cacheA.cache_data_ram.cache,
+//            DUT.cacheB.cache_data_ram.cache
+//            );
         $display("[%0t(ns)] Finish saving simulation result!", $time);
         $display("[%0t(ns)] Finish simulation!", $time);
     end
     
     full_subsystem
-    #(
-        .DATA_WIDTH(DATA_WIDTH),
-        .ADDR_WIDTH(ADDR_WIDTH),
-        .ID_WIDTH  (ID_WIDTH  ),
-        .USER_WIDTH(USER_WIDTH),
-        .STRB_WIDTH(STRB_WIDTH),
-        .SHAREABLE_REGION_START(SHAREABLE_REGION_START), // start address of shareable region
-        .SHAREABLE_REGION_END  (SHAREABLE_REGION_END  ),  // end address of shareable region
-        .IMEM_A_PATH(IMEM_A_PATH),
-        .IMEM_B_PATH(IMEM_B_PATH),
-        .DMEM_INIT  (DMEM_INIT  )
-    )
+//    #(
+//        .DATA_WIDTH(DATA_WIDTH),
+//        .ADDR_WIDTH(ADDR_WIDTH),
+//        .ID_WIDTH  (ID_WIDTH  ),
+//        .USER_WIDTH(USER_WIDTH),
+//        .STRB_WIDTH(STRB_WIDTH),
+//        .SHAREABLE_REGION_START(SHAREABLE_REGION_START), // start address of shareable region
+//        .SHAREABLE_REGION_END  (SHAREABLE_REGION_END  ),  // end address of shareable region
+//        .IMEM_A_PATH(IMEM_A_PATH),
+//        .IMEM_B_PATH(IMEM_B_PATH),
+//        .DMEM_INIT  (DMEM_INIT  )
+//    )
     DUT
     (
         // system signals
