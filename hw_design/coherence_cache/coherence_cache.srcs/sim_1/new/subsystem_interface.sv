@@ -208,7 +208,7 @@ interface dual_core_cache_if
 
     // Clocking Block
     clocking drv_cb @(posedge ACLK);
-        default input #1 output #2;
+        default input #0.3 output #4.5;
         // system signals
         output  ARESETn;
         
@@ -396,7 +396,7 @@ interface dual_core_cache_if
     endclocking
     
     clocking mon_cb @(posedge ACLK);
-        default input #1 output #2;
+        default input #0.3 output #4.5;
         // system signals
         input   ARESETn;
         
@@ -705,7 +705,7 @@ interface dual_core_cache_if
         drv_cb.s_RVALID     <= 0; 
         
         // Hold reset for a few clock cycles
-        repeat (10) @(drv_cb);
+        repeat (20) @(drv_cb);
         drv_cb.ARESETn      <= 1;
         drv_cb.m0_ENABLE    <= 1;
         drv_cb.m1_ENABLE    <= 1;
