@@ -9,10 +9,10 @@ module riscv_axi_wrapper
     parameter ID          = 0,
     parameter DATA_WIDTH  = 32,
     parameter ADDR_WIDTH  = 32,
-    parameter ID_WIDTH    = 1,
+    parameter ID_WIDTH    = 2,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8),
-    parameter SHAREABLE_REGION_START = 32'h0002_0000, // start address of shareable region
+    parameter SHAREABLE_REGION_START = 32'h0000_1000, // start address of shareable region
     parameter SHAREABLE_REGION_END   = 32'h0003_FFFF  // end address of shareable region
 )
 (

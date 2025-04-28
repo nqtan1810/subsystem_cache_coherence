@@ -11,8 +11,12 @@ module full_subsystem_top_tb
     parameter ID_WIDTH    = 1,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8),
-    parameter SHAREABLE_REGION_START = 32'h0002_0000, // start address of shareable region
+    parameter SHAREABLE_REGION_START = 32'h0000_1000, // start address of shareable region
     parameter SHAREABLE_REGION_END   = 32'h0003_FFFF,  // end address of shareable region
+    parameter A_CODE_REGION_START = 32'h0000_0000, // start address of code region
+    parameter A_CODE_REGION_END   = 32'h0000_03FF,  // end address of code region
+    parameter B_CODE_REGION_START = 32'h0000_0400, // start address of code region
+    parameter B_CODE_REGION_END   = 32'h0000_07FF,  // end address of code region
     // input files
     parameter IMEM_A_PATH   = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem",
     parameter IMEM_B_PATH   = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_B.mem",
@@ -57,25 +61,25 @@ module full_subsystem_top_tb
     initial begin
         $display("[%0t(ns)] Start simulation!", $time);
         m_if.reset_n();
-        repeat(1000) @(m_if.drv_cb);
+        repeat(10000) @(m_if.drv_cb);
         $display("[%0t(ns)] Start saving simulation result!", $time);
-//        m_if.save_cache(
-//            DUT.cacheA.way0.state_tag_ram,
-//            DUT.cacheA.way1.state_tag_ram,
-//            DUT.cacheA.way2.state_tag_ram,
-//            DUT.cacheA.way3.state_tag_ram,
+        m_if.save_cache(
+            DUT.D_cacheA.way0.state_tag_ram,
+            DUT.D_cacheA.way1.state_tag_ram,
+            DUT.D_cacheA.way2.state_tag_ram,
+            DUT.D_cacheA.way3.state_tag_ram,
             
-//            DUT.cacheB.way0.state_tag_ram,
-//            DUT.cacheB.way1.state_tag_ram,
-//            DUT.cacheB.way2.state_tag_ram,
-//            DUT.cacheB.way3.state_tag_ram,
+            DUT.D_cacheB.way0.state_tag_ram,
+            DUT.D_cacheB.way1.state_tag_ram,
+            DUT.D_cacheB.way2.state_tag_ram,
+            DUT.D_cacheB.way3.state_tag_ram,
             
-//            DUT.cacheA.plrut_ram.plrut_ram,
-//            DUT.cacheB.plrut_ram.plrut_ram,
+            DUT.D_cacheA.plrut_ram.plrut_ram,
+            DUT.D_cacheB.plrut_ram.plrut_ram,
             
-//            DUT.cacheA.cache_data_ram.cache,
-//            DUT.cacheB.cache_data_ram.cache
-//            );
+            DUT.D_cacheA.cache_data_ram.cache,
+            DUT.D_cacheB.cache_data_ram.cache
+            );
         $display("[%0t(ns)] Finish saving simulation result!", $time);
         $display("[%0t(ns)] Finish simulation!", $time);
     end
@@ -99,13 +103,21 @@ module full_subsystem_top_tb
         .ACLK           (m_if.ACLK   ),
         .ARESETn        (m_if.ARESETn),
         
-        // output of CacheA
-        .m0_CACHE_HIT   (m_if.m0_CACHE_HIT ),
-        .m0_CACHE_BUSY  (m_if.m0_CACHE_BUSY),
+        // output of D-CacheA
+        .m0_D_CACHE_HIT   (m_if.m0_D_CACHE_HIT ),
+        .m0_D_CACHE_BUSY  (m_if.m0_D_CACHE_BUSY),
         
-        // output of CacheB
-        .m1_CACHE_HIT   (m_if.m1_CACHE_HIT ),
-        .m1_CACHE_BUSY  (m_if.m1_CACHE_BUSY)
+        // output of D-CacheB
+        .m1_D_CACHE_HIT   (m_if.m1_D_CACHE_HIT ),
+        .m1_D_CACHE_BUSY  (m_if.m1_D_CACHE_BUSY),
+        
+        // output of I-CacheA
+        .m0_I_CACHE_HIT   (m_if.m0_I_CACHE_HIT ),
+        .m0_I_CACHE_BUSY  (m_if.m0_I_CACHE_BUSY),
+        
+        // output of I-CacheB
+        .m1_I_CACHE_HIT   (m_if.m1_I_CACHE_HIT ),
+        .m1_I_CACHE_BUSY  (m_if.m1_I_CACHE_BUSY)
     );
 
 endmodule
