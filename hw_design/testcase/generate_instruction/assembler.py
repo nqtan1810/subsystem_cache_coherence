@@ -304,10 +304,19 @@ def UType (string) :
 
 def assembler ():
     # fi= open('assembly_code.txt', 'r')
-    fi= open("D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/assembly_code.asm", 'r')
+    sel = int(input("imem_A or imem_B: "))
+    if sel == 0:
+        path_src = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/assembly_code_A.asm"
+        path_dst = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem"
+    elif sel == 1:
+        path_src = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/assembly_code_B.asm"
+        path_dst = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_B.mem"
+    else:
+        exit()
+    fi= open(path_src, 'r')
     string= fi.read()
     fi.close()
-    fo= open('D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem', 'w')
+    fo= open(path_dst, 'w')
 
     result = ''
     ins = string.split('\n')
@@ -367,4 +376,5 @@ def assembler ():
     fo.write(result)
     fo.close()
 
-assembler()
+while True:
+    assembler()
