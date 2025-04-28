@@ -8,10 +8,10 @@ module single_core_cache
 #(
     parameter DATA_WIDTH  = 32,
     parameter ADDR_WIDTH  = 32,
-    parameter ID_WIDTH    = 1,
+    parameter ID_WIDTH    = 2,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8),
-    parameter SHAREABLE_REGION_START = 32'h0002_0000, // start address of shareable region
+    parameter SHAREABLE_REGION_START = 32'h0000_1000, // start address of shareable region
     parameter SHAREABLE_REGION_END   = 32'h0003_FFFF  // end address of shareable region
 )
 (
@@ -166,7 +166,7 @@ module single_core_cache
 
     // internal register to store captured signals
     // signals CPU --> Cache L1
-    reg m_AWID_reg;
+    reg [ID_WIDTH-1:0] m_AWID_reg;
     reg [3:0] m_AWCACHE_reg;
     reg [1:0] m_AWDOMAIN_reg;
     reg [ADDR_WIDTH-1:0] m_AWADDR_reg;
@@ -174,7 +174,7 @@ module single_core_cache
     reg [DATA_WIDTH-1:0] m_WDATA_reg;
     reg [STRB_WIDTH-1:0] m_WSTRB_reg;
     
-    reg m_ARID_reg;
+    reg [ID_WIDTH-1:0] m_ARID_reg;
     reg [3:0] m_ARCACHE_reg;
     reg [1:0] m_ARDOMAIN_reg;
     reg [ADDR_WIDTH-1:0] m_ARADDR_reg;
