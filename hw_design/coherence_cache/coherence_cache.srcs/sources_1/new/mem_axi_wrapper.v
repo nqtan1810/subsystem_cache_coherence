@@ -8,7 +8,7 @@ module mem_axi_wrapper
 #(
     parameter DATA_WIDTH  = 32,
     parameter ADDR_WIDTH  = 32,
-    parameter ID_WIDTH    = 1,
+    parameter ID_WIDTH    = 2,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8)
 )
