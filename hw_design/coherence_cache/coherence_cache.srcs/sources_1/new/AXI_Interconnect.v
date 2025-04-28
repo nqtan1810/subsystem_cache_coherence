@@ -8,7 +8,7 @@ module AXI_Interconnect
 #(
     parameter DATA_WIDTH  = 32,
     parameter ADDR_WIDTH  = 32,
-    parameter ID_WIDTH    = 1,
+    parameter ID_WIDTH    = 2,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8)
 )
@@ -118,6 +118,109 @@ module AXI_Interconnect
 	output     [USER_WIDTH-1:0]	m1_RUSER,
 	output                      m1_RVALID,
     input                       m1_RREADY,
+    
+    /********** Master 2 **********/
+    // AW Channel
+	input      [ID_WIDTH-1:0]   m2_AWID,
+    input	   [ADDR_WIDTH-1:0] m2_AWADDR,
+    input      [7:0]            m2_AWLEN,
+    input      [2:0]            m2_AWSIZE,
+    input      [1:0]            m2_AWBURST,
+    input                       m2_AWLOCK,
+    input      [3:0]            m2_AWCACHE,
+    input      [2:0]            m2_AWPROT,
+    input      [3:0]            m2_AWQOS,
+    input      [3:0]            m2_AWREGION,
+    input      [USER_WIDTH-1:0] m2_AWUSER,
+    input                       m2_AWVALID,
+    output                      m2_AWREADY,
+    // W Channel
+    // input      [ID_WIDTH-1:0]   m2_WID,
+    input      [DATA_WIDTH-1:0] m2_WDATA,
+    input      [STRB_WIDTH-1:0] m2_WSTRB,
+    input                       m2_WLAST,
+    input      [USER_WIDTH-1:0] m2_WUSER,
+    input                       m2_WVALID,
+    output                      m2_WREADY,
+    // B Channel
+    output     [ID_WIDTH-1:0]	m2_BID,
+	output     [1:0]	        m2_BRESP,
+	output     [USER_WIDTH-1:0] m2_BUSER,
+	output                      m2_BVALID,
+    input                       m2_BREADY,
+    // AR Channel
+    input      [ID_WIDTH-1:0]   m2_ARID,
+    input      [ADDR_WIDTH-1:0] m2_ARADDR,
+    input      [7:0]            m2_ARLEN,
+    input      [2:0]            m2_ARSIZE,
+    input      [1:0]            m2_ARBURST,
+    input                       m2_ARLOCK,
+    input      [3:0]            m2_ARCACHE,
+    input      [2:0]            m2_ARPROT,
+    input      [3:0]            m2_ARQOS,
+    input      [3:0]            m2_ARREGION,
+    input      [USER_WIDTH-1:0] m2_ARUSER,
+    input                       m2_ARVALID,
+    output                      m2_ARREADY,
+    // R Channel
+    output     [ID_WIDTH-1:0]   m2_RID,
+	output     [DATA_WIDTH-1:0] m2_RDATA,
+	output     [1:0]	        m2_RRESP,
+    output                      m2_RLAST,
+	output     [USER_WIDTH-1:0]	m2_RUSER,
+	output                      m2_RVALID,
+    input                       m2_RREADY,
+    /********** Master 3 **********/
+    // AW Channel
+    input      [ID_WIDTH-1:0]   m3_AWID,
+    input	   [ADDR_WIDTH-1:0]	m3_AWADDR,
+    input      [7:0]            m3_AWLEN,
+    input      [2:0]            m3_AWSIZE,
+    input      [1:0]            m3_AWBURST,
+    input                       m3_AWLOCK,
+    input      [3:0]            m3_AWCACHE,
+    input      [2:0]            m3_AWPROT,
+    input      [3:0]            m3_AWQOS,
+    input      [3:0]            m3_AWREGION,
+    input      [USER_WIDTH-1:0] m3_AWUSER,
+    input                       m3_AWVALID,
+    output                      m3_AWREADY,
+    // W Channel
+    // input      [ID_WIDTH-1:0]   m3_WID,
+    input      [DATA_WIDTH-1:0] m3_WDATA,
+    input      [STRB_WIDTH-1:0] m3_WSTRB,
+    input                       m3_WLAST,
+    input      [USER_WIDTH-1:0] m3_WUSER,
+    input                       m3_WVALID,
+    output                      m3_WREADY,
+    // B Channel
+    output     [ID_WIDTH-1:0]	m3_BID,
+	output     [1:0]	        m3_BRESP,
+	output     [USER_WIDTH-1:0] m3_BUSER,
+	output                      m3_BVALID,
+    input                       m3_BREADY,
+    // AR Channel
+    input      [ID_WIDTH-1:0]   m3_ARID,
+    input      [ADDR_WIDTH-1:0] m3_ARADDR,
+    input      [7:0]            m3_ARLEN,
+    input      [2:0]            m3_ARSIZE,
+    input      [1:0]            m3_ARBURST,
+    input                       m3_ARLOCK,
+    input      [3:0]            m3_ARCACHE,
+    input      [2:0]            m3_ARPROT,
+    input      [3:0]            m3_ARQOS,
+    input      [3:0]            m3_ARREGION,
+    input      [USER_WIDTH-1:0] m3_ARUSER,
+    input                       m3_ARVALID,
+    output                      m3_ARREADY,
+    // R Channel
+    output     [ID_WIDTH-1:0]   m3_RID,
+	output     [DATA_WIDTH-1:0] m3_RDATA,
+	output     [1:0]	        m3_RRESP,
+    output                      m3_RLAST,
+	output     [USER_WIDTH-1:0]	m3_RUSER,
+	output                      m3_RVALID,
+    input                       m3_RREADY,
 
     /********** Slave **********/
     // AW Channel
@@ -176,8 +279,13 @@ module AXI_Interconnect
     //=========================================================
     wire  m0_wgrnt_w;
     wire  m1_wgrnt_w;
+    wire  m2_wgrnt_w;
+    wire  m3_wgrnt_w;
+    
     wire  m0_wgrnt_r;
     wire  m1_wgrnt_r;
+    wire  m2_wgrnt_r;
+    wire  m3_wgrnt_r;
 
     //=========================================================
     AXI_Arbiter_W u_AXI_Arbiter_W(
@@ -192,13 +300,23 @@ module AXI_Interconnect
         .m1_AWVALID(m1_AWVALID),
         .m1_WVALID(m1_WVALID),
         .m1_BREADY(m1_BREADY),
+        /********** Master 2 **********/
+        .m2_AWVALID(m2_AWVALID),
+        .m2_WVALID(m2_WVALID),
+        .m2_BREADY(m2_BREADY),
+        /********** Master 3 **********/
+        .m3_AWVALID(m3_AWVALID),
+        .m3_WVALID(m3_WVALID),
+        .m3_BREADY(m3_BREADY),
         /********** Slave **********/
         .s_AWREADY(s_AWREADY),
         .s_WREADY(s_WREADY),
         .s_BVALID(s_BVALID),
         
         .m0_wgrnt(m0_wgrnt_w),
-        .m1_wgrnt(m1_wgrnt_w)
+        .m1_wgrnt(m1_wgrnt_w),
+        .m2_wgrnt(m2_wgrnt_w),
+        .m3_wgrnt(m3_wgrnt_w)
     );
 
     //=========================================================
@@ -212,12 +330,20 @@ module AXI_Interconnect
         /********** Master 1 **********/
         .m1_ARVALID(m1_ARVALID),
         .m1_RREADY(m1_RREADY),
+        /********** Master 2 **********/
+        .m2_ARVALID(m2_ARVALID),
+        .m2_RREADY(m2_RREADY),
+        /********** Master 3 **********/
+        .m3_ARVALID(m3_ARVALID),
+        .m3_RREADY(m3_RREADY),
         /********** Slave **********/
         .s_RVALID(s_RVALID),
         .s_RLAST(s_RLAST),
         
         .m0_rgrnt(m0_wgrnt_r),
-        .m1_rgrnt(m1_wgrnt_r)
+        .m1_rgrnt(m1_wgrnt_r),
+        .m2_rgrnt(m2_wgrnt_r),
+        .m3_rgrnt(m3_wgrnt_r)
     );
 
     //=========================================================
@@ -286,6 +412,64 @@ module AXI_Interconnect
         .m1_BUSER(m1_BUSER),
         .m1_BVALID(m1_BVALID),
         .m1_BREADY(m1_BREADY),
+        /********** Master 2 **********/
+        // AW Channel
+        .m2_AWID(m2_AWID),
+        .m2_AWADDR(m2_AWADDR),
+        .m2_AWLEN(m2_AWLEN),
+        .m2_AWSIZE(m2_AWSIZE),
+        .m2_AWBURST(m2_AWBURST),
+        .m2_AWLOCK(m2_AWLOCK),
+        .m2_AWCACHE(m2_AWCACHE),
+        .m2_AWPROT(m2_AWPROT),
+        .m2_AWQOS(m2_AWQOS),
+        .m2_AWREGION(m2_AWREGION),
+        .m2_AWUSER(m2_AWUSER),
+        .m2_AWVALID(m2_AWVALID),
+        .m2_AWREADY(m2_AWREADY),
+        // W Channel
+        // .m2_WID(m2_WID),
+        .m2_WDATA(m2_WDATA),
+        .m2_WSTRB(m2_WSTRB),
+        .m2_WLAST(m2_WLAST),
+        .m2_WUSER(m2_WUSER),
+        .m2_WVALID(m2_WVALID),
+        .m2_WREADY(m2_WREADY),
+        // B Channel
+        .m2_BID(m2_BID),
+        .m2_BRESP(m2_BRESP),
+        .m2_BUSER(m2_BUSER),
+        .m2_BVALID(m2_BVALID),
+        .m2_BREADY(m2_BREADY),
+        /********** Master 3 **********/
+        // AW Channel
+        .m3_AWID(m3_AWID),
+        .m3_AWADDR(m3_AWADDR),
+        .m3_AWLEN(m3_AWLEN),
+        .m3_AWSIZE(m3_AWSIZE),
+        .m3_AWBURST(m3_AWBURST),
+        .m3_AWLOCK(m3_AWLOCK),
+        .m3_AWCACHE(m3_AWCACHE),
+        .m3_AWPROT(m3_AWPROT),
+        .m3_AWQOS(m3_AWQOS),
+        .m3_AWREGION(m3_AWREGION),
+        .m3_AWUSER(m3_AWUSER),
+        .m3_AWVALID(m3_AWVALID),
+        .m3_AWREADY(m3_AWREADY),
+        // W Channel
+        // .m3_WID(m3_WID),
+        .m3_WDATA(m3_WDATA),
+        .m3_WSTRB(m3_WSTRB),
+        .m3_WLAST(m3_WLAST),
+        .m3_WUSER(m3_WUSER),
+        .m3_WVALID(m3_WVALID),
+        .m3_WREADY(m3_WREADY),
+        // B Channel
+        .m3_BID(m3_BID),
+        .m3_BRESP(m3_BRESP),
+        .m3_BUSER(m3_BUSER),
+        .m3_BVALID(m3_BVALID),
+        .m3_BREADY(m3_BREADY),
         /******** Slave ********/
         // AW Channel
         .s_AWID(s_AWID),
@@ -318,7 +502,9 @@ module AXI_Interconnect
         
         /******** input from Arbiter ********/
         .m0_wgrnt(m0_wgrnt_w),
-        .m1_wgrnt(m1_wgrnt_w)
+        .m1_wgrnt(m1_wgrnt_w),
+        .m2_wgrnt(m2_wgrnt_w),
+        .m3_wgrnt(m3_wgrnt_w)
     );
 
     //=========================================================
@@ -374,6 +560,52 @@ module AXI_Interconnect
         .m1_RUSER(m1_RUSER),
         .m1_RVALID(m1_RVALID),
         .m1_RREADY(m1_RREADY),
+        /********** Master 2 **********/
+        // AR Channel
+        .m2_ARID(m2_ARID),
+        .m2_ARADDR(m2_ARADDR),
+        .m2_ARLEN(m2_ARLEN),
+        .m2_ARSIZE(m2_ARSIZE),
+        .m2_ARBURST(m2_ARBURST),
+        .m2_ARLOCK(m2_ARLOCK),
+        .m2_ARCACHE(m2_ARCACHE),
+        .m2_ARPROT(m2_ARPROT),
+        .m2_ARQOS(m2_ARQOS),
+        .m2_ARREGION(m2_ARREGION),
+        .m2_ARUSER(m2_ARUSER),
+        .m2_ARVALID(m2_ARVALID),
+        .m2_ARREADY(m2_ARREADY),
+        // R Channel
+        .m2_RID(m2_RID),
+        .m2_RDATA(m2_RDATA),
+        .m2_RRESP(m2_RRESP),
+        .m2_RLAST(m2_RLAST),
+        .m2_RUSER(m2_RUSER),
+        .m2_RVALID(m2_RVALID),
+        .m2_RREADY(m2_RREADY),
+        /********** Master 3 **********/
+        // AR Channel
+        .m3_ARID(m3_ARID),
+        .m3_ARADDR(m3_ARADDR),
+        .m3_ARLEN(m3_ARLEN),
+        .m3_ARSIZE(m3_ARSIZE),
+        .m3_ARBURST(m3_ARBURST),
+        .m3_ARLOCK(m3_ARLOCK),
+        .m3_ARCACHE(m3_ARCACHE),
+        .m3_ARPROT(m3_ARPROT),
+        .m3_ARQOS(m3_ARQOS),
+        .m3_ARREGION(m3_ARREGION),
+        .m3_ARUSER(m3_ARUSER),
+        .m3_ARVALID(m3_ARVALID),
+        .m3_ARREADY(m3_ARREADY),
+        // R Channel
+        .m3_RID(m3_RID),
+        .m3_RDATA(m3_RDATA),
+        .m3_RRESP(m3_RRESP),
+        .m3_RLAST(m3_RLAST),
+        .m3_RUSER(m3_RUSER),
+        .m3_RVALID(m3_RVALID),
+        .m3_RREADY(m3_RREADY),
         /******** Slave ********/
         // AR Channel
         .s_ARID(s_ARID),
@@ -400,7 +632,9 @@ module AXI_Interconnect
         
         /******** input from Arbiter ********/
         .m0_rgrnt(m0_wgrnt_r),
-        .m1_rgrnt(m1_wgrnt_r)
+        .m1_rgrnt(m1_wgrnt_r),
+        .m2_rgrnt(m2_wgrnt_r),
+        .m3_rgrnt(m3_wgrnt_r)
     );
     
 endmodule

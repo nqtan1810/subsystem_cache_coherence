@@ -26,8 +26,8 @@ interface dual_core_cache_if
     
     // Master 0
     logic                      m0_ENABLE;
-    logic                      m0_CACHE_HIT;
-    logic                      m0_CACHE_BUSY;
+    logic                      m0_D_CACHE_HIT;
+    logic                      m0_D_CACHE_BUSY;
     
     // AXI5 Interface (connect with CPU)
     // AW Channel
@@ -89,10 +89,14 @@ interface dual_core_cache_if
     logic                      m0_RVALID;
     logic                      m0_RREADY;
     
+    // I-CacheA
+    logic                      m0_I_CACHE_HIT;
+    logic                      m0_I_CACHE_BUSY;
+    
     // Master 1
     logic                      m1_ENABLE;
-    logic                      m1_CACHE_HIT;
-    logic                      m1_CACHE_BUSY;
+    logic                      m1_D_CACHE_HIT;
+    logic                      m1_D_CACHE_BUSY;
     
     // AXI5 Interface (connect with CPU)
     // AW Channel
@@ -154,6 +158,10 @@ interface dual_core_cache_if
     logic                      m1_RVALID;
     logic                      m1_RREADY;
     
+    // I-CacheB
+    logic                      m1_I_CACHE_HIT;
+    logic                      m1_I_CACHE_BUSY;
+    
     // Slave
     // AW Channel
     logic  [ID_WIDTH-1:0]      s_AWID;
@@ -214,8 +222,8 @@ interface dual_core_cache_if
         
         // Master 0
         output  m0_ENABLE;
-        input   m0_CACHE_HIT;
-        input   m0_CACHE_BUSY;
+        input   m0_D_CACHE_HIT;
+        input   m0_D_CACHE_BUSY;
         
         // AXI Interface (connect with CPU)
         // AW Channel
@@ -277,10 +285,14 @@ interface dual_core_cache_if
         input   m0_RVALID;
         output  m0_RREADY;
         
+        // I-cacheA
+        input   m0_I_CACHE_HIT;
+        input   m0_I_CACHE_BUSY;
+        
         // Master 1
         output  m1_ENABLE;
-        input   m1_CACHE_HIT;
-        input   m1_CACHE_BUSY;
+        input   m1_D_CACHE_HIT;
+        input   m1_D_CACHE_BUSY;
         
         // AXI5 Interface (connect with CPU)
         // AW Channel
@@ -342,6 +354,10 @@ interface dual_core_cache_if
         input   m1_RVALID;
         output  m1_RREADY;
         
+        // I-cacheB
+        input   m1_I_CACHE_HIT;
+        input   m1_I_CACHE_BUSY;
+        
         // Slave
         // AW Channel
         input   s_AWID;
@@ -402,8 +418,8 @@ interface dual_core_cache_if
         
         // Master 0
         input   m0_ENABLE;
-        input   m0_CACHE_HIT;
-        input   m0_CACHE_BUSY;
+        input   m0_D_CACHE_HIT;
+        input   m0_D_CACHE_BUSY;
         
         // AXI5 Interface (connect with CPU)
         // AW Channel
@@ -465,10 +481,14 @@ interface dual_core_cache_if
         input   m0_RVALID;
         input   m0_RREADY;
         
+        // I-cacheA
+        input   m0_I_CACHE_HIT;
+        input   m0_I_CACHE_BUSY;
+        
         // Master 1
         input   m1_ENABLE;
-        input   m1_CACHE_HIT;
-        input   m1_CACHE_BUSY;
+        input   m1_D_CACHE_HIT;
+        input   m1_D_CACHE_BUSY;
         
         // AXI5 Interface (connect with CPU)
         // AW Channel
@@ -529,6 +549,10 @@ interface dual_core_cache_if
         input   m1_RUSER;
         input   m1_RVALID;
         input   m1_RREADY;
+        
+        // I-cacheB
+        input   m1_I_CACHE_HIT;
+        input   m1_I_CACHE_BUSY;
         
         // Slave
         // AW Channel

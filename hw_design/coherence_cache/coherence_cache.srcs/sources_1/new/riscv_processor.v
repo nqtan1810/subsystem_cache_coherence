@@ -10,11 +10,13 @@ module riscv_processor
     parameter ID          = 0,
     parameter DATA_WIDTH  = 32,
     parameter ADDR_WIDTH  = 32,
-    parameter ID_WIDTH    = 1,
+    parameter ID_WIDTH    = 2,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8),
-    parameter SHAREABLE_REGION_START = 32'h0002_0000, // start address of shareable region
+    parameter SHAREABLE_REGION_START = 32'h0000_1000, // start address of shareable region
     parameter SHAREABLE_REGION_END   = 32'h0003_FFFF,  // end address of shareable region
+    parameter CODE_REGION_START = 32'h0000_0000, // start address of code region
+    parameter CODE_REGION_END   = 32'h0000_03FF,  // end address of code region
     parameter IMEM_PATH = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem"
 )
 (
@@ -22,10 +24,13 @@ module riscv_processor
     input                       ACLK,
     input                       ARESETn,
     
-    // Interface connect with D-Cache
+    // Interface connect with D-Cache and I-Cache
     // D-Cache enable
     output                      d_CACHE_EN,
+    // I-Cache enable
+    output                      i_CACHE_EN,
     
+    // D-Cache related signals
     // AXI5 Interface
     // AW Channel
     output   [ID_WIDTH-1:0]     d_AWID,
@@ -81,11 +86,68 @@ module riscv_processor
     input                       d_RLAST,
     input  [USER_WIDTH-1:0]	    d_RUSER,
     input                       d_RVALID,
-    output                      d_RREADY
+    output                      d_RREADY,
+    
+    // I-Cache related signals
+    // AXI4
+    // AW Channel
+    output [ID_WIDTH-1:0]       i_AWID,
+    output [ADDR_WIDTH-1:0]     i_AWADDR,
+    output [7:0]                i_AWLEN,
+    output [2:0]                i_AWSIZE,
+    output [1:0]                i_AWBURST,
+    output                      i_AWLOCK,
+    output [3:0]                i_AWCACHE,
+    output [2:0]                i_AWPROT,
+    output [3:0]                i_AWQOS,
+    output [3:0]                i_AWREGION,
+    output [USER_WIDTH-1:0]     i_AWUSER,
+    output                      i_AWVALID,
+    input                       i_AWREADY,
+    
+    // W Channel
+    output [DATA_WIDTH-1:0]     i_WDATA,
+    output [STRB_WIDTH-1:0]     i_WSTRB, 
+    output                      i_WLAST,
+    output [USER_WIDTH-1:0]     i_WUSER,
+    output                      i_WVALID,
+    input                       i_WREADY,
+    
+    // B Channel
+    input  [ID_WIDTH-1:0]       i_BID,
+    input  [1:0]                i_BRESP,
+    input  [USER_WIDTH-1:0]     i_BUSER,
+    input                       i_BVALID,
+    output                      i_BREADY,
+   
+    // AR Channel
+    output [ID_WIDTH-1:0]       i_ARID,
+    output [ADDR_WIDTH-1:0]     i_ARADDR,
+    output [7:0]                i_ARLEN,
+    output [2:0]                i_ARSIZE,
+    output [1:0]                i_ARBURST,
+    output                      i_ARLOCK,
+    output [3:0]                i_ARCACHE,
+    output [2:0]                i_ARPROT,
+    output [3:0]                i_ARQOS,
+    output [3:0]                i_ARREGION,
+    output [USER_WIDTH-1:0]     i_ARUSER,
+    output                      i_ARVALID,
+    input                       i_ARREADY,
+    
+    // R Channel
+    input  [ID_WIDTH-1:0]       i_RID,
+    input  [DATA_WIDTH-1:0]     i_RDATA,
+    input  [1:0]                i_RRESP,
+    input                       i_RLAST,
+    input  [USER_WIDTH-1:0]	    i_RUSER,
+    input                       i_RVALID,
+    output                      i_RREADY
 );
     
     // enable for pipeline registers
     wire pipeline_enable;
+    wire IF_ready;
     
     // ********************************* IF Stage *********************************
     reg  [31:0] pc;
@@ -210,13 +272,20 @@ module riscv_processor
     pipeline_control u_pipeline_control (
         .ACLK              (ACLK),  // Clock signal
         .ARESETn           (ARESETn),  // Active-low reset signal
-        .i_memwrite_EX     (memwrite_EX),  // MEM Write enable from EX stage
-        .i_memread_EX      (memread_EX),  // MEM Read enable from EX stage
+        // D-Cache related signals
+        .i_memwrite_EX     (memwrite_EX & IF_ready),  // MEM Write enable from EX stage
+        .i_memread_EX      (memread_EX & IF_ready),  // MEM Read enable from EX stage
         .i_d_BVALID        (d_BVALID),  // BVALID signal from AXI response
         .i_d_RVALID        (d_RVALID),  // RVALID signal from AXI response
         .i_d_RLAST         (d_RLAST),  // RLAST signal from AXI response
+        // // I-Cache related signals
+        // .i_RRESP           (i_RRESP ),
+        // .i_RLAST           (i_RLAST ),
+        // .i_RVALID          (i_RVALID),
         .o_enable          (pipeline_enable)   // Output enable signal for pipeline control
     );
+    
+    assign IF_ready = i_RVALID & i_RLAST & (i_RRESP == 0);
     
     
     // ********************************* IF Stage *********************************
@@ -225,7 +294,7 @@ module riscv_processor
             pc <= 0;
         end
         else 
-        if (pipeline_enable) begin
+        if (pipeline_enable & IF_ready) begin
             if(stall) begin
                 pc <= pc;
             end
@@ -240,19 +309,103 @@ module riscv_processor
     assign pc2         = rs1_data + imm_EX;
     assign flush_IF_ID = pcsel1 | pcsel2;
     
-    imem #(
-        .DATA_WIDTH (DATA_WIDTH), 
-        .ADDR_WIDTH (ADDR_WIDTH), 
-        .IMEM_PATH  (IMEM_PATH)
-    ) u_imem (
-        .i_addr (pc),
-        .o_data (instr)
+    instr_riscv_axi_wrapper
+    #(
+        .ID        (ID + 2    ),
+        .DATA_WIDTH(DATA_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH),
+        .ID_WIDTH  (ID_WIDTH  ),
+        .USER_WIDTH(USER_WIDTH),
+        .STRB_WIDTH(DATA_WIDTH/8),
+        .ADDR_START(CODE_REGION_START), // start address of code region
+        .ADDR_END  (CODE_REGION_END  ) // end address of code region
+    )
+    i_cache_axi_wrapper
+    (
+        // system signals
+        .ACLK       (ACLK   ),
+        .ARESETn    (ARESETn),
+        
+        // Interface connect with D-Cache
+        // D-Cache enable
+        .i_CACHE_EN (i_CACHE_EN),
+        
+        // AXI5 Interface
+        // AW Channel
+        .i_AWID     (i_AWID    ),
+        .i_AWADDR   (i_AWADDR  ),
+        .i_AWLEN    (i_AWLEN   ),
+        .i_AWSIZE   (i_AWSIZE  ),
+        .i_AWBURST  (i_AWBURST ),
+        .i_AWLOCK   (i_AWLOCK  ),
+        .i_AWCACHE  (i_AWCACHE ),
+        .i_AWPROT   (i_AWPROT  ),
+        .i_AWQOS    (i_AWQOS   ),
+        .i_AWREGION (i_AWREGION),
+        .i_AWUSER   (i_AWUSER  ),
+        .i_AWVALID  (i_AWVALID ),
+        .i_AWREADY  (i_AWREADY ),
+        
+        // W Channel
+        .i_WDATA    (i_WDATA ),
+        .i_WSTRB    (i_WSTRB ), 
+        .i_WLAST    (i_WLAST ),
+        .i_WUSER    (i_WUSER ),
+        .i_WVALID   (i_WVALID),
+        .i_WREADY   (i_WREADY),
+        
+        // B Channel
+        .i_BID      (i_BID   ),
+        .i_BRESP    (i_BRESP ),
+        .i_BUSER    (i_BUSER ),
+        .i_BVALID   (i_BVALID),
+        .i_BREADY   (i_BREADY),
+       
+        // AR Channel
+        .i_ARID     (i_ARID    ),
+        .i_ARADDR   (i_ARADDR  ),
+        .i_ARLEN    (i_ARLEN   ),
+        .i_ARSIZE   (i_ARSIZE  ),
+        .i_ARBURST  (i_ARBURST ),
+        .i_ARLOCK   (i_ARLOCK  ),
+        .i_ARCACHE  (i_ARCACHE ),
+        .i_ARPROT   (i_ARPROT  ),
+        .i_ARQOS    (i_ARQOS   ),
+        .i_ARREGION (i_ARREGION),
+        .i_ARUSER   (i_ARUSER  ),
+        .i_ARVALID  (i_ARVALID ),
+        .i_ARREADY  (i_ARREADY ),
+        
+        // R Channel
+        .i_RID      (i_RID   ),
+        .i_RDATA    (i_RDATA ),
+        .i_RRESP    (i_RRESP ),
+        .i_RLAST    (i_RLAST ),
+        .i_RUSER    (i_RUSER ),
+        .i_RVALID   (i_RVALID),
+        .i_RREADY   (i_RREADY),
+        
+        // interface connect with Instruction Mem
+        .i_imem_access(pipeline_enable),  // should asserted every cycle
+        .i_r0w1       (1'b0),  // only used read operation
+        .i_pc         (pc),  // address to load instruction
+        .i_w_data     (0)   // should be not used as instruction is read-only
     );
+    
+    // imem #(
+    //     .DATA_WIDTH (DATA_WIDTH), 
+    //     .ADDR_WIDTH (ADDR_WIDTH), 
+    //     .IMEM_PATH  (IMEM_PATH)
+    // ) u_imem (
+    //     .i_addr (pc),
+    //     .o_data (instr)
+    // );
+    assign instr = i_RDATA;
     
     IF_ID_register u_IF_ID_register (
         .i_clk         (ACLK),
         .i_rst_n       (ARESETn),
-        .i_enable      (pipeline_enable),
+        .i_enable      (pipeline_enable & IF_ready),
         .i_blocking    (stall),
         .i_flush_IF    (flush_IF_ID),
         .i_pc_incr4_IF (pc_incr4),
@@ -324,7 +477,7 @@ module riscv_processor
     ID_EX_register u_ID_EX_register (
         .i_clk             (ACLK),
         .i_rst_n           (ARESETn),
-        .i_enable          (pipeline_enable),
+        .i_enable          (pipeline_enable & IF_ready),
         .i_flush_ID        (flush_IF_ID),
         .i_regwrite_ID     (regwrite),
         .i_wb_ID           (wb),
@@ -486,7 +639,7 @@ module riscv_processor
     EX_MEM_register u_EX_MEM_register (
         .i_clk                (ACLK),
         .i_rst_n              (ARESETn),
-        .i_enable             (pipeline_enable),
+        .i_enable             (pipeline_enable & IF_ready),
         .i_regwrite_EX        (regwrite_EX),
         .i_wb_EX              (wb_EX      ),
         .i_slt_EX             (slt_EX     ),
@@ -529,7 +682,7 @@ module riscv_processor
 
     // ********************************* MEM Stage ********************************
     riscv_axi_wrapper #(
-        .ID                    (ID),
+        .ID                    (ID + 2    ),
         .DATA_WIDTH            (DATA_WIDTH),
         .ADDR_WIDTH            (ADDR_WIDTH),
         .ID_WIDTH              (ID_WIDTH  ),
@@ -537,7 +690,7 @@ module riscv_processor
         .STRB_WIDTH            (STRB_WIDTH),
         .SHAREABLE_REGION_START(SHAREABLE_REGION_START),
         .SHAREABLE_REGION_END  (SHAREABLE_REGION_END  )
-    ) u_riscv_axi_wrapper (
+    ) d_cache_axi_wrapper (
         // system signals
         .ACLK                  (ACLK),
         .ARESETn               (ARESETn),
@@ -603,11 +756,11 @@ module riscv_processor
         .d_RREADY              (d_RREADY),
         
         // interface connect with Data Ram
-        .i_write_dmem          (memwrite_EX),
+        .i_write_dmem          (memwrite_EX & IF_ready),
         .i_waddr_dmem          (alu_result_MEM),
         .i_wdata_dmem          (dataW_MEM),
         
-        .i_read_dmem           (memread_EX),
+        .i_read_dmem           (memread_EX & IF_ready),
         .i_raddr_dmem          (alu_result_MEM),
         
         .i_ls_b                (ls_b_MEM),
@@ -617,7 +770,7 @@ module riscv_processor
     MEM_WB_register u_MEM_WB_register (
         .i_clk                (ACLK),
         .i_rst_n              (ARESETn),
-        .i_enable             (pipeline_enable),
+        .i_enable             (pipeline_enable & IF_ready),
         .i_regwrite_MEM       (regwrite_MEM),
         .i_wb_MEM             (wb_MEM      ),
         .i_slt_MEM            (slt_MEM     ),
