@@ -264,6 +264,7 @@ module riscv_processor
     wire [6:0] opcode_EX;
     
     // ********************************* MEM Stage ********************************
+    reg [DATA_WIDTH-1:0] d_RDATA_reg;
     // ********************************* WB Stage *********************************
     wire [31:0] dataD_memtoreg;
     wire [31:0] dataD_jump;
@@ -803,7 +804,12 @@ module riscv_processor
     assign dataD          = (wb_WB) ? auipc_lui_data_WB : dataD_slt;
     
     // loaded data from dmem (D-Cache)
-    assign dataR = d_RDATA;
+    always @(posedge ACLK) begin
+        if (d_RVALID && d_RLAST) begin
+            d_RDATA_reg <= d_RDATA;
+        end
+    end
+    assign dataR = d_RDATA_reg;
     assign dataR_gen = (unsigned_MEM) ? ((ls_b_MEM) ? dataR[7:0] : ((ls_h_MEM) ? dataR[15:0] : dataR)) : ((ls_b_MEM) ? {{24{dataR[7]}}, dataR[7:0]} : ((ls_h_MEM) ? {{16{dataR[15]}}, dataR[15:0]} : dataR));
     
 endmodule
