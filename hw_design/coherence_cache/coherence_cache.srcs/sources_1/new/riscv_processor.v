@@ -16,13 +16,21 @@ module riscv_processor
     parameter SHAREABLE_REGION_START = 32'h0000_1000, // start address of shareable region
     parameter SHAREABLE_REGION_END   = 32'h0003_FFFF,  // end address of shareable region
     parameter CODE_REGION_START = 32'h0000_0000, // start address of code region
-    parameter CODE_REGION_END   = 32'h0000_03FF,  // end address of code region
-    parameter IMEM_PATH = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem"
+    parameter CODE_REGION_END   = 32'h0000_03FF  // end address of code region
+    // parameter IMEM_PATH = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem"
 )
 (
     // system signals
     input                       ACLK,
     input                       ARESETn,
+    
+    // enable
+    input                       enable,
+    
+    // interface with regfile
+    input                       reg_rd_en,
+    input   [4:0]               reg_addr,
+    output  [DATA_WIDTH-1:0]    reg_data,
     
     // Interface connect with D-Cache and I-Cache
     // D-Cache enable
@@ -327,6 +335,9 @@ module riscv_processor
         .ACLK       (ACLK   ),
         .ARESETn    (ARESETn),
         
+        // enable
+        .enable     (enable),
+        
         // Interface connect with D-Cache
         // D-Cache enable
         .i_CACHE_EN (i_CACHE_EN),
@@ -459,6 +470,11 @@ module riscv_processor
     register_file u_register_file (
         .clk         (ACLK),
         .rst_n       (ARESETn),
+        // regfile
+        .reg_rd_en   (reg_rd_en),
+        .reg_addr    (reg_addr ),
+        .reg_data    (reg_data ),
+        
         .regwrite    (regwrite_WB),
         .write_reg   (w_reg_WB),
         .write_data  (dataD),
@@ -683,7 +699,7 @@ module riscv_processor
 
     // ********************************* MEM Stage ********************************
     riscv_axi_wrapper #(
-        .ID                    (ID + 2    ),
+        .ID                    (ID        ),
         .DATA_WIDTH            (DATA_WIDTH),
         .ADDR_WIDTH            (ADDR_WIDTH),
         .ID_WIDTH              (ID_WIDTH  ),
