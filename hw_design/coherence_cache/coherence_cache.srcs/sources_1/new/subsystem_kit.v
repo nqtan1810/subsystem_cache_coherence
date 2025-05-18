@@ -41,8 +41,8 @@ module subsystem_kit
     
     // to Main Memory
     input                    m_wr_mem_en,
-    input   [ADDR_WIDTH-1:0] m_wr_addr,
-    input   [DATA_WIDTH-1:0] m_wr_data
+    input   [ADDR_WIDTH-1:0] m_wr_mem_addr,
+    input   [DATA_WIDTH-1:0] m_wr_mem_data
 );
 
     wire                     m0_ENABLE;
@@ -179,9 +179,9 @@ module subsystem_kit
         .enable         (enable),
         
         // regfile
-        .reg_rd_en      (m0_rd_reg_en),
-        .reg_addr       (m0_reg_addr),
-        .reg_data       (m0_reg_data),
+        .reg_rd_en      (m0_reg_rd_en),
+        .reg_addr       (m0_reg_addr ),
+        .reg_data       (m0_reg_data ),
         
         // D-Cache interface
         .d_CACHE_EN     (m0_ENABLE),
@@ -434,9 +434,9 @@ module subsystem_kit
         .enable         (enable),
         
         // regfile
-        .rd_reg_en      (m1_rd_reg_en),
-        .reg_addr       (m1_reg_addr),
-        .reg_data       (m1_reg_data),
+        .reg_rd_en      (m1_reg_rd_en),
+        .reg_addr       (m1_reg_addr ),
+        .reg_data       (m1_reg_data ),
         
         // D-Cache interface
         .d_CACHE_EN     (m1_ENABLE),
@@ -621,8 +621,8 @@ module subsystem_kit
         .ACLK          (ACLK   ),
         .ARESETn       (ARESETn),
         .ENABLE        (m2_ENABLE),
-//        .CACHE_HIT     (m0_I_CACHE_HIT),
-//        .CACHE_BUSY    (m0_I_CACHE_BUSY),
+        .CACHE_HIT     (/*m0_I_CACHE_HIT */),
+        .CACHE_BUSY    (/*m0_I_CACHE_BUSY*/),
     
         // AXI5 Interface (connect with CPU)
         // AW Channel
@@ -802,8 +802,8 @@ module subsystem_kit
         .ACLK          (ACLK   ),
         .ARESETn       (ARESETn),
         .ENABLE        (m3_ENABLE),
-//        .CACHE_HIT     (m1_I_CACHE_HIT),
-//        .CACHE_BUSY    (m1_I_CACHE_BUSY),
+        .CACHE_HIT     (/*m1_I_CACHE_HIT */),
+        .CACHE_BUSY    (/*m1_I_CACHE_BUSY*/),
     
         // AXI5 Interface (connect with CPU)
         // AW Channel
@@ -1078,8 +1078,8 @@ module subsystem_kit
         .ACLK       (ACLK   ),
         .ARESETn    (ARESETn),
         .ENABLE     (m0_ENABLE    ),
-//        .CACHE_HIT  (m0_D_CACHE_HIT ),
-//        .CACHE_BUSY (m0_D_CACHE_BUSY),
+        .CACHE_HIT  (/*m0_D_CACHE_HIT */),
+        .CACHE_BUSY (/*m0_D_CACHE_BUSY*/),
         
         // AXI5 Interface (connect with CPU)
         // AW Channel
@@ -1240,8 +1240,8 @@ module subsystem_kit
         .ACLK       (ACLK   ),
         .ARESETn    (ARESETn),
         .ENABLE     (m1_ENABLE    ),
-//        .CACHE_HIT  (m1_D_CACHE_HIT ),
-//        .CACHE_BUSY (m1_D_CACHE_BUSY),
+        .CACHE_HIT  (/*m1_D_CACHE_HIT */),
+        .CACHE_BUSY (/*m1_D_CACHE_BUSY*/),
         
         // AXI5 Interface (connect with CPU)
         // AW Channel
@@ -1779,6 +1779,11 @@ module subsystem_kit
         /********* System signals *********/
         .ACLK       (ACLK   ),
         .ARESETn    (ARESETn),
+        
+        // to program instruction mem
+        .wr_mem_en  (m_wr_mem_en  ),
+        .wr_mem_addr(m_wr_mem_addr),
+        .wr_mem_data(m_wr_mem_data),
         
         /********** Slave Interface **********/
         // AW Channel
