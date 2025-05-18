@@ -18,6 +18,11 @@ module memory
 	input                       ACLK,
 	input      	                ARESETn,
 	
+	// to Main Memory
+    input                       wr_mem_en,
+    input   [ADDR_WIDTH-1:0]    wr_mem_addr,
+    input   [DATA_WIDTH-1:0]    wr_mem_data,
+	
     /********** Slave Interface **********/
     // AW Channel
     input      [ID_WIDTH-1:0]   m_AWID,
@@ -172,9 +177,9 @@ module memory
         .rst_n  (ARESETn),
     
         // write port
-        .w_en   (w_en  ),
-        .w_addr (w_addr[17:2]),
-        .w_data (w_data),
+        .w_en   (w_en | wr_mem_en),
+        .w_addr (({16{w_en}} & w_addr[17:2]) | ({16{wr_mem_en}} & wr_mem_addr[17:2])),
+        .w_data (({32{w_en}} & w_data) | ({32{wr_mem_en}} & wr_mem_data)),
         
         // read port
         .r_en   (r_en  ),
