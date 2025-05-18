@@ -20,6 +20,9 @@ module instr_riscv_axi_wrapper
     input                           ACLK,
     input                           ARESETn,
     
+    // enable
+    input                           enable,
+    
     // Interface connect with D-Cache
     // D-Cache enable
     output                          i_CACHE_EN,
@@ -113,7 +116,7 @@ module instr_riscv_axi_wrapper
     // next state
     always @(*) begin
         case (state)
-            IDLE    : next_state = i_imem_access ? (i_r0w1 ? W_ADDR : R_ADDR) : IDLE;
+            IDLE    : next_state = (enable & i_imem_access) ? (i_r0w1 ? W_ADDR : R_ADDR) : IDLE;
             W_ADDR  : next_state = i_AWREADY ? W_DATA : W_ADDR;
             W_DATA  : next_state = i_WREADY ? W_RESP : W_DATA;
             W_RESP  : next_state = i_BVALID ? IDLE : W_RESP;
