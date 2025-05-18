@@ -7,6 +7,11 @@
 module register_file (
     input  wire        clk,
     input  wire        rst_n,        // Active-low reset
+    // interface with regfile
+    input  wire        reg_rd_en,
+    input  wire [4:0]  reg_addr,
+    output reg  [31:0] reg_data,
+    
     input  wire        regwrite,
     input  wire [4:0]  write_reg,
     input  wire [31:0] write_data,
@@ -36,6 +41,16 @@ module register_file (
     assign read_data1 = (rs1 == 0) ? 32'b0 : (regwrite && (rs1 == write_reg)) ? write_data : regfile[rs1];
 
     assign read_data2 = (rs2 == 0) ? 32'b0 : (regwrite && (rs2 == write_reg)) ? write_data : regfile[rs2];
+    
+    // regfile external output
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            reg_data <= 0;
+        end 
+        else if (reg_rd_en) begin
+            reg_data <= regfile[reg_addr];
+        end
+    end
 
 endmodule
 
