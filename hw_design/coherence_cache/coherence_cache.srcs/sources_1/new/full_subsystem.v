@@ -8,7 +8,7 @@ module full_subsystem
 #(
     parameter DATA_WIDTH  = 32,
     parameter ADDR_WIDTH  = 32,
-    parameter ID_WIDTH    = 1,
+    parameter ID_WIDTH    = 2,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8),
     parameter SHAREABLE_REGION_START = 32'h0000_1000, // start address of shareable region
@@ -17,15 +17,15 @@ module full_subsystem
     parameter A_CODE_REGION_END   = 32'h0000_03FF,  // end address of code region
     parameter B_CODE_REGION_START = 32'h0000_0400, // start address of code region
     parameter B_CODE_REGION_END   = 32'h0000_07FF,  // end address of code region
-    parameter IMEM_A_PATH   = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem",
-    parameter IMEM_B_PATH   = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_B.mem",
+//    parameter IMEM_A_PATH   = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_A.mem",
+//    parameter IMEM_B_PATH   = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/imem_B.mem",
     parameter DMEM_INIT   = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sources_1/new/mem_init.mem"
 )
 (
     // system signals
     input                    ACLK,
     input                    ARESETn,
-   
+    
     // output of D-Cache
     output                   m0_D_CACHE_HIT,
     output                   m0_D_CACHE_BUSY,
@@ -167,8 +167,8 @@ module full_subsystem
         .SHAREABLE_REGION_START (SHAREABLE_REGION_START),
         .SHAREABLE_REGION_END   (SHAREABLE_REGION_END  ),
         .CODE_REGION_START      (A_CODE_REGION_START   ), // start address of code region
-        .CODE_REGION_END        (A_CODE_REGION_END     ),  // end address of code region
-        .IMEM_PATH              (IMEM_A_PATH           )
+        .CODE_REGION_END        (A_CODE_REGION_END     )  // end address of code region
+        // .IMEM_PATH              (IMEM_A_PATH           )
     ) cpuA (
         .ACLK           (ACLK),
         .ARESETn        (ARESETn),
@@ -414,8 +414,8 @@ module full_subsystem
         .SHAREABLE_REGION_START (SHAREABLE_REGION_START),
         .SHAREABLE_REGION_END   (SHAREABLE_REGION_END  ),
         .CODE_REGION_START      (B_CODE_REGION_START   ), // start address of code region
-        .CODE_REGION_END        (B_CODE_REGION_END     ),  // end address of code region
-        .IMEM_PATH              (IMEM_B_PATH           )
+        .CODE_REGION_END        (B_CODE_REGION_END     )  // end address of code region
+        // .IMEM_PATH              (IMEM_B_PATH           )
     ) cpuB (
         .ACLK           (ACLK),
         .ARESETn        (ARESETn),
@@ -1747,7 +1747,7 @@ module full_subsystem
         .s_RREADY   (s_RREADY)
     );
     
-    memory
+    (* keep_hierarchy = "yes" *) memory
     #(
         .DATA_WIDTH(DATA_WIDTH),
         .ADDR_WIDTH(ADDR_WIDTH),
