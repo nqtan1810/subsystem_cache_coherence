@@ -8,7 +8,7 @@ module full_subsystem_top_tb
 #(
     parameter DATA_WIDTH  = 32,
     parameter ADDR_WIDTH  = 32,
-    parameter ID_WIDTH    = 1,
+    parameter ID_WIDTH    = 2,
     parameter USER_WIDTH  = 4,
     parameter STRB_WIDTH  = (DATA_WIDTH/8),
     parameter SHAREABLE_REGION_START = 32'h0000_1000, // start address of shareable region
@@ -61,25 +61,25 @@ module full_subsystem_top_tb
     initial begin
         $display("[%0t(ns)] Start simulation!", $time);
         m_if.reset_n();
-        repeat(10000) @(m_if.drv_cb);
+        repeat(20000) @(m_if.drv_cb);
         $display("[%0t(ns)] Start saving simulation result!", $time);
-        m_if.save_cache(
-            DUT.D_cacheA.way0.state_tag_ram,
-            DUT.D_cacheA.way1.state_tag_ram,
-            DUT.D_cacheA.way2.state_tag_ram,
-            DUT.D_cacheA.way3.state_tag_ram,
+//        m_if.save_cache(
+//            DUT.D_cacheA.way0.state_tag_ram,
+//            DUT.D_cacheA.way1.state_tag_ram,
+//            DUT.D_cacheA.way2.state_tag_ram,
+//            DUT.D_cacheA.way3.state_tag_ram,
             
-            DUT.D_cacheB.way0.state_tag_ram,
-            DUT.D_cacheB.way1.state_tag_ram,
-            DUT.D_cacheB.way2.state_tag_ram,
-            DUT.D_cacheB.way3.state_tag_ram,
+//            DUT.D_cacheB.way0.state_tag_ram,
+//            DUT.D_cacheB.way1.state_tag_ram,
+//            DUT.D_cacheB.way2.state_tag_ram,
+//            DUT.D_cacheB.way3.state_tag_ram,
             
-            DUT.D_cacheA.plrut_ram.plrut_ram,
-            DUT.D_cacheB.plrut_ram.plrut_ram,
+//            DUT.D_cacheA.plrut_ram.plrut_ram,
+//            DUT.D_cacheB.plrut_ram.plrut_ram,
             
-            DUT.D_cacheA.cache_data_ram.cache,
-            DUT.D_cacheB.cache_data_ram.cache
-            );
+//            DUT.D_cacheA.cache_data_ram.cache,
+//            DUT.D_cacheB.cache_data_ram.cache
+//            );
         $display("[%0t(ns)] Finish saving simulation result!", $time);
         $display("[%0t(ns)] Finish simulation!", $time);
     end
