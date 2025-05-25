@@ -3,7 +3,10 @@
 // branch unit module: move from ID to EX stage
 //////////////////////////////////////////////////////////////////////////////////
 
-module branch_unit (                        // slack = ?
+// *******************************************************************************
+// New branch_unit
+// *******************************************************************************
+module branch_unit (                        
     input               i_jalr_EX,
     input               i_branch_EX,
     input [2:0]         i_funct3_EX,
@@ -43,10 +46,26 @@ module branch_unit (                        // slack = ?
     output reg          o_pcsel2
 );
 
+    reg [31:0] src_A; 
+    reg [31:0] src_B;
+    
+    wire rs1_MEM_match; 
+    wire rs2_MEM_match; 
+    wire rs1_WB_match; 
+    wire rs2_WB_match;
+    
+    assign rs1_MEM_match = i_rs1_EX == i_write_reg_MEM;
+    assign rs2_MEM_match = i_rs2_EX == i_write_reg_MEM;
+    
+    assign rs1_WB_match = i_rs1_EX == i_write_reg_WB;
+    assign rs2_WB_match = i_rs2_EX == i_write_reg_WB;
+    
     always @(*) begin
         o_pcsel1    = 0;
         o_pcsel2    = 0;
         o_rs1_data  = 0;
+        src_A = i_dataA_EX;
+        src_B = i_dataB_EX;
         if((!i_jump_EX) && (!i_branch_EX)) begin  // khong phai lenh nhay/re nhanh
             o_pcsel1 = 0;
             o_pcsel2 = 0;
@@ -56,7 +75,7 @@ module branch_unit (                        // slack = ?
                 if(i_jalr_EX) begin      // jalr
                     o_pcsel1 = 1;
                     o_pcsel2 = 1;
-                    if(i_rs1_EX == i_write_reg_MEM) begin     // get data from MEM stage
+                    if(rs1_MEM_match) begin     // get data from MEM stage
                         if(i_jump_MEM) begin
                             o_rs1_data = i_pc_incr4_MEM;
                         end
@@ -70,7 +89,7 @@ module branch_unit (                        // slack = ?
                             o_rs1_data = i_alu_result_MEM;
                         end
                     end 
-                    else if(i_rs1_EX == i_write_reg_WB) begin      // get data from WB stage
+                    else if(rs1_WB_match) begin      // get data from WB stage
                         if(i_jump_WB) begin
                             o_rs1_data = i_pc_incr4_WB;
                         end
@@ -96,245 +115,416 @@ module branch_unit (                        // slack = ?
             end
             else if (i_branch_EX) begin      // nhom lenh branch: beq, bne, ...
                 o_pcsel2 = 0;
-                if ((i_rs1_EX!=i_write_reg_MEM)&&(i_rs2_EX!=i_write_reg_MEM)&&(i_rs1_EX!=i_write_reg_WB)&&(i_rs2_EX!=i_write_reg_WB)) begin
-                    case (i_funct3_EX)
-                        3'b000: o_pcsel1 = i_dataA_EX == i_dataB_EX;//beq
-                        3'b001: o_pcsel1 = i_dataA_EX != i_dataB_EX;//bne
-                        3'b100: o_pcsel1 = $signed(i_dataA_EX) < $signed(i_dataB_EX); //blt
-                        3'b101: o_pcsel1 = $signed(i_dataA_EX) >= $signed(i_dataB_EX); //bge
-                        3'b110: o_pcsel1 = i_dataA_EX < i_dataB_EX; // bltu
-                        3'b111: o_pcsel1 = i_dataA_EX >= i_dataB_EX; //bgeu
-                        default: o_pcsel1 = 1'b0;
-                    endcase
+                // khong xung dot
+                if (!(rs1_MEM_match || rs2_MEM_match || rs1_WB_match || rs2_WB_match)) begin
+                    src_A = i_dataA_EX;
+                    src_B = i_dataB_EX;
                 end        
-                else if(i_rs1_EX == i_write_reg_MEM || i_rs2_EX == i_write_reg_MEM) begin     // xung dot tai tang MEM
-                    if(i_jump_MEM) begin
-                        if(i_rs1_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_pc_incr4_MEM == i_dataB_EX;//beq
-                                3'b001: o_pcsel1= i_pc_incr4_MEM != i_dataB_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_pc_incr4_MEM) < $signed(i_dataB_EX); //blt
-                                3'b101: o_pcsel1= $signed(i_pc_incr4_MEM) >= $signed(i_dataB_EX); //bge
-                                3'b110: o_pcsel1= i_pc_incr4_MEM < i_dataB_EX; // bltu
-                                3'b111: o_pcsel1= i_pc_incr4_MEM >= i_dataB_EX; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_pc_incr4_MEM == i_dataA_EX;//beq
-                                3'b001: o_pcsel1= i_pc_incr4_MEM != i_dataA_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_pc_incr4_MEM); //blt
-                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_pc_incr4_MEM); //bge
-                                3'b110: o_pcsel1= i_dataA_EX < i_pc_incr4_MEM; // bltu
-                                3'b111: o_pcsel1= i_dataA_EX >= i_pc_incr4_MEM; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
-                    end
-                    else if(i_wb_MEM) begin
-                        if(i_rs1_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_auipc_lui_data_MEM == i_dataB_EX;//beq
-                                3'b001: o_pcsel1= i_auipc_lui_data_MEM != i_dataB_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_auipc_lui_data_MEM) < $signed(i_dataB_EX); //blt
-                                3'b101: o_pcsel1= $signed(i_auipc_lui_data_MEM) >= $signed(i_dataB_EX); //bge
-                                3'b110: o_pcsel1= i_auipc_lui_data_MEM < i_dataB_EX; // bltu
-                                3'b111: o_pcsel1= i_auipc_lui_data_MEM >= i_dataB_EX; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_auipc_lui_data_MEM == i_dataA_EX;//beq
-                                3'b001: o_pcsel1= i_auipc_lui_data_MEM != i_dataA_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_auipc_lui_data_MEM); //blt
-                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_auipc_lui_data_MEM); //bge
-                                3'b110: o_pcsel1= i_dataA_EX < i_auipc_lui_data_MEM; // bltu
-                                3'b111: o_pcsel1= i_dataA_EX >= i_auipc_lui_data_MEM; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
-                    end
-                    else if(i_slt_MEM) begin
-                        if(i_rs1_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_slt_data_MEM == i_dataB_EX;//beq
-                                3'b001: o_pcsel1= i_slt_data_MEM != i_dataB_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_slt_data_MEM) < $signed(i_dataB_EX); //blt
-                                3'b101: o_pcsel1= $signed(i_slt_data_MEM) >= $signed(i_dataB_EX); //bge
-                                3'b110: o_pcsel1= i_slt_data_MEM < i_dataB_EX; // bltu
-                                3'b111: o_pcsel1= i_slt_data_MEM >= i_dataB_EX; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_slt_data_MEM == i_dataA_EX;//beq
-                                3'b001: o_pcsel1= i_slt_data_MEM != i_dataA_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_slt_data_MEM); //blt
-                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_slt_data_MEM); //bge
-                                3'b110: o_pcsel1= i_dataA_EX < i_slt_data_MEM; // bltu
-                                3'b111: o_pcsel1= i_dataA_EX >= i_slt_data_MEM; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
-                    end
-                    else begin
-                        if(i_rs1_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen == i_dataB_EX) : (i_alu_result_MEM == i_dataB_EX);//beq
-                                3'b001: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen != i_dataB_EX) : (i_alu_result_MEM != i_dataB_EX);//bne
-                                3'b100: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataR_gen) < $signed(i_dataB_EX)) : ($signed(i_alu_result_MEM) < $signed(i_dataB_EX)); //blt
-                                3'b101: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataR_gen) >= $signed(i_dataB_EX)) : ($signed(i_alu_result_MEM) >= $signed(i_dataB_EX)); //bge
-                                3'b110: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen < i_dataB_EX) : (i_alu_result_MEM < i_dataB_EX); // bltu
-                                3'b111: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen >= i_dataB_EX) : (i_alu_result_MEM >= i_dataB_EX); //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_MEM) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen == i_dataA_EX) : (i_alu_result_MEM == i_dataA_EX);//beq
-                                3'b001: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen != i_dataA_EX) : (i_alu_result_MEM != i_dataA_EX);//bne
-                                3'b100: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataA_EX) < $signed(i_dataR_gen)) : ($signed(i_dataA_EX) < $signed(i_alu_result_MEM)); //blt
-                                3'b101: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataA_EX) >= $signed(i_dataR_gen)) : ($signed(i_dataA_EX) >= $signed(i_alu_result_MEM)); //bge
-                                3'b110: o_pcsel1= (i_memread_MEM) ? (i_dataA_EX < i_dataR_gen) : (i_dataA_EX < i_alu_result_MEM); // bltu
-                                3'b111: o_pcsel1= (i_memread_MEM) ? (i_dataA_EX >= i_dataR_gen) : (i_dataA_EX >= i_alu_result_MEM); //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
-                    end
-                end
-                else if(i_rs1_EX == i_write_reg_WB || i_rs2_EX == i_write_reg_WB) begin     // xung dot tai tang WB
+                // xung dot tai tang WB
+                if(rs1_WB_match) begin     
                     if(i_jump_WB) begin
-                        if(i_rs1_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_pc_incr4_WB == i_dataB_EX;//beq
-                                3'b001: o_pcsel1= i_pc_incr4_WB != i_dataB_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_pc_incr4_WB) < $signed(i_dataB_EX); //blt
-                                3'b101: o_pcsel1= $signed(i_pc_incr4_WB) >= $signed(i_dataB_EX); //bge
-                                3'b110: o_pcsel1= i_pc_incr4_WB < i_dataB_EX; // bltu
-                                3'b111: o_pcsel1= i_pc_incr4_WB >= i_dataB_EX; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_pc_incr4_WB == i_dataA_EX;//beq
-                                3'b001: o_pcsel1= i_pc_incr4_WB != i_dataA_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_pc_incr4_WB); //blt
-                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_pc_incr4_WB); //bge
-                                3'b110: o_pcsel1= i_dataA_EX < i_pc_incr4_WB; // bltu
-                                3'b111: o_pcsel1= i_dataA_EX >= i_pc_incr4_WB; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
+                        src_A = i_pc_incr4_WB;
                     end
                     else if(i_wb_WB) begin
-                        if(i_rs1_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_auipc_lui_data_WB == i_dataB_EX;//beq
-                                3'b001: o_pcsel1= i_auipc_lui_data_WB != i_dataB_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_auipc_lui_data_WB) < $signed(i_dataB_EX); //blt
-                                3'b101: o_pcsel1= $signed(i_auipc_lui_data_WB) >= $signed(i_dataB_EX); //bge
-                                3'b110: o_pcsel1= i_auipc_lui_data_WB < i_dataB_EX; // bltu
-                                3'b111: o_pcsel1= i_auipc_lui_data_WB >= i_dataB_EX; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_auipc_lui_data_WB == i_dataA_EX;//beq
-                                3'b001: o_pcsel1= i_auipc_lui_data_WB != i_dataA_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_auipc_lui_data_WB); //blt
-                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_auipc_lui_data_WB); //bge
-                                3'b110: o_pcsel1= i_dataA_EX < i_auipc_lui_data_WB; // bltu
-                                3'b111: o_pcsel1= i_dataA_EX >= i_auipc_lui_data_WB; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
+                        src_A = i_auipc_lui_data_WB;
                     end
                     else if(i_slt_WB) begin
-                        if(i_rs1_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_slt_data_WB == i_dataB_EX;//beq
-                                3'b001: o_pcsel1= i_slt_data_WB != i_dataB_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_slt_data_WB) < $signed(i_dataB_EX); //blt
-                                3'b101: o_pcsel1= $signed(i_slt_data_WB) >= $signed(i_dataB_EX); //bge
-                                3'b110: o_pcsel1= i_slt_data_WB < i_dataB_EX; // bltu
-                                3'b111: o_pcsel1= i_slt_data_WB >= i_dataB_EX; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= i_slt_data_WB == i_dataA_EX;//beq
-                                3'b001: o_pcsel1= i_slt_data_WB != i_dataA_EX;//bne
-                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_slt_data_WB); //blt
-                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_slt_data_WB); //bge
-                                3'b110: o_pcsel1= i_dataA_EX < i_slt_data_WB; // bltu
-                                3'b111: o_pcsel1= i_dataA_EX >= i_slt_data_WB; //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
+                        src_A = i_slt_data_WB;
                     end
                     else begin
-                        if(i_rs1_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= (i_regwrite_WB) ? (i_dataD == i_dataB_EX) : (i_dataA_EX == i_dataB_EX);//beq
-                                3'b001: o_pcsel1= (i_regwrite_WB) ? (i_dataD != i_dataB_EX) : (i_dataA_EX != i_dataB_EX);//bne
-                                3'b100: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataD) < $signed(i_dataB_EX)) : ($signed(i_dataA_EX) < $signed(i_dataB_EX)); //blt
-                                3'b101: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataD) >= $signed(i_dataB_EX)) : ($signed(i_dataA_EX) >= $signed(i_dataB_EX)); //bge
-                                3'b110: o_pcsel1= (i_regwrite_WB) ? (i_dataD < i_dataB_EX) : (i_dataA_EX < i_dataB_EX); // bltu
-                                3'b111: o_pcsel1= (i_regwrite_WB) ? (i_dataD >= i_dataB_EX) : (i_dataA_EX >= i_dataB_EX); //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else if(i_rs2_EX == i_write_reg_WB) begin
-                            case (i_funct3_EX)
-                                3'b000: o_pcsel1= (i_regwrite_WB) ? (i_dataD == i_dataA_EX) : (i_dataB_EX == i_dataA_EX);//beq
-                                3'b001: o_pcsel1= (i_regwrite_WB) ? (i_dataD != i_dataA_EX) : (i_dataB_EX != i_dataA_EX);//bne
-                                3'b100: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataA_EX) < $signed(i_dataD)) : ($signed(i_dataA_EX) < $signed(i_dataB_EX)); //blt
-                                3'b101: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataA_EX) >= $signed(i_dataD)) : ($signed(i_dataA_EX) >= $signed(i_dataB_EX)); //bge
-                                3'b110: o_pcsel1= (i_regwrite_WB) ? (i_dataA_EX < i_dataD) : (i_dataA_EX < i_dataB_EX); // bltu
-                                3'b111: o_pcsel1= (i_regwrite_WB) ? (i_dataA_EX >= i_dataD) : (i_dataA_EX >= i_dataB_EX); //bgeu
-                                default: o_pcsel1 = 1'b0;
-                            endcase
-                        end
-                        else begin
-                            o_pcsel1 = 0;
-                        end
+                        src_A = i_regwrite_WB ? i_dataD : i_dataA_EX;
                     end
                 end
-            end
-            else begin
-                o_pcsel1 = 0;
+                if(rs2_WB_match) begin     
+                    if(i_jump_WB) begin
+                        src_B = i_pc_incr4_WB;
+                    end
+                    else if(i_wb_WB) begin
+                        src_B = i_auipc_lui_data_WB;
+                    end
+                    else if(i_slt_WB) begin
+                        src_B = i_slt_data_WB;
+                    end
+                    else begin
+                        src_B = i_regwrite_WB ? i_dataD : i_dataB_EX;
+                    end
+                end                    
+                // xung dot tai tang MEM
+                if(rs1_MEM_match) begin     
+                    if(i_jump_MEM) begin
+                        src_A = i_pc_incr4_MEM;
+                    end
+                    else if(i_wb_MEM) begin
+                        src_A = i_auipc_lui_data_MEM;
+                    end
+                    else if(i_slt_MEM) begin
+                        src_A = i_slt_data_MEM;
+                    end
+                    else begin
+                        src_A = i_memread_MEM ? i_dataR_gen : i_alu_result_MEM;
+                    end
+                end
+                if(rs2_MEM_match) begin     
+                    if(i_jump_MEM) begin
+                        src_B = i_pc_incr4_MEM;
+                    end
+                    else if(i_wb_MEM) begin
+                        src_B = i_auipc_lui_data_MEM;
+                    end
+                    else if(i_slt_MEM) begin
+                        src_B = i_slt_data_MEM;
+                    end
+                    else begin
+                        src_B = i_memread_MEM ? i_dataR_gen : i_alu_result_MEM;
+                    end
+                end
+                case (i_funct3_EX)
+                    3'b000: o_pcsel1 = src_A == src_B;//beq
+                    3'b001: o_pcsel1 = src_A != src_B;//bne
+                    3'b100: o_pcsel1 = $signed(src_A) < $signed(src_B); //blt
+                    3'b101: o_pcsel1 = $signed(src_A) >= $signed(src_B); //bge
+                    3'b110: o_pcsel1 = src_A < src_B; // bltu
+                    3'b111: o_pcsel1 = src_A >= src_B; //bgeu
+                    default: o_pcsel1 = 1'b0;
+                endcase
             end
         end
     end
-    
 endmodule
+
+
+//module branch_unit (                        // slack = ?
+//    input               i_jalr_EX,
+//    input               i_branch_EX,
+//    input [2:0]         i_funct3_EX,
+
+//    input [4:0]         i_rs1_EX,
+//    input [4:0]         i_rs2_EX,
+
+//    input               i_jump_EX,
+
+//    input [4:0]         i_write_reg_MEM,
+//    input               i_jump_MEM,
+//    input               i_wb_MEM,
+//    input               i_slt_MEM,
+//    input               i_memread_MEM,
+//    input [31:0]        i_pc_incr4_MEM,
+//    input [31:0]        i_auipc_lui_data_MEM,
+//    input [31:0]        i_slt_data_MEM,
+//    input [31:0]        i_alu_result_MEM,
+//    input [31:0]        i_dataR_gen,
+
+//    input [4:0]         i_write_reg_WB,
+//    input               i_jump_WB,
+//    input               i_wb_WB,
+//    input               i_slt_WB,
+//    input               i_regwrite_WB,
+//    input [31:0]        i_pc_incr4_WB,
+//    input [31:0]        i_auipc_lui_data_WB,
+//    input [31:0]        i_slt_data_WB,
+//    input [31:0]        i_alu_result_WB,
+//    input [31:0]        i_dataD,
+
+//    input [31:0]        i_dataA_EX,
+//    input [31:0]        i_dataB_EX,
+
+//    output reg [31:0]   o_rs1_data,
+//    output reg          o_pcsel1,
+//    output reg          o_pcsel2
+//);
+
+//    always @(*) begin
+//        o_pcsel1    = 0;
+//        o_pcsel2    = 0;
+//        o_rs1_data  = 0;
+//        if((!i_jump_EX) && (!i_branch_EX)) begin  // khong phai lenh nhay/re nhanh
+//            o_pcsel1 = 0;
+//            o_pcsel2 = 0;
+//        end 
+//        else begin
+//            if(i_jump_EX) begin 
+//                if(i_jalr_EX) begin      // jalr
+//                    o_pcsel1 = 1;
+//                    o_pcsel2 = 1;
+//                    if(i_rs1_EX == i_write_reg_MEM) begin     // get data from MEM stage
+//                        if(i_jump_MEM) begin
+//                            o_rs1_data = i_pc_incr4_MEM;
+//                        end
+//                        else if(i_wb_MEM) begin
+//                            o_rs1_data = i_auipc_lui_data_MEM;
+//                        end
+//                        else if(i_slt_MEM) begin
+//                            o_rs1_data = i_slt_data_MEM;
+//                        end
+//                        else begin
+//                            o_rs1_data = i_alu_result_MEM;
+//                        end
+//                    end 
+//                    else if(i_rs1_EX == i_write_reg_WB) begin      // get data from WB stage
+//                        if(i_jump_WB) begin
+//                            o_rs1_data = i_pc_incr4_WB;
+//                        end
+//                        else if(i_wb_WB) begin
+//                            o_rs1_data = i_auipc_lui_data_WB;
+//                        end
+//                        else if(i_slt_WB) begin
+//                            o_rs1_data = i_slt_data_WB;
+//                        end
+//                        else begin
+//                            o_rs1_data = i_alu_result_WB;
+//                        end
+//                    end 
+//                    else begin
+//                        o_rs1_data = i_dataA_EX;
+//                    end
+//                end
+//                else begin          // jal
+//                    o_pcsel1 = 1;
+//                    o_pcsel2 = 0;
+//                    o_rs1_data = i_dataA_EX;
+//                end
+//            end
+//            else if (i_branch_EX) begin      // nhom lenh branch: beq, bne, ...
+//                o_pcsel2 = 0;
+//                if ((i_rs1_EX!=i_write_reg_MEM)&&(i_rs2_EX!=i_write_reg_MEM)&&(i_rs1_EX!=i_write_reg_WB)&&(i_rs2_EX!=i_write_reg_WB)) begin
+//                    case (i_funct3_EX)
+//                        3'b000: o_pcsel1 = i_dataA_EX == i_dataB_EX;//beq
+//                        3'b001: o_pcsel1 = i_dataA_EX != i_dataB_EX;//bne
+//                        3'b100: o_pcsel1 = $signed(i_dataA_EX) < $signed(i_dataB_EX); //blt
+//                        3'b101: o_pcsel1 = $signed(i_dataA_EX) >= $signed(i_dataB_EX); //bge
+//                        3'b110: o_pcsel1 = i_dataA_EX < i_dataB_EX; // bltu
+//                        3'b111: o_pcsel1 = i_dataA_EX >= i_dataB_EX; //bgeu
+//                        default: o_pcsel1 = 1'b0;
+//                    endcase
+//                end        
+//                else if(i_rs1_EX == i_write_reg_MEM || i_rs2_EX == i_write_reg_MEM) begin     // xung dot tai tang MEM
+//                    if(i_jump_MEM) begin
+//                        if(i_rs1_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_pc_incr4_MEM == i_dataB_EX;//beq
+//                                3'b001: o_pcsel1= i_pc_incr4_MEM != i_dataB_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_pc_incr4_MEM) < $signed(i_dataB_EX); //blt
+//                                3'b101: o_pcsel1= $signed(i_pc_incr4_MEM) >= $signed(i_dataB_EX); //bge
+//                                3'b110: o_pcsel1= i_pc_incr4_MEM < i_dataB_EX; // bltu
+//                                3'b111: o_pcsel1= i_pc_incr4_MEM >= i_dataB_EX; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_pc_incr4_MEM == i_dataA_EX;//beq
+//                                3'b001: o_pcsel1= i_pc_incr4_MEM != i_dataA_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_pc_incr4_MEM); //blt
+//                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_pc_incr4_MEM); //bge
+//                                3'b110: o_pcsel1= i_dataA_EX < i_pc_incr4_MEM; // bltu
+//                                3'b111: o_pcsel1= i_dataA_EX >= i_pc_incr4_MEM; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                    else if(i_wb_MEM) begin
+//                        if(i_rs1_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_auipc_lui_data_MEM == i_dataB_EX;//beq
+//                                3'b001: o_pcsel1= i_auipc_lui_data_MEM != i_dataB_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_auipc_lui_data_MEM) < $signed(i_dataB_EX); //blt
+//                                3'b101: o_pcsel1= $signed(i_auipc_lui_data_MEM) >= $signed(i_dataB_EX); //bge
+//                                3'b110: o_pcsel1= i_auipc_lui_data_MEM < i_dataB_EX; // bltu
+//                                3'b111: o_pcsel1= i_auipc_lui_data_MEM >= i_dataB_EX; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_auipc_lui_data_MEM == i_dataA_EX;//beq
+//                                3'b001: o_pcsel1= i_auipc_lui_data_MEM != i_dataA_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_auipc_lui_data_MEM); //blt
+//                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_auipc_lui_data_MEM); //bge
+//                                3'b110: o_pcsel1= i_dataA_EX < i_auipc_lui_data_MEM; // bltu
+//                                3'b111: o_pcsel1= i_dataA_EX >= i_auipc_lui_data_MEM; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                    else if(i_slt_MEM) begin
+//                        if(i_rs1_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_slt_data_MEM == i_dataB_EX;//beq
+//                                3'b001: o_pcsel1= i_slt_data_MEM != i_dataB_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_slt_data_MEM) < $signed(i_dataB_EX); //blt
+//                                3'b101: o_pcsel1= $signed(i_slt_data_MEM) >= $signed(i_dataB_EX); //bge
+//                                3'b110: o_pcsel1= i_slt_data_MEM < i_dataB_EX; // bltu
+//                                3'b111: o_pcsel1= i_slt_data_MEM >= i_dataB_EX; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_slt_data_MEM == i_dataA_EX;//beq
+//                                3'b001: o_pcsel1= i_slt_data_MEM != i_dataA_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_slt_data_MEM); //blt
+//                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_slt_data_MEM); //bge
+//                                3'b110: o_pcsel1= i_dataA_EX < i_slt_data_MEM; // bltu
+//                                3'b111: o_pcsel1= i_dataA_EX >= i_slt_data_MEM; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                    else begin
+//                        if(i_rs1_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen == i_dataB_EX) : (i_alu_result_MEM == i_dataB_EX);//beq
+//                                3'b001: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen != i_dataB_EX) : (i_alu_result_MEM != i_dataB_EX);//bne
+//                                3'b100: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataR_gen) < $signed(i_dataB_EX)) : ($signed(i_alu_result_MEM) < $signed(i_dataB_EX)); //blt
+//                                3'b101: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataR_gen) >= $signed(i_dataB_EX)) : ($signed(i_alu_result_MEM) >= $signed(i_dataB_EX)); //bge
+//                                3'b110: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen < i_dataB_EX) : (i_alu_result_MEM < i_dataB_EX); // bltu
+//                                3'b111: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen >= i_dataB_EX) : (i_alu_result_MEM >= i_dataB_EX); //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_MEM) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen == i_dataA_EX) : (i_alu_result_MEM == i_dataA_EX);//beq
+//                                3'b001: o_pcsel1= (i_memread_MEM) ? (i_dataR_gen != i_dataA_EX) : (i_alu_result_MEM != i_dataA_EX);//bne
+//                                3'b100: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataA_EX) < $signed(i_dataR_gen)) : ($signed(i_dataA_EX) < $signed(i_alu_result_MEM)); //blt
+//                                3'b101: o_pcsel1= (i_memread_MEM) ? ($signed(i_dataA_EX) >= $signed(i_dataR_gen)) : ($signed(i_dataA_EX) >= $signed(i_alu_result_MEM)); //bge
+//                                3'b110: o_pcsel1= (i_memread_MEM) ? (i_dataA_EX < i_dataR_gen) : (i_dataA_EX < i_alu_result_MEM); // bltu
+//                                3'b111: o_pcsel1= (i_memread_MEM) ? (i_dataA_EX >= i_dataR_gen) : (i_dataA_EX >= i_alu_result_MEM); //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                end
+//                else if(i_rs1_EX == i_write_reg_WB || i_rs2_EX == i_write_reg_WB) begin     // xung dot tai tang WB
+//                    if(i_jump_WB) begin
+//                        if(i_rs1_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_pc_incr4_WB == i_dataB_EX;//beq
+//                                3'b001: o_pcsel1= i_pc_incr4_WB != i_dataB_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_pc_incr4_WB) < $signed(i_dataB_EX); //blt
+//                                3'b101: o_pcsel1= $signed(i_pc_incr4_WB) >= $signed(i_dataB_EX); //bge
+//                                3'b110: o_pcsel1= i_pc_incr4_WB < i_dataB_EX; // bltu
+//                                3'b111: o_pcsel1= i_pc_incr4_WB >= i_dataB_EX; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_pc_incr4_WB == i_dataA_EX;//beq
+//                                3'b001: o_pcsel1= i_pc_incr4_WB != i_dataA_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_pc_incr4_WB); //blt
+//                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_pc_incr4_WB); //bge
+//                                3'b110: o_pcsel1= i_dataA_EX < i_pc_incr4_WB; // bltu
+//                                3'b111: o_pcsel1= i_dataA_EX >= i_pc_incr4_WB; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                    else if(i_wb_WB) begin
+//                        if(i_rs1_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_auipc_lui_data_WB == i_dataB_EX;//beq
+//                                3'b001: o_pcsel1= i_auipc_lui_data_WB != i_dataB_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_auipc_lui_data_WB) < $signed(i_dataB_EX); //blt
+//                                3'b101: o_pcsel1= $signed(i_auipc_lui_data_WB) >= $signed(i_dataB_EX); //bge
+//                                3'b110: o_pcsel1= i_auipc_lui_data_WB < i_dataB_EX; // bltu
+//                                3'b111: o_pcsel1= i_auipc_lui_data_WB >= i_dataB_EX; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_auipc_lui_data_WB == i_dataA_EX;//beq
+//                                3'b001: o_pcsel1= i_auipc_lui_data_WB != i_dataA_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_auipc_lui_data_WB); //blt
+//                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_auipc_lui_data_WB); //bge
+//                                3'b110: o_pcsel1= i_dataA_EX < i_auipc_lui_data_WB; // bltu
+//                                3'b111: o_pcsel1= i_dataA_EX >= i_auipc_lui_data_WB; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                    else if(i_slt_WB) begin
+//                        if(i_rs1_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_slt_data_WB == i_dataB_EX;//beq
+//                                3'b001: o_pcsel1= i_slt_data_WB != i_dataB_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_slt_data_WB) < $signed(i_dataB_EX); //blt
+//                                3'b101: o_pcsel1= $signed(i_slt_data_WB) >= $signed(i_dataB_EX); //bge
+//                                3'b110: o_pcsel1= i_slt_data_WB < i_dataB_EX; // bltu
+//                                3'b111: o_pcsel1= i_slt_data_WB >= i_dataB_EX; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= i_slt_data_WB == i_dataA_EX;//beq
+//                                3'b001: o_pcsel1= i_slt_data_WB != i_dataA_EX;//bne
+//                                3'b100: o_pcsel1= $signed(i_dataA_EX) < $signed(i_slt_data_WB); //blt
+//                                3'b101: o_pcsel1= $signed(i_dataA_EX) >= $signed(i_slt_data_WB); //bge
+//                                3'b110: o_pcsel1= i_dataA_EX < i_slt_data_WB; // bltu
+//                                3'b111: o_pcsel1= i_dataA_EX >= i_slt_data_WB; //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                    else begin
+//                        if(i_rs1_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= (i_regwrite_WB) ? (i_dataD == i_dataB_EX) : (i_dataA_EX == i_dataB_EX);//beq
+//                                3'b001: o_pcsel1= (i_regwrite_WB) ? (i_dataD != i_dataB_EX) : (i_dataA_EX != i_dataB_EX);//bne
+//                                3'b100: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataD) < $signed(i_dataB_EX)) : ($signed(i_dataA_EX) < $signed(i_dataB_EX)); //blt
+//                                3'b101: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataD) >= $signed(i_dataB_EX)) : ($signed(i_dataA_EX) >= $signed(i_dataB_EX)); //bge
+//                                3'b110: o_pcsel1= (i_regwrite_WB) ? (i_dataD < i_dataB_EX) : (i_dataA_EX < i_dataB_EX); // bltu
+//                                3'b111: o_pcsel1= (i_regwrite_WB) ? (i_dataD >= i_dataB_EX) : (i_dataA_EX >= i_dataB_EX); //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else if(i_rs2_EX == i_write_reg_WB) begin
+//                            case (i_funct3_EX)
+//                                3'b000: o_pcsel1= (i_regwrite_WB) ? (i_dataD == i_dataA_EX) : (i_dataB_EX == i_dataA_EX);//beq
+//                                3'b001: o_pcsel1= (i_regwrite_WB) ? (i_dataD != i_dataA_EX) : (i_dataB_EX != i_dataA_EX);//bne
+//                                3'b100: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataA_EX) < $signed(i_dataD)) : ($signed(i_dataA_EX) < $signed(i_dataB_EX)); //blt
+//                                3'b101: o_pcsel1= (i_regwrite_WB) ? ($signed(i_dataA_EX) >= $signed(i_dataD)) : ($signed(i_dataA_EX) >= $signed(i_dataB_EX)); //bge
+//                                3'b110: o_pcsel1= (i_regwrite_WB) ? (i_dataA_EX < i_dataD) : (i_dataA_EX < i_dataB_EX); // bltu
+//                                3'b111: o_pcsel1= (i_regwrite_WB) ? (i_dataA_EX >= i_dataD) : (i_dataA_EX >= i_dataB_EX); //bgeu
+//                                default: o_pcsel1 = 1'b0;
+//                            endcase
+//                        end
+//                        else begin
+//                            o_pcsel1 = 0;
+//                        end
+//                    end
+//                end
+//            end
+//            else begin
+//                o_pcsel1 = 0;
+//            end
+//        end
+//    end
+    
+//endmodule
 
 //////////////////////////////////////////////////////////////////////////////////
 // branch unit module
