@@ -173,6 +173,14 @@ module full_subsystem
         .ACLK           (ACLK),
         .ARESETn        (ARESETn),
         
+        // enable
+        .enable         (1),
+        
+        // regfile
+        .reg_rd_en      (0),
+        .reg_addr       (0),
+        .reg_data       (),
+        
         // D-Cache interface
         .d_CACHE_EN     (m0_ENABLE),
         
@@ -419,6 +427,14 @@ module full_subsystem
     ) cpuB (
         .ACLK           (ACLK),
         .ARESETn        (ARESETn),
+        
+        // enable
+        .enable         (1),
+        
+        // regfile
+        .reg_rd_en      (0),
+        .reg_addr       (0),
+        .reg_data       (),
         
         // D-Cache interface
         .d_CACHE_EN     (m1_ENABLE),
@@ -1761,6 +1777,11 @@ module full_subsystem
         /********* System signals *********/
         .ACLK       (ACLK   ),
         .ARESETn    (ARESETn),
+        
+        // to program instruction mem
+        .wr_mem_en  (0),
+        .wr_mem_addr(0),
+        .wr_mem_data(0),
         
         /********** Slave Interface **********/
         // AW Channel
