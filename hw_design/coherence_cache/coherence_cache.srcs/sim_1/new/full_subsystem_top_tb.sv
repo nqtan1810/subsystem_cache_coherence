@@ -63,23 +63,25 @@ module full_subsystem_top_tb
         m_if.reset_n();
         repeat(20000) @(m_if.drv_cb);
         $display("[%0t(ns)] Start saving simulation result!", $time);
-//        m_if.save_cache(
-//            DUT.D_cacheA.way0.state_tag_ram,
-//            DUT.D_cacheA.way1.state_tag_ram,
-//            DUT.D_cacheA.way2.state_tag_ram,
-//            DUT.D_cacheA.way3.state_tag_ram,
+        m_if.save_cache(
+            DUT.D_cacheA.way0.state_tag_ram,
+            DUT.D_cacheA.way1.state_tag_ram,
+            DUT.D_cacheA.way2.state_tag_ram,
+            DUT.D_cacheA.way3.state_tag_ram,
             
-//            DUT.D_cacheB.way0.state_tag_ram,
-//            DUT.D_cacheB.way1.state_tag_ram,
-//            DUT.D_cacheB.way2.state_tag_ram,
-//            DUT.D_cacheB.way3.state_tag_ram,
+            DUT.D_cacheB.way0.state_tag_ram,
+            DUT.D_cacheB.way1.state_tag_ram,
+            DUT.D_cacheB.way2.state_tag_ram,
+            DUT.D_cacheB.way3.state_tag_ram,
             
-//            DUT.D_cacheA.plrut_ram.plrut_ram,
-//            DUT.D_cacheB.plrut_ram.plrut_ram,
+            DUT.D_cacheA.plrut_ram.plrut_ram,
+            DUT.D_cacheB.plrut_ram.plrut_ram,
             
-//            DUT.D_cacheA.cache_data_ram.cache,
-//            DUT.D_cacheB.cache_data_ram.cache
-//            );
+            DUT.D_cacheA.cache_data_ram.cache,
+            DUT.D_cacheB.cache_data_ram.cache,
+            
+            DUT.main_memory.umem.mem
+            );
         $display("[%0t(ns)] Finish saving simulation result!", $time);
         $display("[%0t(ns)] Finish simulation!", $time);
     end
