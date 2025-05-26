@@ -18,7 +18,8 @@ interface dual_core_cache_if
     parameter PLRUT_RAM_A = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/plrut_ram_A.mem",
     parameter PLRUT_RAM_B = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/plrut_ram_B.mem",
     parameter DATA_RAM_A = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/data_ram_A.mem",
-    parameter DATA_RAM_B = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/data_ram_B.mem"
+    parameter DATA_RAM_B = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/data_ram_B.mem",
+    parameter MAIN_MEMORY = "D:/University/KLTN/hw_design/coherence_cache/coherence_cache.srcs/sim_1/new/main_memory_result.mem"
 ) (input bit ACLK);
 
     // system signals
@@ -801,6 +802,24 @@ interface dual_core_cache_if
         $fclose(file);
     endtask
     
+    task save_main_memory(input string path, input reg [31:0] main_memory [0:2**16-1]);
+        integer file;
+        integer i;
+    
+        // Open the file for writing
+        file = $fopen(path, "w");
+        if (file == 0) begin
+            $display("Error: Unable to open file %s", path);
+            return;
+        end
+        // Write data
+        for (i = 0; i < 2**16; i = i + 1) begin
+            $fdisplay(file, "0x%h", main_memory[i]);
+        end
+        // Close the file
+        $fclose(file);
+    endtask
+    
     task save_cache(
                     input reg [24:0] state_tag_ram_A_0 [0:15],
                     input reg [24:0] state_tag_ram_A_1 [0:15],
@@ -816,7 +835,9 @@ interface dual_core_cache_if
                     input reg [2:0] plrut_ram_B [0:15],
                     
                     input reg [31:0] cache_data_A [0:1023],
-                    input reg [31:0] cache_data_B [0:1023]
+                    input reg [31:0] cache_data_B [0:1023],
+                    
+                    input reg [31:0] main_memory [0:2**16-1]
                   );
         // $display("[%0t(ns)] Start saving simulation result!", $time);
         save_state_tag_ram(STATE_TAG_A, state_tag_ram_A_0, state_tag_ram_A_1, state_tag_ram_A_2, state_tag_ram_A_3);
@@ -827,6 +848,8 @@ interface dual_core_cache_if
         
         save_data_ram(DATA_RAM_A, cache_data_A);
         save_data_ram(DATA_RAM_B, cache_data_B);
+        
+        save_main_memory(MAIN_MEMORY, main_memory);
         // $display("[%0t(ns)] Finish saving simulation result!", $time);
     endtask
     
