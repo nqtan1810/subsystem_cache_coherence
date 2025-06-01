@@ -49,7 +49,7 @@ module AXI_Arbiter_W (
             AXI_MASTER_0: begin                 // 0 --> 1, 2, 3
                 if(m0_AWVALID)                  
                     next_state = AXI_MASTER_0;  
-                else if(m0_WVALID||s_WREADY)    
+                else if(m0_WVALID/*||s_WREADY*/)    
                     next_state = AXI_MASTER_0;  
                 else if(s_BVALID&&m0_BREADY)    
                     next_state = AXI_MASTER_1;  
@@ -65,7 +65,7 @@ module AXI_Arbiter_W (
             AXI_MASTER_1: begin                 // 1 --> 2, 3, 0
                 if(m1_AWVALID)                  
                     next_state = AXI_MASTER_1;
-                else if(m1_WVALID||s_WREADY)
+                else if(m1_WVALID/*||s_WREADY*/)
                     next_state = AXI_MASTER_1;
                 else if(s_BVALID&&m1_BREADY)
                     next_state = AXI_MASTER_2;
@@ -81,7 +81,7 @@ module AXI_Arbiter_W (
             AXI_MASTER_2: begin                 // 2 --> 3, 0, 1
                 if(m2_AWVALID)                  
                     next_state = AXI_MASTER_2;
-                else if(m2_WVALID||s_WREADY)
+                else if(m2_WVALID/*||s_WREADY*/)
                     next_state = AXI_MASTER_2;
                 else if(s_BVALID&&m2_BREADY)
                     next_state = AXI_MASTER_3;
@@ -97,7 +97,7 @@ module AXI_Arbiter_W (
             AXI_MASTER_3: begin                 // 3 --> 0, 1, 2
                 if(m3_AWVALID)                  
                     next_state = AXI_MASTER_3;
-                else if(m3_WVALID||s_WREADY)
+                else if(m3_WVALID/*||s_WREADY*/)
                     next_state = AXI_MASTER_3;
                 else if(s_BVALID&&m3_BREADY)
                     next_state = AXI_MASTER_0;
