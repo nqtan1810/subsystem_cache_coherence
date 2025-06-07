@@ -156,6 +156,7 @@ module riscv_processor
     // enable for pipeline registers
     wire pipeline_enable;
     wire IF_ready;
+    wire is_not_done;
     
     // ********************************* IF Stage *********************************
     reg  [31:0] pc;
@@ -295,6 +296,7 @@ module riscv_processor
     );
     
     assign IF_ready = i_RVALID & i_RLAST & (i_RRESP == 0);
+    assign is_not_done = (pc >> 2) < 256;
     
     
     // ********************************* IF Stage *********************************
@@ -398,7 +400,7 @@ module riscv_processor
         .i_RREADY   (i_RREADY),
         
         // interface connect with Instruction Mem
-        .i_imem_access(pipeline_enable),  // should asserted every cycle
+        .i_imem_access(pipeline_enable & is_not_done),  // should asserted every cycle
         .i_r0w1       (1'b0),  // only used read operation
         .i_pc         (pc),  // address to load instruction
         .i_w_data     (0)   // should be not used as instruction is read-only
