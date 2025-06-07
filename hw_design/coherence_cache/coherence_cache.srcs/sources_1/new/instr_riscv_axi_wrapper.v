@@ -184,7 +184,7 @@ module instr_riscv_axi_wrapper
                 i_AWQOS     = 0;
                 i_AWREGION  = 0;
                 i_AWUSER    = 0;
-                i_AWVALID   = 1 && (i_AWADDR <= ADDR_END);
+                i_AWVALID   = 1;
                 
                 // W Channel
                 i_WDATA     = 0;
@@ -334,7 +334,7 @@ module instr_riscv_axi_wrapper
                 i_ARQOS     = 0;
                 i_ARREGION  = 0;
                 i_ARUSER    = 0;
-                i_ARVALID   = 1 && (i_ARADDR <= ADDR_END);
+                i_ARVALID   = 1;
                 
                 // R Channel
                 i_RREADY    = 0;
