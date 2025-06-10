@@ -73,17 +73,6 @@ base_addr_4:
     lui     x5, 0xCAFEB               # upper 20 bits
     ori     x5, x5, 0x0BE             # x5 = 0xCAFEB0BE
     sw      x5, 0(x1)                 # store to memory
-    
-# =================== To synchronize =========================
-synchronize:
-    addi    x2, x0, 0
-    addi    x3, x0, 32        # x1 = loop counter = 100
-
-nop_loop:
-    add     x0, x0, x0         # no effect, but still consumes an instruction
-    addi    x2, x2, 1         # decrement counter
-    beq     x2, x3, base_addr_5    # repeat until x1 == 0
-
 
 # ===================== Store to 0x1C00 ======================
 base_addr_5:
