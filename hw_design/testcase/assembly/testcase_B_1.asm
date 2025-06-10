@@ -1,14 +1,12 @@
 # ======================================================================
-# Description:
+# Description: 
 # ======================================================================
-
 .text
-
 # ============= Write Miss, Write Hit, Write Allocate Test =============
-# ===================== Store to 0x1000 ======================
+# ===================== Store to 0x3000 ======================
 base_addr_1:
-    addi    x1, x0, 0x10              # x1 = 0x10
-    slli    x1, x1, 8                 # x1 = 0x1000
+    addi    x1, x0, 0x24              # x1 = 0x24
+    slli    x1, x1, 8                 # x1 = 0x2400
 
     addi    x2, x0, 0                 # i = 0
     addi    x3, x0, 16                # loop limit = 16
@@ -57,37 +55,37 @@ load_loop_2:
     addi    x2, x2, 1
     jal     x0, load_loop_2
 
-# ===================== Store to 0x1400 ======================
+# ===================== Store to 0x2800 ======================
 base_addr_3:
-    addi    x1, x0, 0x14
-    slli    x1, x1, 8                 # x1 = 0x1400
+    addi    x1, x0, 0x28
+    slli    x1, x1, 8                 # x1 = 0x2800
 
     lui     x5, 0x12345
     ori     x5, x5, 0x678
     sw      x5, 0(x1)
 
-# ===================== Store to 0x1800 ======================
+# ===================== Store to 0x2c00 ======================
 base_addr_4:
-    addi    x1, x0, 0x18
-    slli    x1, x1, 8                 # x1 = 0x1800
+    addi    x1, x0, 0x2c
+    slli    x1, x1, 8                 # x1 = 0x2c00
 
     lui     x5, 0xCAFEB
     ori     x5, x5, 0x0BE
     sw      x5, 0(x1)
 
-# ===================== Store to 0x1C00 ======================
+# ===================== Store to 0xc00 ======================
 base_addr_5:
-    addi    x1, x0, 0x1C
-    slli    x1, x1, 8                 # x1 = 0x1C00
+    addi    x1, x0, 0xc
+    slli    x1, x1, 8                 # x1 = 0xc00
 
     lui     x5, 0x13579
     ori     x5, x5, 0x0E0
     sw      x5, 0(x1)
 
-# ===================== Store to 0x2000 ======================
+# ===================== Store to 0xc40 ======================
 base_addr_6:
-    addi    x1, x0, 0x20
-    slli    x1, x1, 8                 # x1 = 0x2000
+    addi    x1, x0, 0xc4
+    slli    x1, x1, 4                 # x1 = 0xc40
 
     lui     x5, 0x2468A
     ori     x5, x5, 0x0CE
@@ -95,8 +93,8 @@ base_addr_6:
 
 # ============= Read Miss, Read Hit, Read Allocate Test =============
 base_addr_7:
-    addi    x1, x0, 0x10
-    slli    x1, x1, 8                 # x1 = 0x1000
+    addi    x1, x0, 0x24
+    slli    x1, x1, 8                 # x1 = 0x2400
 
     addi    x2, x0, 0
     addi    x3, x0, 16
