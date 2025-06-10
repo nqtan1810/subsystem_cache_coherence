@@ -28,3 +28,5 @@ store_loop1:
 
     addi    x2, x2, 1                 # i++
     jal     x0, store_loop1           # repeat loop
+    
+end_program:

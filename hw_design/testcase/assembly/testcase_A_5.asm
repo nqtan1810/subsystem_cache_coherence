@@ -44,3 +44,5 @@ store_3:
     sw      x11,  0(x1)               # load word
     sh      x12,  4(x1)               # load halfword (signed)
     sb      x13,  8(x1)               # load halfword (unsigned)
+    
+end_program:
