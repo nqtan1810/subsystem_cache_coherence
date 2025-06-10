@@ -1,111 +1,134 @@
-# This is testcase_B_1.asm
-# Description: CORE_0/CORE_1 Read/Write hit/miss, access private region and shared region but no overlap address
+# ======================================================================
+# Description:
+# ======================================================================
 
 .text
-# assembly code is start here!
-# === Set x13 = 0x0C00 ===
-addi x13, x0, 0x0C
-slli x13, x13, 8      # x13 = 0x0C00
 
-# === x14 = index = 0 ===
-addi x14, x0, 0
+# ============= Write Miss, Write Hit, Write Allocate Test =============
+# ===================== Store to 0x1000 ======================
+base_addr_1:
+    addi    x1, x0, 0x10              # x1 = 0x10
+    slli    x1, x1, 8                 # x1 = 0x1000
 
-# === Store 5 values to memory at 0x0C00 ===
+    addi    x2, x0, 0                 # i = 0
+    addi    x3, x0, 16                # loop limit = 16
+
 store_loop1:
-    addi x15, x0, 5
-    beq  x14, x15, load_loop1
+    beq     x2, x3, base_addr_2       # if i == 16, jump to next phase
 
-    # Value = 0x22222222 + i
-    addi x16, x0, 0x22
-    slli x16, x16, 8
-    ori  x16, x16, 0x22
-    slli x16, x16, 8
-    ori  x16, x16, 0x22
-    slli x16, x16, 8
-    ori  x16, x16, 0x22
-    add  x16, x16, x14
+    lui     x6, 0x00ABC               # x6 = 0x00ABC000
+    ori     x6, x6, 0x7EF             # x6 = 0x00ABC7EF
 
-    slli x17, x14, 2
-    add  x18, x13, x17
-    sw   x16, 0(x18)
+    xor     x5, x5, x6                # pseudo-random value
+    andi    x5, x5, -16               # align to 16 bytes
+    or      x4, x5, x2                # embed i into LSB
 
-    addi x14, x14, 1
-    jal  x0, store_loop1
+    slli    x5, x2, 2                 # offset = i * 4
+    add     x6, x1, x5                # address = base + offset
+    sw      x4, 0(x6)                 # store to memory
 
-# === Load values from 0x0C00 ===
-load_loop1:
-    addi x14, x0, 0
-    addi x19, x0, 0    # accumulator register
+    addi    x2, x2, 1
+    jal     x0, store_loop1
 
-load1:
-    addi x15, x0, 5
-    beq  x14, x15, switch_base
+# ===================== Read Hit Test ======================
+base_addr_2:
+    addi    x2, x0, 0
+    addi    x3, x0, 16
+    addi    x22, x0, -1               # AND accumulator
 
-    slli x17, x14, 2
-    add  x18, x13, x17
+load_loop_2:
+    beq     x2, x3, base_addr_3
 
-    lw   x20, 0(x18)
-    lh   x21, 0(x18)
-    lhu  x22, 0(x18)
-    lb   x23, 0(x18)
-    lbu  x24, 0(x18)
+    slli    x4, x2, 2
+    add     x5, x1, x4
 
-    add  x19, x19, x20
-    xor  x19, x19, x21
-    or   x19, x19, x22
-    and  x19, x19, x23
-    add  x19, x19, x24
+    lw      x6,  0(x5)
+    lh      x7,  0(x5)
+    lhu     x8,  0(x5)
+    lb      x9,  0(x5)
+    lbu     x10, 0(x5)
 
-    addi x14, x14, 1
-    jal  x0, load1
+    or      x21, x21, x6             
+    and     x22, x22, x7             
+    xor     x23, x23, x8             
+    add     x24, x24, x9             
+    add     x25, x25, x10             
 
-# === Switch base to 0x2000 ===
-switch_base:
-    addi x13, x0, 0x20
-    slli x13, x13, 8      # x13 = 0x2000
-    addi x14, x0, 0
+    addi    x2, x2, 1
+    jal     x0, load_loop_2
 
-# === Store to 0x2000 ===
-store_loop2:
-    addi x15, x0, 5
-    beq  x14, x15, load_loop2
+# ===================== Store to 0x1400 ======================
+base_addr_3:
+    addi    x1, x0, 0x14
+    slli    x1, x1, 8                 # x1 = 0x1400
 
-    # Value = 0xDEADBEEF + i
-    addi x16, x0, 0xEF
-    slli x16, x16, 8
-    ori  x16, x16, 0xBE
-    slli x16, x16, 8
-    ori  x16, x16, 0xAD
-    slli x16, x16, 8
-    ori  x16, x16, 0xDE
-    add  x16, x16, x14
+    lui     x5, 0x12345
+    ori     x5, x5, 0x678
+    sw      x5, 0(x1)
 
-    slli x17, x14, 2
-    add  x18, x13, x17
-    sw   x16, 0(x18)
+# ===================== Store to 0x1800 ======================
+base_addr_4:
+    addi    x1, x0, 0x18
+    slli    x1, x1, 8                 # x1 = 0x1800
 
-    addi x14, x14, 1
-    jal  x0, store_loop2
+    lui     x5, 0xCAFEB
+    ori     x5, x5, 0x0BE
+    sw      x5, 0(x1)
 
-# === Load from 0x2000 ===
-load_loop2:
-    addi x14, x0, 0
+# ===================== Store to 0x1C00 ======================
+base_addr_5:
+    addi    x1, x0, 0x1C
+    slli    x1, x1, 8                 # x1 = 0x1C00
 
-load2:
-    addi x15, x0, 5
-    beq  x14, x15, end_program
+    lui     x5, 0x13579
+    ori     x5, x5, 0x0E0
+    sw      x5, 0(x1)
 
-    slli x17, x14, 2
-    add  x18, x13, x17
+# ===================== Store to 0x2000 ======================
+base_addr_6:
+    addi    x1, x0, 0x20
+    slli    x1, x1, 8                 # x1 = 0x2000
 
-    lw   x20, 0(x18)
-    lh   x21, 0(x18)
-    lhu  x22, 0(x18)
-    lb   x23, 0(x18)
-    lbu  x24, 0(x18)
+    lui     x5, 0x2468A
+    ori     x5, x5, 0x0CE
+    sw      x5, 0(x1)
 
-    addi x14, x14, 1
-    jal  x0, load2
+# ============= Read Miss, Read Hit, Read Allocate Test =============
+base_addr_7:
+    addi    x1, x0, 0x10
+    slli    x1, x1, 8                 # x1 = 0x1000
 
-# === End of program ===
+    addi    x2, x0, 0
+    addi    x3, x0, 16
+    addi    x27, x0, -1               # x27 = 0xFFFFFFFF
+
+load_loop_7:
+    beq     x2, x3, quick_check
+
+    slli    x4, x2, 2
+    add     x5, x1, x4
+
+    lw      x6,  0(x5)
+    lh      x7,  0(x5)
+    lhu     x8,  0(x5)
+    lb      x9,  0(x5)
+    lbu     x10, 0(x5)
+
+    or      x26, x26, x6             
+    and     x27, x27, x7             
+    xor     x28, x28, x8             
+    add     x29, x29, x9           
+    add     x30, x30, x10             
+
+    addi    x2, x2, 1
+    jal     x0, load_loop_7
+
+quick_check:  
+    # to quick check
+    xor     x11, x21, x26              
+    xor     x12, x22, x27             
+    xor     x13, x23, x28             
+    xor     x14, x24, x29            
+    xor     x15, x25, x30            
+
 end_program:
