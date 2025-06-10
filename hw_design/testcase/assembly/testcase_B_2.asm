@@ -41,12 +41,12 @@ quick_check_1:
     
 # ===================== To Synchronize =======================
 nop_synchronize:
-    addi    x2, x0, 50                # x1 = loop counter = 100
+    addi    x2, x0, 50                # x2 = loop counter = 100
 
 nop_loop:
     add     x0, x0, x0                # no effect, but still consumes an instruction
     addi    x2, x2, -1                # decrement counter
-    bne     x2, x0, nop_loop          # repeat until x1 == 0
+    bne     x2, x0, nop_loop          # repeat until x2 == 0
 
 base_addr_2:
     addi    x1, x0, 0x20              # x1 = 0x20
