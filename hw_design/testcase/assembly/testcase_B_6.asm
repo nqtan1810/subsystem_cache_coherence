@@ -16,10 +16,9 @@ nop_loop:
 base_addr_1:
     addi    x1, x0, 0x10              # x1 = 0x10
     slli    x1, x1, 8                 # x1 = 0x1000 (base address)
-    
-    addi    x2, x0, 0x3FF
 
 store_1:
+    addi    x2, x0, 0x3FF
     sw      x2, 0(x1)                 # store value at address
     
 # ===================== Test E -> S (In Core_0) =====================
