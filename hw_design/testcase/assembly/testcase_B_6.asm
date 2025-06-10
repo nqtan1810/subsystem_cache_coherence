@@ -27,7 +27,7 @@ base_addr_2:
     addi    x1, x0, 0x14              # x1 = 0x14
     slli    x1, x1, 8                 # x1 = 0x1400 (base address)
     
-store_1:
+store_2:
     lw      x6, 0(x1)                 # load value at address
     
 end_program:
