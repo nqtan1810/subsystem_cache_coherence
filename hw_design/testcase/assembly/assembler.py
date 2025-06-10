@@ -25,7 +25,7 @@ register= {
     'x21'   :  '10101',         's5'    :   '10101',
     'x22'   :  '10110',         's6'    :   '10110',
     'x23'   :  '10111',         's7'    :   '10111',
-    'x24'   :  '11000',         's8'    :   '11000', 
+    'x24'   :  '11000',         's8'    :   '11000',
     'x25'   :  '11001',         's9'    :   '11001',
     'x26'   :  '11010',         's10'   :   '11010',
     'x27'   :  '11011',         's11'   :   '11011',
@@ -47,15 +47,15 @@ FMT= {
     'fence.i'   : 'I',    'sd'    : 'S',    'bge'   : 'SB',
                                             'bltu'  : 'SB',
     'addi'      : 'I',    'add'   : 'R',    'bgeu'  : 'SB',
-    'slli'      : 'I',    'sub'   : 'R',        
+    'slli'      : 'I',    'sub'   : 'R',
     'slti'      : 'I',    'sll'   : 'R',    'jalr'  : 'I',
-    'sltiu'     : 'I',    'slt'   : 'R',    'jal'   : 'UJ',    
-    'xori'      : 'I',    'sltu'  : 'R',    
-    'srli'      : 'I',    'xor'   : 'R',    
+    'sltiu'     : 'I',    'slt'   : 'R',    'jal'   : 'UJ',
+    'xori'      : 'I',    'sltu'  : 'R',
+    'srli'      : 'I',    'xor'   : 'R',
     'srai'      : 'I',    'srl'   : 'R',
     'ori'       : 'I',    'sra'   : 'R',
     'andi'      : 'I',    'or'    : 'R',
-    'lui'       : 'U',    'and'   : 'R', 
+    'lui'       : 'U',    'and'   : 'R',
 }
 OPCODE= {
     'lb'        : '0000011',    'auipc' : '0010111',    'addw'  : '0111011',    'ecall' :   '1110011',
@@ -70,15 +70,15 @@ OPCODE= {
     'fence.i'   : '0001111',    'sd'    : '0100011',    'bge'   : '1100011',
                                                         'bltu'  : '1100011',
     'addi'      : '0010011',    'add'   : '0110011',    'bgeu'  : '1100011',
-    'slli'      : '0010011',    'sub'   : '0110011',        
+    'slli'      : '0010011',    'sub'   : '0110011',
     'slti'      : '0010011',    'sll'   : '0110011',    'jalr'  : '1100111',
     'sltiu'     : '0010011',    'slt'   : '0110011',    'jal'   : '1101111',
-    'xori'      : '0010011',    'sltu'  : '0110011',    
-    'srli'      : '0010011',    'xor'   : '0110011',    
+    'xori'      : '0010011',    'sltu'  : '0110011',
+    'srli'      : '0010011',    'xor'   : '0110011',
     'srai'      : '0010011',    'srl'   : '0110011',
     'ori'       : '0010011',    'sra'   : '0110011',
     'andi'      : '0010011',    'or'    : '0110011',
-    'lui'       : '0110111',    'and'   : '0110011', 
+    'lui'       : '0110111',    'and'   : '0110011',
 }
 
 FUNCT3= {
@@ -94,37 +94,37 @@ FUNCT3= {
     'fence.i'   : '001',    'sd'    : '011',        'bge'   : '101',
                                                     'bltu'  : '110',
     'addi'      : '000',    'add'   : '000',        'bgeu'  : '111',
-    'slli'      : '001',    'sub'   : '000',        
+    'slli'      : '001',    'sub'   : '000',
     'slti'      : '010',    'sll'   : '001',        'jalr'  : '000',
-    'sltiu'     : '011',    'slt'   : '010',    
-    'xori'      : '100',    'sltu'  : '011',    
-    'srli'      : '101',    'xor'   : '100',    
+    'sltiu'     : '011',    'slt'   : '010',
+    'xori'      : '100',    'sltu'  : '011',
+    'srli'      : '101',    'xor'   : '100',
     'srai'      : '101',    'srl'   : '101',
     'ori'       : '110',    'sra'   : '101',
     'andi'      : '111',    'or'    : '110',
-                            'and'   : '111', 
+                            'and'   : '111',
 }
 
 FUNCT7 ={
     'addw'  : '0000000',    'ecall' :   '000000000000',
     'subw'  : '0100000',    'ebreak':   '000000000001',
-    'slliw' : '0000000',    'sllw'  :   '000000000000',    
-    'srliw' : '0000000',    'srlw'  :   '0000000',   
-    'sraiw' : '0100000',    'sraw'  :   '0100000',    
-                                                                                  
-    'add'   : '0000000',    
-    'slli'  : '0000000',    'sub'   : '0100000',        
-    'sll'   : '0000000',   
-    'slt'   : '0000000',    
-    'sltu'  : '0000000',    
-    'srli'  : '0000000',    'xor'   : '0000000',    
+    'slliw' : '0000000',    'sllw'  :   '000000000000',
+    'srliw' : '0000000',    'srlw'  :   '0000000',
+    'sraiw' : '0100000',    'sraw'  :   '0100000',
+
+    'add'   : '0000000',
+    'slli'  : '0000000',    'sub'   : '0100000',
+    'sll'   : '0000000',
+    'slt'   : '0000000',
+    'sltu'  : '0000000',
+    'srli'  : '0000000',    'xor'   : '0000000',
     'srai'  : '0100000',    'srl'   : '0000000',
     'sra'   : '0100000',
     'or'    : '0000000',
-    'and'   : '0000000', 
+    'and'   : '0000000',
 }
 def handler_string (string) :
-   
+
     if string.find("//") != -1 :
         string = string [0:string.find("//")]
     if string.find("#") != -1 :
@@ -195,7 +195,7 @@ def IType (string) :
     if mlist[0]=='lb' or mlist[0]=='lw' or mlist[0] == 'lh' or mlist[0] == 'ld' or mlist[0] =='lbu' or mlist[0] == 'lhu' or mlist[0] == 'lwu' :
         opcode = OPCODE [mlist[0]]
         funct3 = FUNCT3 [mlist[0]]
-        rd = register [mlist[1]] 
+        rd = register [mlist[1]]
         if mlist[2].startswith('0x'):
             mlist[2]=convert_hextodec(mlist[2])
         imm = bin(int(mlist[2]))[2:14].rjust(12,'0')
@@ -203,8 +203,8 @@ def IType (string) :
            imm= bin((1<<12) - - int(mlist[2]))
            imm = imm[2:]
         rs1 = register [mlist[3]]
-        return imm+rs1+funct3+rd+opcode 
-    
+        return imm+rs1+funct3+rd+opcode
+
     if mlist[0] == 'slli' or mlist[0]=='srli' or mlist[0]=='srai' or mlist[0]=='slliw'or mlist[0]=='srliw' or mlist[0]=='sraiw':
          opcode = OPCODE [mlist[0]]
          funct3 = FUNCT3 [mlist[0]]
@@ -212,13 +212,13 @@ def IType (string) :
          funct7 = FUNCT7 [mlist[0]]
          if mlist[3].startswith('0x'):
              mlist[3]=convert_hextodec(mlist[3])
-         
+
          imm = bin(int(mlist[3]))[2:7].rjust(5,'0')
          if int(mlist[3]) <0 :
              imm= bin((1<<12) - - int(mlist[3]))
              imm = imm [2:]
          rs1 = register [mlist[2]]
-         return funct7+imm+rs1+funct3+rd+opcode 
+         return funct7+imm+rs1+funct3+rd+opcode
 
     if mlist[0] == 'ecall' or mlist[0]== 'ebreak' :
          opcode = OPCODE [mlist[0]]
@@ -237,7 +237,7 @@ def IType (string) :
         imm= bin((1<<12) - - int(mlist[3]))
         imm = imm [2:]
     rs1 = register [mlist[2]]
-    return imm+rs1+funct3+rd+opcode 
+    return imm+rs1+funct3+rd+opcode
 
 def UJType (string) :
     mlist = string.split()
@@ -284,7 +284,7 @@ def SBType (string) :
     imm = bin(temp)[2:13].rjust(13,'0')
     if int(temp) <0 :
         imm= bin((1<<13) - - temp)[2:]
-    return  imm[0]+imm[2:8]+rs2+rs1+FUNCT3[mlist[0]]+imm[8:12]+imm[1]+opcode 
+    return  imm[0]+imm[2:8]+rs2+rs1+FUNCT3[mlist[0]]+imm[8:12]+imm[1]+opcode
 
 def UType (string) :
     mlist = string.split()
@@ -322,25 +322,25 @@ def assembler (tc_id, core_id):
             break
         pos+=1
 
-    for i in range (pos+1,len(ins)) :  
+    for i in range (pos+1,len(ins)) :
         ins[i]= handler_string(ins[i])
         if ins[i] == ' ' or ins[i]=='' or ins[i]=='\n':
             continue
-        
+
         li = ins[i].split()
         if len(li) ==1 :
             while ins[i].find(':') != -1 :
                 address[ins[i][:ins[i].find(':')]] = PC
                 ins[i] = ins[i][ins[i].find(':')+1:]
-       
+
         else :
             if ins[i].find(':') != -1 :
                 label = ins[i] [:ins[i].find (':')].strip()
                 instruction = ins[i] [ins[i].find (':')+1:].strip()
                 address [label] = PC
-                address [instruction] = PC 
+                address [instruction] = PC
                 ins[i]=instruction
-                PC+=4   
+                PC+=4
             else:
                 ins[i]+=" "+ str (i)
                 address[ins[i]] = PC
@@ -370,7 +370,7 @@ def assembler (tc_id, core_id):
     fo.write(result)
     fo.close()
 
-for k in range(1, 21):
+for k in range(1, 10):
     assembler(k, 'A')
     assembler(k, 'B')
 
