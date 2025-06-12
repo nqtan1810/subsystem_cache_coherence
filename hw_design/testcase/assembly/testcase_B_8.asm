@@ -31,3 +31,5 @@ base_addr_2:
     
 load_2:
     lw      x8,  0(x1)                # load word
+
+end_program:

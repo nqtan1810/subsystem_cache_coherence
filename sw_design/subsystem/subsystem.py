@@ -117,8 +117,13 @@ subsystem_actual_result_dir = os.path.join(testcase_dir, 'run/subsystem_actual_r
 
 def compare_actual_expected_results(actual_dir=subsystem_actual_result_dir, expected_dir=subsystem_expected_result_dir, log_dir=run_dir):
     with open(f"{log_dir}/result.log", "w", encoding="utf-8") as log:
+        total_tc = 0
+        passed_tc = 0
+        failed_tc = 0
         for dirpath, _, filenames in os.walk(expected_dir):
             for filename in filenames:
+                if filename == "main_memory_result.mem":
+                    total_tc = total_tc + 1
                 rel_path = os.path.relpath(os.path.join(dirpath, filename), expected_dir)
                 expected_file = os.path.join(expected_dir, rel_path)
                 actual_file = os.path.join(actual_dir, rel_path)
@@ -127,8 +132,18 @@ def compare_actual_expected_results(actual_dir=subsystem_actual_result_dir, expe
                     log.write(f"[MISSING]    {rel_path}\n")
                 elif not filecmp.cmp(expected_file, actual_file, shallow=False):
                     log.write(f"[DIFFERENT]  {rel_path}\n")
+                    if filename == "main_memory_result.mem":
+                        failed_tc = failed_tc + 1
                 else:
                     log.write(f"[MATCHED]    {rel_path}\n")
+                    if filename == "main_memory_result.mem":
+                        passed_tc = passed_tc + 1
+        log.write("********************* SUMMARY *********************\n")
+        log.write(f"{' - Number of Testcases:':40} {total_tc:>5}\n")
+        log.write(f"{' - Number of PASSED Testcases:':40} {passed_tc:>5}\n")
+        log.write(f"{' - Number of FAILED Testcases:':40} {failed_tc:>5}\n")
+        log.write(f"{' - Number of MISSED Testcases:':40} {total_tc - passed_tc - failed_tc:>5}\n")
+        log.write("********************* END *************************\n")
 
 def run_cache():
     print("SW cache tb is still developing!")

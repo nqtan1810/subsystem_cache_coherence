@@ -9,10 +9,10 @@ base_addr_1:
     slli    x1, x1, 8                 # x1 = 0x1400 (base address)
 
     addi    x2, x0, 0                 # x2 = i = 0
-    addi    x3, x0, 8                # x3 = loop limit = 8
+    addi    x3, x0, 8                 # x3 = loop limit = 8
 
 store_loop1:
-    beq     x2, x3, quick_check_1     # if i == 16, jump to next phase
+    beq     x2, x3, end_program       # if i == 16, jump to next phase
 
     # Generate constant 0x01234567 using LUI + ORI (no LI)
     lui     x6, 0x1234                # x6 = 0x01234

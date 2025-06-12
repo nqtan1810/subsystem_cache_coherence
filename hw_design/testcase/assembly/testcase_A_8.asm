@@ -32,4 +32,5 @@ nop_loop:
 store_3:
     addi    x2, x0, 0x246
     sw	    x2, 0(x1)
-    
+
+end_program:
