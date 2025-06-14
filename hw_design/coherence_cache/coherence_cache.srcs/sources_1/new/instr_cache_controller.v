@@ -185,6 +185,33 @@ module instr_cache_controller
     reg fetch_done; // used to synchronize --> create a temp clk to check hit again when completing fetch from Cache L1/Other Cache L1
     reg [1:0] s_RRESP_reg;
     
+    // ****************************************************************************
+    // START - for calculate performance purpose only
+    // ****************************************************************************
+    reg [31:0] cache_hit_num;
+    reg [31:0] cache_access_num;
+    
+    always @(posedge ACLK) begin
+        if (!ARESETn) begin
+            cache_hit_num <= 0;
+        end
+        else begin
+            cache_hit_num <= cache_hit_num + ((state == HIT_MISS) & hit);
+        end
+    end
+    
+    always @(posedge ACLK) begin
+        if (!ARESETn) begin
+            cache_access_num <= 0;
+        end
+        else begin
+            cache_access_num <= cache_access_num + ((state == M_W_ADDR) | (state == M_R_ADDR));
+        end
+    end
+    // ****************************************************************************
+    // END - for calculate performance purpose only
+    // ****************************************************************************
+    
     // some fixed value (do not use)
     assign m_BUSER      = 0;
     assign m_RUSER      = 0;

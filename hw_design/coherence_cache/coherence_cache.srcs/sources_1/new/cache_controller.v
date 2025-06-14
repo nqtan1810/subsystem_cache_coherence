@@ -197,6 +197,33 @@ module cache_controller
     // reg interrupt_req_bus; // used to indicate Cache L1 has been interrup REQ_BUS and change to READ_MEM to fix core0 snoop hit and core1 write-back
     reg [3:0] s_RRESP_reg;
     
+    // ****************************************************************************
+    // START - for calculate performance purpose only
+    // ****************************************************************************
+    reg [31:0] cache_hit_num;
+    reg [31:0] cache_access_num;
+    
+    always @(posedge ACLK) begin
+        if (!ARESETn) begin
+            cache_hit_num <= 0;
+        end
+        else begin
+            cache_hit_num <= cache_hit_num + ((state == HIT_MISS) & hit);
+        end
+    end
+    
+    always @(posedge ACLK) begin
+        if (!ARESETn) begin
+            cache_access_num <= 0;
+        end
+        else begin
+            cache_access_num <= cache_access_num + ((state == M_W_ADDR) | (state == M_R_ADDR));
+        end
+    end
+    // ****************************************************************************
+    // END - for calculate performance purpose only
+    // ****************************************************************************
+    
     // some fixed value (do not use)
     assign m_BUSER      = 0;
     assign m_RUSER      = 0;

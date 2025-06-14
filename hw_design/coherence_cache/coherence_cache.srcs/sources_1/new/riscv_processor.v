@@ -298,6 +298,33 @@ module riscv_processor
     assign IF_ready = i_RVALID & i_RLAST & (i_RRESP == 0);
     assign is_not_done = (pc >> 2) < 256;
     
+    // ****************************************************************************
+    // START - for calculate performance purpose only
+    // ****************************************************************************
+    reg [31:0] instr_num;
+    reg [31:0] runtime_in_cycle;
+    
+    always @(posedge ACLK) begin
+        if (!ARESETn) begin
+            runtime_in_cycle <= 0;
+        end
+        else begin
+            runtime_in_cycle <= runtime_in_cycle + (enable & is_not_done);
+        end
+    end
+    
+    always @(posedge ACLK) begin
+        if (!ARESETn) begin
+            instr_num <= 0;
+        end
+        else begin
+            instr_num <= instr_num + i_RVALID;
+        end
+    end
+    
+    // ****************************************************************************
+    // END - for calculate performance purpose only
+    // ****************************************************************************
     
     // ********************************* IF Stage *********************************
     always @(posedge ACLK) begin

@@ -55,13 +55,13 @@ module full_subsystem_top_tb
     
     initial begin
         forever
-            #7 SystemClock = ~SystemClock;
+            #3.675 SystemClock = ~SystemClock;
     end
     
     initial begin
         $display("[%0t(ns)] Start simulation!", $time);
         m_if.reset_n();
-        repeat(20000) @(m_if.drv_cb);
+        repeat(30000) @(m_if.drv_cb);
         $display("[%0t(ns)] Start saving simulation result!", $time);
         m_if.save_cache(
             DUT.D_cacheA.way0.state_tag_ram,
