@@ -122,9 +122,10 @@ void Reset_SoC ()
     Reset_Cache ();
     Reset_Mem ();
 
+    usleep(100);
     SUBSYSTEM_mWriteReg (baseaddr, reset, 0x1);
     SUBSYSTEM_mWriteReg (baseaddr, enable, 0x0);
-    usleep(100);
+    usleep(1);
     SUBSYSTEM_mWriteReg (baseaddr, reset, 0x0);
 }
 
@@ -236,6 +237,7 @@ void Enable_SoC (uint32_t period)
 
     SUBSYSTEM_mWriteReg (baseaddr, enable, 0x1);
 	usleep(period);
+	usleep(100);
 	SUBSYSTEM_mWriteReg (baseaddr, enable, 0x0);
 	usleep(period);
 }
