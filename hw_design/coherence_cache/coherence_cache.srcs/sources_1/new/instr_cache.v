@@ -242,6 +242,7 @@ module instr_cache
     
             default: m_RDATA = 32'b0; // unsupported ARSIZE
         endcase
+        m_RDATA = {32{m_RVALID}} & m_RDATA;
     end
     // assign m_RDATA = r_data;
     assign s_WDATA = r_data;
