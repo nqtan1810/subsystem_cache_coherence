@@ -91,8 +91,25 @@
 #define m_wr_mem_addr    		0x74
 #define m_wr_mem_data    		0x78
 
+#define EN_RESET				0x1
+#define DIS_RESET				0x0
+#define ENABLE					0x1
+#define DISABLE					0x0
 #define I_CACHE_WRITE_VAL 		0x800000
 #define D_CACHE_WRITE_VAL 		0x1000000
+
+#define M_STATE					0x0
+#define O_STATE					0x1
+#define E_STATE					0x2
+#define S_STATE					0x3
+#define I_STATE					0x4
+
+#define REG_NUM					0x20
+#define NUM_WAY					0x4
+#define SET_NUM					0x10
+#define INSTR_NUM				0x100
+
+#define MEM_SIZE				(1 << 16)	// 2^16 = 65536 = 64KB
 
 #define printf           		xil_printf
 
@@ -119,14 +136,16 @@ void Reset_SoC ()
     u32 baseaddr;
     baseaddr = (u32) XPAR_SUBSYSTEM_0_S00_AXI_BASEADDR;
 
+    SUBSYSTEM_mWriteReg (baseaddr, reset, EN_RESET);
+	SUBSYSTEM_mWriteReg (baseaddr, enable, DISABLE);
+	usleep(1);
+
     Reset_Cache ();
     Reset_Mem ();
 
     usleep(100);
-    SUBSYSTEM_mWriteReg (baseaddr, reset, 0x1);
-    SUBSYSTEM_mWriteReg (baseaddr, enable, 0x0);
+    SUBSYSTEM_mWriteReg (baseaddr, reset, DIS_RESET);
     usleep(1);
-    SUBSYSTEM_mWriteReg (baseaddr, reset, 0x0);
 }
 
 void Write_Cache (uint8_t core_id, uint8_t set_index)
@@ -138,39 +157,39 @@ void Write_Cache (uint8_t core_id, uint8_t set_index)
 		// I-Cache
 		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_i_cache_addr, set_index);
 		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_i_cache_data, I_CACHE_WRITE_VAL);
-		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_i_cache_en, 0x1);
-		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_i_cache_en, 0x0);
+		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_i_cache_en, ENABLE);
+		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_i_cache_en, DISABLE);
 		// D-Cache
 		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_d_cache_addr, set_index);
 		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_d_cache_data, D_CACHE_WRITE_VAL);
-		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_d_cache_en, 0x1);
-		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_d_cache_en, 0x0);
+		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_d_cache_en, ENABLE);
+		SUBSYSTEM_mWriteReg (baseaddr, m0_wr_d_cache_en, DISABLE);
 	}
 	else {
 		// I-Cache
 		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_i_cache_addr, set_index);
 		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_i_cache_data, I_CACHE_WRITE_VAL);
-		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_i_cache_en, 0x1);
-		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_i_cache_en, 0x0);
+		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_i_cache_en, ENABLE);
+		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_i_cache_en, DISABLE);
 		// D-Cache
 		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_d_cache_addr, set_index);
 		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_d_cache_data, D_CACHE_WRITE_VAL);
-		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_d_cache_en, 0x1);
-		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_d_cache_en, 0x0);
+		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_d_cache_en, ENABLE);
+		SUBSYSTEM_mWriteReg (baseaddr, m1_wr_d_cache_en, DISABLE);
 	}
 }
 
 void Display_State(uint8_t state_val)
 {
-	if (state_val == 0)
+	if (state_val == M_STATE)
 		printf("\tM\t");
-	if (state_val == 1)
+	if (state_val == O_STATE)
 		printf("\tO\t");
-	if (state_val == 2)
+	if (state_val == E_STATE)
 		printf("\tE\t");
-	if (state_val == 3)
+	if (state_val == S_STATE)
 		printf("\tS\t");
-	if (state_val == 4)
+	if (state_val == I_STATE)
 		printf("\tI\t");
 }
 
@@ -179,24 +198,24 @@ void Read_Cache (uint8_t core_id, uint8_t set_index)
 	u32 baseaddr;
 	baseaddr = (u32) XPAR_SUBSYSTEM_0_S00_AXI_BASEADDR;
 
-	for(int i = 0; i < 4; i++){
+	for(int i = 0; i < NUM_WAY; i++){
 		if (core_id == core_0) {
 			// D-Cache
 			SUBSYSTEM_mWriteReg (baseaddr, m0_rd_d_cache_way_sel, 1 << i);
 			SUBSYSTEM_mWriteReg (baseaddr, m0_rd_d_cache_addr, set_index);
-			SUBSYSTEM_mWriteReg (baseaddr, m0_rd_d_cache_en, 0x1);
+			SUBSYSTEM_mWriteReg (baseaddr, m0_rd_d_cache_en, ENABLE);
 			// display read data
 			Display_State ((SUBSYSTEM_mReadReg  (baseaddr, m0_rd_d_cache_data) >> 22) & 0x7);
-			SUBSYSTEM_mWriteReg (baseaddr, m0_rd_d_cache_en, 0x0);
+			SUBSYSTEM_mWriteReg (baseaddr, m0_rd_d_cache_en, DISABLE);
 		}
 		else {
 			// D-Cache
 			SUBSYSTEM_mWriteReg (baseaddr, m1_rd_d_cache_way_sel, 1 << i);
 			SUBSYSTEM_mWriteReg (baseaddr, m1_rd_d_cache_addr, set_index);
-			SUBSYSTEM_mWriteReg (baseaddr, m1_rd_d_cache_en, 0x1);
+			SUBSYSTEM_mWriteReg (baseaddr, m1_rd_d_cache_en, ENABLE);
 			// display read data
 			Display_State ((SUBSYSTEM_mReadReg  (baseaddr, m1_rd_d_cache_data) >> 22) & 0x7);
-			SUBSYSTEM_mWriteReg (baseaddr, m1_rd_d_cache_en, 0x0);
+			SUBSYSTEM_mWriteReg (baseaddr, m1_rd_d_cache_en, DISABLE);
 		}
 	}
 	printf("\n");
@@ -205,14 +224,14 @@ void Read_Cache (uint8_t core_id, uint8_t set_index)
 void Display_Cache_State (uint8_t core_id)
 {
 	printf ("******* State of D-Cache CORE_%0d *******\n", core_id);
-	for (int i = 0; i < 16; i++){
+	for (int i = 0; i < SET_NUM; i++){
 		Read_Cache (core_id, i);
 	}
 }
 
 void Reset_Cache ()
 {
-	for(int i = 0; i < 16; i++){
+	for(int i = 0; i < SET_NUM; i++){
 		Write_Cache (core_0, i);
 		Write_Cache (core_1, i);
 	}
@@ -220,14 +239,21 @@ void Reset_Cache ()
 
 void Reset_Mem ()
 {
-    addr_inst_0 = 0;
-    addr_inst_1 = 0;
-    for(int i = 0; i < 256; i++){
-    	Load_Instr (core_0, &addr_inst_0, 0x00000000);
-    	Load_Instr (core_1, &addr_inst_1, 0x00000000);
-    }
-    addr_inst_0 = 0;
-    addr_inst_1 = 0;
+//    addr_inst_0 = 0;
+//    addr_inst_1 = 0;
+//    for(int i = 0; i < INSTR_NUM; i++){
+//    	Load_Instr (core_0, &addr_inst_0, 0x00000000);
+//    	Load_Instr (core_1, &addr_inst_1, 0x00000000);
+//    }
+//    addr_inst_0 = 0;
+//    addr_inst_1 = 0;
+	addr_inst_0 = 0;
+	addr_inst_1 = 0;
+	for (int i = 0; i < MEM_SIZE; i++){
+		Load_Instr (core_0, &addr_inst_0, 0x00000000);
+	}
+	addr_inst_0 = 0;
+	addr_inst_1 = 0;
 }
 
 void Enable_SoC (uint32_t period)
@@ -235,10 +261,10 @@ void Enable_SoC (uint32_t period)
     u32 baseaddr;
     baseaddr = (u32) XPAR_SUBSYSTEM_0_S00_AXI_BASEADDR;
 
-    SUBSYSTEM_mWriteReg (baseaddr, enable, 0x1);
-	usleep(period);
-	usleep(100);
-	SUBSYSTEM_mWriteReg (baseaddr, enable, 0x0);
+    usleep(period);
+    SUBSYSTEM_mWriteReg (baseaddr, enable, ENABLE);
+	usleep(period + 1000);
+	SUBSYSTEM_mWriteReg (baseaddr, enable, DISABLE);
 	usleep(period);
 }
 
@@ -247,10 +273,10 @@ void Load_Instr(uint8_t core_id, uint32_t *addr_inst, uint32_t data_inst)
     u32 baseaddr;
     baseaddr = (u32) XPAR_SUBSYSTEM_0_S00_AXI_BASEADDR;
 
-    SUBSYSTEM_mWriteReg (baseaddr, m_wr_mem_addr, *addr_inst + core_id * 256 * 4);
+    SUBSYSTEM_mWriteReg (baseaddr, m_wr_mem_addr, *addr_inst + core_id * INSTR_NUM * 4);
     SUBSYSTEM_mWriteReg (baseaddr, m_wr_mem_data, data_inst);
-    SUBSYSTEM_mWriteReg (baseaddr, m_wr_mem_en, 0x1);
-    SUBSYSTEM_mWriteReg (baseaddr, m_wr_mem_en, 0x0);
+    SUBSYSTEM_mWriteReg (baseaddr, m_wr_mem_en, ENABLE);
+    SUBSYSTEM_mWriteReg (baseaddr, m_wr_mem_en, DISABLE);
     *addr_inst = *addr_inst + 4;
 }
 
@@ -261,22 +287,22 @@ void Read_Reg(uint8_t core_id, uint8_t reg_addr)
 
     if (core_id == core_0) {
     	SUBSYSTEM_mWriteReg (baseaddr, m0_reg_addr , reg_addr);
-    	SUBSYSTEM_mWriteReg (baseaddr, m0_reg_rd_en, 0x1);
+    	SUBSYSTEM_mWriteReg (baseaddr, m0_reg_rd_en, ENABLE);
     	printf("x%d = %x\n", reg_addr, SUBSYSTEM_mReadReg  (baseaddr, m0_reg_data));
-    	SUBSYSTEM_mWriteReg (baseaddr, m0_reg_rd_en, 0x0);
+    	SUBSYSTEM_mWriteReg (baseaddr, m0_reg_rd_en, DISABLE);
     }
     else {
     	SUBSYSTEM_mWriteReg (baseaddr, m1_reg_addr , reg_addr);
-		SUBSYSTEM_mWriteReg (baseaddr, m1_reg_rd_en, 0x1);
+		SUBSYSTEM_mWriteReg (baseaddr, m1_reg_rd_en, ENABLE);
 		printf("x%d = %x\n", reg_addr, SUBSYSTEM_mReadReg  (baseaddr, m1_reg_data));
-		SUBSYSTEM_mWriteReg (baseaddr, m1_reg_rd_en, 0x0);
+		SUBSYSTEM_mWriteReg (baseaddr, m1_reg_rd_en, DISABLE);
     }
 }
 
 void Display_RegFile (uint32_t core_id)
 {
 	printf("Register File of Core_%d\n", core_id);
-	for (int i=0; i<=31; i=i+1)
+	for (int i = 0; i < REG_NUM; i = i + 1)
     {
 		Read_Reg(core_id, i);
     }
@@ -831,15 +857,15 @@ int main()
 	printf("Press b to DISPLAY REGFILE of CORE_0. \n");
 	printf("Press c to DISPLAY STATE of D-Cache CORE_0. \n");
 	printf("Press d to DISPLAY STATE of D-Cache CORE_1. \n");
-	printf("Press 1 to check Testcase: Test Read (hit/miss), Write (hit/miss), Write-back, PLRUt, Fetch MEM, Read-Write Allocate \n");
-	printf("Press 2 to check Testcase: Test Rd Request 		- Rd Response \n");
-	printf("Press 3 to check Testcase: Test RdX Request 	- RdX Response \n");
-	printf("Press 4 to check Testcase: Test Invalid Request - Invalid Response \n");
-	printf("Press 5 to check Testcase: Test state transition: I --> E, I --> S, I --> M \n");
-	printf("Press 6 to check Testcase: Test state transition: E --> I, E --> S, E --> M \n");
-	printf("Press 7 to check Testcase: Test state transition: M --> I, M --> O \n");
-	printf("Press 8 to check Testcase: Test state transition: O --> I, O --> M \n");
-	printf("Press 9 to check Testcase: Test state transition: S --> I, S --> M \n");
+	printf("Press 1 to CHECK TESTCASE 1: Test Read (hit/miss), Write (hit/miss), Write-back, PLRUt, Fetch MEM, Read-Write Allocate \n");
+	printf("Press 2 to CHECK TESTCASE 2: Test Rd Request 		- Rd Response \n");
+	printf("Press 3 to CHECK TESTCASE 3: Test RdX Request 	- RdX Response \n");
+	printf("Press 4 to CHECK TESTCASE 4: Test Invalid Request - Invalid Response \n");
+	printf("Press 5 to CHECK TESTCASE 5: Test state transition: I --> E, I --> S, I --> M \n");
+	printf("Press 6 to CHECK TESTCASE 6: Test state transition: E --> I, E --> S, E --> M \n");
+	printf("Press 7 to CHECK TESTCASE 7: Test state transition: M --> I, M --> O \n");
+	printf("Press 8 to CHECK TESTCASE 8: Test state transition: O --> I, O --> M \n");
+	printf("Press 9 to CHECK TESTCASE 9: Test state transition: S --> I, S --> M \n");
 	printf("Press e to EXIT. \n");
 
 	while (1) {
